@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "financesentimentcorpus"
+version = "0.1.0"
+description = ""
+authors = ["BrianBae <bohblue23@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+beautifulsoup4 = "^4.12.3"
+requests = "^2.31.0"
+pandas = {extras = ["aws", "compression", "computation", "fss", "html", "output-formatting", "performance", "plot"], version = "^2.2.2"}
+scrapy = "^2.11.1"
+alembic = "^1.13.1"
+scrapy-fake-useragent = "^1.4.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
