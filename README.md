@@ -1,4 +1,4 @@
-# Project
+# LLM Trader-py
 <p align="center">
     <img src="assets/main.png" alt="Logo">
 </p>
