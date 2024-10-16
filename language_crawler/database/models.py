@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, LargeBinary
 from language_crawler.database.base import Base
@@ -16,7 +16,7 @@ class ArticleOrm(Base):
     original_id = Column(String, nullable=True)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     latest_scraped_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
 
 class ArticleContentOrm(Base):
     __tablename__ = 'article_contents'
@@ -30,4 +30,22 @@ class ArticleContentOrm(Base):
     language = Column(String, nullable=False)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
+
+class ResearchReport(Base):
+    __tablename__ = 'research_reports'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String, nullable=False)
+    date = Column(DateTime, nullable=False)
+    file_url = Column(String, nullable=False)
+    securities_company = Column(String, nullable=False)
+    category = Column(String, nullable=True)
+    company_id = Column(String, nullable=True)
+    report_type = Column(String, nullable=True)
+    report_id = Column(String, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+
+    def __repr__(self):
+        return f"<ResearchReport(id={self.id}, title='{self.title}', date='{self.date}', securities_company='{self.securities_company}')>"

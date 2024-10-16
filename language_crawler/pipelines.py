@@ -100,3 +100,14 @@ class FinanceNewsContentPipeline:
         self.sess.close()
         return item
     
+class ResearchMarketinfoListPipeline:
+    def open_spider(self, spider): 
+        self.sess = SessionLocal()   
+        
+    def close_spider(self, spider): 
+        self.sess.close()
+
+    def process_item(self, item: ArticleContentItem, spider):
+        print(item)
+        return item
+    
