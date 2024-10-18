@@ -60,35 +60,6 @@ def parse_report_url(url):
     else:
         return None
 
-def extract_info_from_soup(soup):
-    rows = soup.find_all('tr')
-    results = []
-    kst = pytz.timezone('Asia/Seoul')
-    
-    for row in rows[2:]:  # Skip the header and blank rows
-        cells = row.find_all('td')
-        if len(cells) == 6:
-            company = cells[0].find('a').text.strip()
-            title = cells[1].find('a').text.strip()
-            securities_company = cells[2].text.strip()
-            file_url = cells[3].find('a')['href'] if cells[3].find('a') else None
-            date_str = cells[4].text.strip()
-
-            # Parse the date string and set the timezone to KST
-            date_obj = datetime.strptime(date_str, '%y.%m.%d')
-            date_obj = kst.localize(date_obj)
-            
-            results.append(NaverResearchCompanyItem(
-                company=company, 
-                title=title,
-                date_str=date_str,
-                date_obj=date_obj,
-                file_url=file_url,
-                securities_company_name=securities_company,
-                report_item=parse_report_url(file_url)
-            ))
-    
-    return results
 
 class NaverResearchMarketInfo(scrapy.Spider):
     name = os.path.basename(__file__).replace('.py', '')
@@ -118,20 +89,7 @@ class NaverResearchMarketInfo(scrapy.Spider):
         return f"https://finance.naver.com/research/company_list.naver?&page={page}"
 
     async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
-        reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[NaverResearchMarketInfoItem] = extract_info_from_soup(reports_list_soup)
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-
-        for _reports in reports:
-            file_url = _reports.get('file_url', None)
-            yield _reports
-        
-        time.sleep(10)
-
+        pass
         #     yield ArticleItem(
         #         ticker=response.meta['ticker'],
         #         article_id=article_id,

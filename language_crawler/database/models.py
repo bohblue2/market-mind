@@ -36,6 +36,7 @@ class ResearchReport(Base):
     __tablename__ = 'research_reports'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    target_company = Column(String, nullable=True)
     title = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
     file_url = Column(String, nullable=False)
@@ -44,8 +45,8 @@ class ResearchReport(Base):
     company_id = Column(String, nullable=True)
     report_type = Column(String, nullable=True)
     report_id = Column(String, nullable=True)
-    created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
 
     def __repr__(self):
         return f"<ResearchReport(id={self.id}, title='{self.title}', date='{self.date}', securities_company='{self.securities_company}')>"

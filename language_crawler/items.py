@@ -38,28 +38,19 @@ class ArticleContentItem(ItemBase):
     def __str__(self) -> str:
         return ""
 
-class NaverResearchReportItem(ItemBase):
+class NaverReportItem(ItemBase):
     category = scrapy.Field()
-    company_id = scrapy.Field()
+    security_company_id = scrapy.Field()
     date = scrapy.Field()
     report_type = scrapy.Field()
     report_id = scrapy.Field()
 
-class NaverResearchMarketInfoItem(ItemBase):
-    # category, and company
+class NaverResearchItem(ItemBase):
+    category = scrapy.Field()
+    company = scrapy.Field()
     title = scrapy.Field()
     date_str = scrapy.Field()
     date_obj: datetime = scrapy.Field()
     file_url = scrapy.Field()
     securities_company_name = scrapy.Field()
-    report_item: NaverResearchReportItem = scrapy.Field()
-
-
-class NaverResearchCompanyItem(ItemBase):
-    company = scrapy.Field
-    title = scrapy.Field()
-    date_str = scrapy.Field()
-    date_obj: datetime = scrapy.Field()
-    file_url = scrapy.Field()
-    securities_company_name = scrapy.Field()
-    report_item: NaverResearchReportItem = scrapy.Field()
+    report_item: NaverReportItem = scrapy.Field()
