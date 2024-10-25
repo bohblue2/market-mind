@@ -44,6 +44,8 @@ class NaverReportItem(ItemBase):
     date = scrapy.Field()
     report_type = scrapy.Field()
     report_id = scrapy.Field()
+    target_company = scrapy.Field()
+    target_industry = scrapy.Field()
 
 class NaverResearchItem(ItemBase):
     category = scrapy.Field()

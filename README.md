@@ -22,6 +22,9 @@ poetry shell
 # 반드시 datasets/articles.db 를 먼저 생성해야함
 alembic upgrade head
 
+# database/model 수정시 alembic 업데이
+alembic revision --autogenerate -m "message"
+
 # TASK1: 네이버 뉴스 링크 리스트를 datasets/articles.db 에 저장
 scrapy crawl naver_news_content
 

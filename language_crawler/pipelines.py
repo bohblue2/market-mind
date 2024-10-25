@@ -3,12 +3,13 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
+import asyncio
 import pytz
 import lzma
 from datetime import datetime
 
 from sqlalchemy import inspect
-from language_crawler.database.models import ArticleContentOrm, ArticleOrm
+from language_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
 from language_crawler.database.session import SessionLocal
 from language_crawler.database.session import engine
 from language_crawler.items import ArticleContentItem, ArticleItem
@@ -107,7 +108,48 @@ class ResearchMarketinfoListPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    def process_item(self, item: ArticleContentItem, spider):
-        print(item)
+    def process_item(self, item: dict, spider):
+        """
+        {
+            'title': '불거지는 중동 사태와 크레딧 시장 영향은?', 
+            'date_str': '24.10.07', 
+            'date_obj': datetime.datetime(2024, 10, 7, 0, 0, tzinfo=<DstTzInfo 'Asia/Seoul' KST+9:00:00 STD>), 
+            'file_url': 'https://stock.pstatic.net/stock-research/debenture/61/20241007_debenture_545326000.pdf', 
+            'securities_company_name': 'iM증권', 
+            'report_item': 
+                {'category': 'debenture', 
+                'date': '20241007',
+                'report_id': '545326000',
+                'report_type': 'debenture',
+                'security_company_id': '61'}
+            }
+        """
+        research_report = ResearchReportOrm(
+            title=item.get('title'),
+            date=item.get('date_obj'),
+            file_url=item.get('file_url'),
+            issuer_company_name=item.get('securities_company_name'),
+            issuer_company_id=item['report_item'].get('security_company_id'),
+            report_category=item['report_item'].get('category'),
+            report_id=item['report_item'].get('report_id'),
+            target_company=item['report_item'].get('target_company', None),  # Not provided in the input data
+            target_industry=item['report_item'].get('target_industry', None),  # Not provided in the input data
+            updated_at=datetime.now(pytz.UTC),
+        )
+        # NOTE: Check downloaded
+        self.sess.add(research_report)
+        self.sess.commit()
+        asyncio.create_task(download_files(self.sess, research_report))
+        self.sess.close()
         return item
-    
+
+async def download_files(sess, research_report):
+    try:
+        pass
+    except Exception as e:
+        raise e
+    else:
+        research_report.downloaded = True
+        sess.add(research_report)
+        sess.commit()
+        

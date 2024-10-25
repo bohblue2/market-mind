@@ -13,6 +13,7 @@ pandas = {extras = ["aws", "compression", "computation", "fss", "html", "output-
 scrapy = "^2.11.1"
 alembic = "^1.13.1"
 scrapy-fake-useragent = "^1.4.4"
+httpx = "^0.27.2"
 
 
 [build-system]

@@ -32,21 +32,22 @@ class ArticleContentOrm(Base):
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
 
-class ResearchReport(Base):
+class ResearchReportOrm(Base):
     __tablename__ = 'research_reports'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    target_company = Column(String, nullable=True)
     title = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
     file_url = Column(String, nullable=False)
-    securities_company = Column(String, nullable=False)
-    category = Column(String, nullable=True)
-    company_id = Column(String, nullable=True)
-    report_type = Column(String, nullable=True)
-    report_id = Column(String, nullable=True)
+    issuer_company_name = Column(String, nullable=False)
+    issuer_company_id = Column(String, nullable=False)
+    report_category = Column(String, nullable=False)
+    report_id = Column(String, nullable=False)
+    target_company  = Column(String, nullable=True)
+    target_industry = Column(String, nullable=True)
+    downloaded = Column(Boolean, nullable=True)
     updated_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=False)
 
     def __repr__(self):
-        return f"<ResearchReport(id={self.id}, title='{self.title}', date='{self.date}', securities_company='{self.securities_company}')>"
+        return f"<ResearchReport(id={self.id}, title='{self.title}', date='{self.date}', securities_company='{self.issuer_company_name}')>"

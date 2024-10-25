@@ -75,6 +75,7 @@ class NewsContents(scrapy.Spider):
             return 
         soup = BeautifulSoup(content_html, "html.parser")
         for tag in soup(['img', 'span', 'strong', 'em', 'div']):
+            # decompose() 메소드는 해당 태그와 그 내용을 HTML 트리에서 완전히 제거합니다.
             tag.decompose()
         contnet_text = soup.get_text()
         
