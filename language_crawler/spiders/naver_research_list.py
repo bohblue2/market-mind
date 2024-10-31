@@ -1,3 +1,4 @@
+import abc
 import time
 from typing import List
 from bs4 import BeautifulSoup
@@ -14,7 +15,7 @@ from language_crawler.items import ArticleItem, NaverResearchItem
 from language_crawler.spiders.commons import parse_report_url
 
 KST = pytz.timezone('Asia/Seoul')
-DEFAULT_WAIT_TIME: int = 1
+DEFAULT_WAIT_TIME: int = 10
 DEFAULT_START_PAGE: int = 1
 DEFAULT_END_PAGE: int = 3
 
@@ -50,6 +51,18 @@ class NaverResearchBase(scrapy.Spider):
     async def errback(self, failure):
         self.log(type(failure))
         meta = failure.request.meta
+
+    async def parse(self, response: HtmlResponse):
+        meta = response.meta
+        current_page = meta['page']
+        items: List[NaverResearchItem] = await self._inner_parse(response=response)
+        self.log(f"Extracted {len(items)} reports from page {current_page}")
+        for item in items:
+            yield item
+   
+    @abc.abstractmethod 
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
+        raise NotImplementedError
     
     @staticmethod
     def parse_with_common_columns(soup):
@@ -147,19 +160,10 @@ class NaverResearchMarketInfo(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[NaverResearchItem] = self.parse_with_common_columns(reports_list_soup)
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-        
-        for report in reports:
-            yield report
-
-        time.sleep(10)
+        return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchCompanyList(NaverResearchBase):
     name = 'naver_research_company_list'
@@ -167,19 +171,10 @@ class NaverResearchCompanyList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/company_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[dict] = self.parse_with_extra_columns(reports_list_soup, 'target_company')
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-
-        for _reports in reports:
-            yield _reports
-        
-        time.sleep(10)
+        return self.parse_with_extra_columns(reports_list_soup, 'target_company')
 
 class NaverResearchDebentureList(NaverResearchBase):
     name = 'naver_research_debenture_list'
@@ -187,19 +182,10 @@ class NaverResearchDebentureList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[NaverResearchItem] = self.parse_with_common_columns(reports_list_soup)
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-        
-        for report in reports:
-            yield report
-
-        time.sleep(10)
+        return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchEconomyList(NaverResearchBase):
     name = 'naver_research_economy_list'
@@ -207,19 +193,10 @@ class NaverResearchEconomyList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda page: f"https://finance.naver.com/research/economy_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[NaverResearchItem] = self.parse_with_common_columns(reports_list_soup)
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-        
-        for report in reports:
-            yield report
-
-        time.sleep(10)
+        return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchIndustryList(NaverResearchBase):
     name = 'naver_research_industry_list'
@@ -227,34 +204,19 @@ class NaverResearchIndustryList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[dict] = self.parse_with_extra_columns(reports_list_soup, 'target_industry')
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
+        return self.parse_with_extra_columns(reports_list_soup, 'target_industry')
 
-        for _reports in reports:
-            yield _reports
         
-        time.sleep(10)
-
 class NaverResearchInvestList(NaverResearchBase):
     name = 'naver_research_invest_list'
     start_page = 1
     end_page = 3
     _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}"
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-    
+    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
-        reports: List[NaverResearchItem] = self.parse_with_common_columns(reports_list_soup)
-        self.log(f"Extracted {len(reports)} reports from page {current_page}")
-        
-        for report in reports:
-            yield report
+        return self.parse_with_common_columns(reports_list_soup)

@@ -9,6 +9,7 @@ import lzma
 from datetime import datetime
 
 from sqlalchemy import inspect
+from language_crawler.commons import async_download_pdf
 from language_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
 from language_crawler.database.session import SessionLocal
 from language_crawler.database.session import engine
@@ -108,7 +109,7 @@ class ResearchMarketinfoListPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    def process_item(self, item: dict, spider):
+    async def process_item(self, item: dict, spider):
         """
         {
             'title': '불거지는 중동 사태와 크레딧 시장 영향은?', 
@@ -139,17 +140,19 @@ class ResearchMarketinfoListPipeline:
         # NOTE: Check downloaded
         self.sess.add(research_report)
         self.sess.commit()
-        asyncio.create_task(download_files(self.sess, research_report))
-        self.sess.close()
+        await download_report(self.sess, research_report, item)
         return item
 
-async def download_files(sess, research_report):
+async def download_report(sess, research_report_orm: ResearchReportOrm, item: dict):
     try:
-        pass
+        report_item = item.get('report_item')
+        # TODO: Refactor save_path
+        save_path = f'./datasets/research_report/{report_item['date']}/{report_item['category']}/{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf'
+        await async_download_pdf(url=research_report_orm.file_url, save_path=save_path)
     except Exception as e:
         raise e
     else:
-        research_report.downloaded = True
-        sess.add(research_report)
+        research_report_orm.downloaded = True
+        sess.add(research_report_orm)
         sess.commit()
         
