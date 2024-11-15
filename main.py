@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from language_backend.schemas import ChatCompletionResponse, ChatRequest, HealthCheck, RoleEnum
 from language_backend.service.llm import LlmService
 
+from dotenv import load_dotenv
+load_dotenv('./.dev.env')
+
 LATEST_INDEX = -1
 
 def get_app() -> FastAPI:
@@ -80,6 +83,8 @@ async def chat_completion(
 ):
     last_message = request.messages[LATEST_INDEX].content
     response_text = llm_service.generate_answer(content=last_message)
+    if response_text == "" or response_text is None:
+        response_text = "I'm sorry, I don't have an answer to that question."
     return ChatCompletionResponse(role=RoleEnum.assistant, content=response_text)
 
 if __name__ == "__main__":

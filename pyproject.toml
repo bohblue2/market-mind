@@ -9,7 +9,6 @@ readme = "README.md"
 python = "^3.12"
 beautifulsoup4 = "^4.12.3"
 requests = "^2.31.0"
-pandas = {extras = ["aws", "compression", "computation", "fss", "html", "output-formatting", "performance", "plot"], version = "^2.2.2"}
 scrapy = "^2.11.1"
 alembic = "^1.13.1"
 scrapy-fake-useragent = "^1.4.4"
@@ -25,6 +24,7 @@ langserve = {extras = ["all"], version = "^0.3.0"}
 pymupdf = "^1.24.12"
 langchain-upstage = "^0.3.0"
 langchain-milvus = "^0.1.7"
+pandas = "^2.2.3"
 
 
 [tool.poetry.group.dev.dependencies]
