@@ -49,7 +49,7 @@ class LlmService:
     def __init__(self):
         self._client: MilvusClient = get_client()
         collection = get_naver_news_article_collection()
-        milvus_store = Zilliz(
+        vectorstore = Zilliz(
             embedding_function = OpenAIEmbeddings(model="text-embedding-3-large"),
             collection_name = collection.name,
             connection_args = {
@@ -61,7 +61,7 @@ class LlmService:
             text_field="content",
             drop_old=False
         )
-        retriever = milvus_store.as_retriever()
+        retriever = vectorstore.as_retriever()
         llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
 
         self._rag_chain = (
