@@ -1,2 +1,5 @@
 .startup.sh
 *.env
+
+**/*.pyc
+**/__pycache__/
