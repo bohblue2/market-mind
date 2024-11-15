@@ -12,9 +12,8 @@ class RoleEnum(str, Enum):
     assistant = "assistant"
     system = "system"
 
-# 메시지 구조 정의
 class Message(BaseModel):
-    role: RoleEnum  # Enum으로 역할 지정
+    role: RoleEnum  
     content: str
 
 # 요청 형식 정의
