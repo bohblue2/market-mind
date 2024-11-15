@@ -17,9 +17,12 @@ PROMPT_TEMPLATE = """
 Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
 Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
 If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
 <context>
 {context}
 </context>
+
+컨텍스트가 제공되지 않을 경우, "정보가 제공되지 않았습니다. 잘 모르겠습니다." 라고 답변해주세요.
 
 <question>
 {question}
@@ -68,9 +71,10 @@ class LlmService:
             | StrOutputParser()
         )
 
-    def generate_answer(self, content: str, prompt_template: Optional[str] = None) -> str:
+    def generate_answer(self, content: str, prompt_template: Optional[str] = "") -> str:
         return self._rag_chain.invoke(
-            f"다음과 같은 프롬프트에 맞춰서 답변해야합니다:'{prompt_template}' 그리고\n내용: {content} 에 대한 답변을 작성해주세요."
+            f"다음과 같은 프롬프트에 맞춰서 답변해야합니다:'{prompt_template}' 프롬프트가 비어있다면 신경쓰지 마세요. \
+            그리고\n질문에: {content} 에 대한 답변을 작성해주세요."
         )
     
     def close(self):
