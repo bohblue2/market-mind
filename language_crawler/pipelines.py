@@ -133,7 +133,7 @@ class ResearchMarketinfoListPipeline:
             issuer_company_id=item['report_item'].get('security_company_id'),
             report_category=item['report_item'].get('category'),
             report_id=item['report_item'].get('report_id'),
-            target_company=item['report_item'].get('target_company', None),  # Not provided in the input data
+            target_company=item['report_item'].get('target_company', None),    # Not provided in the input data
             target_industry=item['report_item'].get('target_industry', None),  # Not provided in the input data
             updated_at=datetime.now(pytz.UTC),
         )
@@ -146,8 +146,11 @@ class ResearchMarketinfoListPipeline:
 async def download_report(sess, research_report_orm: ResearchReportOrm, item: dict):
     try:
         report_item = item.get('report_item')
-        # TODO: Refactor save_path
-        save_path = f'./datasets/research_report/{report_item['date']}/{report_item['category']}/{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf'
+        save_path = (
+            f"./datasets/research_report/{report_item['date']}/"
+            f"{report_item['category']}/"
+            f"{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf"
+        )
         await async_download_pdf(url=research_report_orm.file_url, save_path=save_path)
     except Exception as e:
         raise e
