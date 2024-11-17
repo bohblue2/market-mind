@@ -3,7 +3,7 @@
 import re
 from urllib.parse import urlparse
 
-from language_crawler.items import NaverReportItem
+from mm_crawler.items import NaverReportItem
 
 def parse_report_url(url):
     """

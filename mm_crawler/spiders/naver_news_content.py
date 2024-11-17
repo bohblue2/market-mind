@@ -10,9 +10,9 @@ from scrapy.http.response.html import HtmlResponse
 from twisted.python.failure import Failure
 from bs4 import BeautifulSoup
 
-from language_crawler.database.models import ArticleContentOrm, ArticleOrm
-from language_crawler.database.session import SessionLocal
-from language_crawler.items import ArticleContentItem 
+from mm_crawler.database.models import ArticleContentOrm, ArticleOrm
+from mm_crawler.database.session import SessionLocal
+from mm_crawler.items import ArticleContentItem 
 
 ArticleId = Union[str, int]
 OfficeId = Union[str, int]

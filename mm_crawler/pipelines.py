@@ -9,16 +9,16 @@ import lzma
 from datetime import datetime
 
 from sqlalchemy import inspect
-from language_crawler.commons import async_download_pdf
-from language_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
-from language_crawler.database.session import SessionLocal
-from language_crawler.database.session import engine
-from language_crawler.items import ArticleContentItem, ArticleItem
+from mm_crawler.commons import async_download_pdf
+from mm_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
+from mm_crawler.database.session import SessionLocal
+from mm_crawler.database.session import engine
+from mm_crawler.items import ArticleContentItem, ArticleItem
 
 
 kst = pytz.timezone('Asia/Seoul')
 
-class LanguageCrawlerPipeline:
+class MarketMindPipeline:
     """
     Typical uses of item pipelines are:
     - cleansing HTML data

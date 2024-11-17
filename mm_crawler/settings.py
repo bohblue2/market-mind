@@ -1,4 +1,4 @@
-# Scrapy settings for language_crawler project
+# Scrapy settings for market_mind project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,15 +7,15 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "language_crawler"
+BOT_NAME = "market_mind"
 
-SPIDER_MODULES = ["language_crawler.spiders"]
-NEWSPIDER_MODULE = "language_crawler.spiders"
+SPIDER_MODULES = ["market_mind.spiders"]
+NEWSPIDER_MODULE = "market_mind.spiders"
 
 # LOG_LEVEL = 'INFO'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "language_crawler (+http://www.yourdomain.com)"
+#USER_AGENT = "market_mind (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -81,13 +81,13 @@ ROBOTSTXT_OBEY = False
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "language_crawler.middlewares.LanguageCrawlerSpiderMiddleware": 543,
+#    "market_mind.middlewares.LanguageCrawlerSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "language_crawler.middlewares.LanguageCrawlerDownloaderMiddleware": 543,
+#    "market_mind.middlewares.LanguageCrawlerDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -99,7 +99,7 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 # ITEM_PIPELINES = {
-#    "language_crawler.pipelines.FinanceNewsListPipeline": 1,
+#    "market_mind.pipelines.FinanceNewsListPipeline": 1,
 # }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

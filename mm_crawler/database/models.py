@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, LargeBinary
-from language_crawler.database.base import Base
+from mm_crawler.database.base import Base
 
 class ArticleOrm(Base):
     __tablename__ = 'articles'

@@ -4,7 +4,7 @@ from typing import Optional
 
 from pymilvus import MilvusClient
 
-from language_backend.vectorstore import get_naver_news_article_collection, get_client
+from mm_backend.vectorstore import get_naver_news_article_collection, get_client
 from langchain_milvus.retrievers import MilvusCollectionHybridSearchRetriever
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate

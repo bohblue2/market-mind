@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import os
 from typing import Any, List, Optional
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, MilvusClient, utility
-from language_backend.constant import DEFAULT_EMBEDDING_DIM, MILVUS_METRIC_TYPE, MILVUS_NLIST, MILVUS_NPROBE, MILVUS_TOP_K, MILVUS_INDEX_TYPE
+from mm_backend.constant import DEFAULT_EMBEDDING_DIM, MILVUS_METRIC_TYPE, MILVUS_NLIST, MILVUS_NPROBE, MILVUS_TOP_K, MILVUS_INDEX_TYPE
 from pymilvus import connections
 
 def get_client() -> MilvusClient:   

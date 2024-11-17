@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from language_crawler.database.models import ArticleOrm
+from mm_crawler.database.models import ArticleOrm
 
 @pytest.fixture(scope='module')
 def session():

@@ -3,60 +3,61 @@ import scrapy
 import pandas as pd
 import os
 import re
-from datetime import datetime
 
 from scrapy.http.response.html import HtmlResponse
-from language_crawler.items import ArticleItem
+
+from mm_crawler.items import ArticleItem
 
 class FinanceNewsList(scrapy.Spider):
     name = os.path.basename(__file__).replace('.py', '')
     allowed_domains = ['naver.com']
-    custom_settings = dict(
-        ITEM_PIPELINES={"language_crawler.pipelines.FinanceNewsListPipeline": 1}
+    custom_settings =dict(
+        ITEM_PIPELINES = {"language_crawler.pipelines.FinanceNewsListPipeline": 1}
     )
 
-    df = pd.read_csv('datasets/kosdaq.csv')
+    df = pd.read_csv('datasets/test_code.csv')
     tickers = df['종목코드'].tolist()
-
-    # Define the date range
-    start_date = datetime.strptime('2023-01-02', '%Y-%m-%d')
-    end_date = datetime.strptime('2024-01-02', '%Y-%m-%d')
 
     def start_requests(self):
         for ticker in self.tickers:
             target_url = self._get_target_url(ticker, page=1)
+
             yield scrapy.Request(
                 target_url,
                 meta=dict(ticker=ticker, page=1),
-                callback=self.parse,
+                callback=self.parse, 
                 errback=self.errback,
             )
+        
+    def _get_target_url(self, ticker: str, page: str=1):
+        return f"https://finance.naver.com/item/news_news.naver?code={ticker:06d}&page={page}"
 
-    def _get_target_url(self, ticker: str, page: int = 1):
-        return f"https://finance.naver.com/item/news_news.naver?code={ticker}&page={page}"
 
-    def parse(self, response: HtmlResponse):
+    async def parse(self, response: HtmlResponse):
         meta = response.meta
         current_page = meta['page']
 
         # Check end of page
-        if '뉴스가 없습니다.' in response.text:
+        info_text_area = response.css('div > table > tbody > tr > td > div').get()
+        if info_text_area and '뉴스가 없습니다.' in info_text_area:
             self.log(f"End of page reached for {meta['ticker']}")
             return
 
+        if not info_text_area:
+            self.log(f"Failed to find info_text_area for {meta['ticker']}. Performing full search.")
+            if '뉴스가 없습니다.' in response.text:
+                self.log(f"Full Searching successfully done! End of page reached for {meta['ticker']}")
+                return
+            else:
+                self.log(f"Full Searching failed for {meta['ticker']}. Something went wrong.")
+        
         processed_ids = set()
-
+        
         for row in response.css('table.type5 tr'):
             content_url = row.css('td.title a::attr(href)').extract_first()
             title = row.css('td.title a::text').get()
             source = row.css('td.info::text').get()
-            date_text = row.css('td.date::text').get()
-
-            if date_text:
-                date_text = date_text.strip()  # Remove any leading/trailing whitespace
-                article_date = datetime.strptime(date_text, '%Y.%m.%d %H:%M')
-                if not (self.start_date <= article_date <= self.end_date):
-                    continue  # Skip articles outside the date range
+            date = row.css('td.date::text').get()
 
             article_id = None
             office_id = None
@@ -72,7 +73,7 @@ class FinanceNewsList(scrapy.Spider):
                     self.log(f"Article ID: {article_id}, Office ID: {office_id}")
             else:
                 self.log(f"Failed to extract article_id and office_id from content_url: {content_url}")
-
+            
             row_class = row.attrib.get('class', '')
             is_relation_origin = False
             is_related = False
@@ -91,7 +92,7 @@ class FinanceNewsList(scrapy.Spider):
                 relation_origin_id = f"{rel_office_id}{rel_article_id}"
             else:
                 self.log(f"Main article found: {title}")
-
+            
             yield ArticleItem(
                 ticker=response.meta['ticker'],
                 article_id=article_id,
@@ -99,7 +100,7 @@ class FinanceNewsList(scrapy.Spider):
                 media_name=source,
                 title=title,
                 link=content_url,
-                article_published_at=date_text,
+                article_published_at=date,
                 is_origin=is_relation_origin,
                 origin_id=relation_origin_id if is_related else None,
             )
@@ -110,24 +111,30 @@ class FinanceNewsList(scrapy.Spider):
         yield scrapy.Request(
             self._get_target_url(meta['ticker'], current_page + 1),
             meta=dict(ticker=meta['ticker'], page=current_page + 1),
-            callback=self.parse,
+            callback=self.parse, 
             errback=self.errback,
         )
 
+    def _is_related_article(self, row_class: str) -> bool:
+        return 'relation_tit' in row_class or 'relation_lst' in row_class
+
     def _extract_cluster_ids(self, row_class: str):
         # Extract clusterId
+        # "<tr class="relation_lst _clusterId0310000829596">" 이런 형식인데 _clusterId0310000829596 에서 
+        # 0310000829596 이부분을 추출하고 싶어, 이 부분의 앞의 3자리는 언론사 고유 id 이고 뒷자리는 모두 뉴스 기사 고유 ID야.
         match = re.search(r'_clusterId(\d{3})(\d+)', row_class)
         if match:
             return match.group(1), match.group(2)
         return None, None
 
     def _extract_article_and_office_ids(self, content_url: str):
-        # Extract office_id and article_id from content_url
+        # "/item/news_read.naver?article_id=0000365184&office_id=374&code=060310&page=1&sm=" 
+        # 에서 office_id와 article_id를 추출하고 싶어.
         match = re.search(r'article_id=(\d+)&office_id=(\d+)', content_url)
         if match:
             return match.group(1), match.group(2)
         return None, None
-
-    def errback(self, failure):
+    
+    async def errback(self, failure):
         self.log(type(failure))
         meta = failure.request.meta

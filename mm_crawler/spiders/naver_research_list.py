@@ -11,8 +11,8 @@ import pytz
 
 from scrapy.http.response.html import HtmlResponse
 
-from language_crawler.items import ArticleItem, NaverResearchItem 
-from language_crawler.spiders.commons import parse_report_url
+from mm_crawler.items import ArticleItem, NaverResearchItem 
+from mm_crawler.spiders.commons import parse_report_url
 
 KST = pytz.timezone('Asia/Seoul')
 DEFAULT_WAIT_TIME: int = 10

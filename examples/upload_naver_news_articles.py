@@ -7,9 +7,9 @@ engine = create_engine('sqlite:///./datasets/naver_news.db')
 query = "SELECT * FROM article_contents"
 df = pd.read_sql(query, engine)
 
-from language_backend.constant import NAVER_NEWS_ARTICLE_COLLECTION 
+from mm_backend.constant import NAVER_NEWS_ARTICLE_COLLECTION 
 
-from language_backend.vectorstore import get_client
+from mm_backend.vectorstore import get_client
 
 
 client = get_client()
@@ -21,7 +21,7 @@ from langchain_openai import OpenAIEmbeddings
 
 embedding = OpenAIEmbeddings(model="text-embedding-3-large")
 
-from language_backend.vectorstore import get_naver_news_article_collection
+from mm_backend.vectorstore import get_naver_news_article_collection
 collection = get_naver_news_article_collection()
 for row in df.itertuples():
     collection.insert([
