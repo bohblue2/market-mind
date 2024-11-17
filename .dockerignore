@@ -2,3 +2,5 @@
 # **/.startup.sh
 # **/*.env
 fly.toml
+
+.mypy_cache
