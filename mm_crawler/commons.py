@@ -3,7 +3,7 @@ import aiofiles
 import requests
 import httpx
 
-def download_pdf(url, save_path):
+def download_pdf(url: str, save_path: str) -> None:
     response = requests.get(url)
     if response.status_code == 200:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)

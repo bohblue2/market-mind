@@ -1,0 +1,8 @@
+{
+    // "python.linting.enabled": true,
+    "files.autoSave": "afterDelay",
+    "python.analysis.typeCheckingMode": "off",
+    "ruff.importStrategy": "fromEnvironment",
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "editor.formatOnSave": true,
+}

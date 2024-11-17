@@ -3,12 +3,13 @@ import os
 from typing import Optional
 
 from pymilvus import MilvusClient
-
-from mm_llm.vectorstore.milvus import get_naver_news_article_collection, get_client
+from langchain_milvus import Zilliz
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection 
 
 PROMPT_TEMPLATE = """
 Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
@@ -35,7 +36,6 @@ Assistant:"""
 prompt = PromptTemplate(
     template=PROMPT_TEMPLATE, input_variables=["context", "question"]
 )
-from langchain_milvus import Zilliz
 
 
 # Define a function to format the retrieved documents
@@ -44,7 +44,7 @@ def format_docs(docs):
 
 class GeneratorService:
     def __init__(self):
-        self._client: MilvusClient = get_client()
+        self._client: MilvusClient = get_milvus_client()
         collection = get_naver_news_article_collection()
         vectorstore = Zilliz(
             embedding_function = OpenAIEmbeddings(model="text-embedding-3-large"),

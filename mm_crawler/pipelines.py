@@ -3,16 +3,14 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
-import asyncio
-import pytz
+from typing import Any, Dict
+import pytz # type: ignore
 import lzma
 from datetime import datetime
 
-from sqlalchemy import inspect
 from mm_crawler.commons import async_download_pdf
 from mm_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
 from mm_crawler.database.session import SessionLocal
-from mm_crawler.database.session import engine
 from mm_crawler.items import ArticleContentItem, ArticleItem
 
 
@@ -109,7 +107,7 @@ class ResearchMarketinfoListPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    async def process_item(self, item: dict, spider):
+    async def process_item(self, item: Dict[str, Any], spider):
         """
         {
             'title': '불거지는 중동 사태와 크레딧 시장 영향은?', 
@@ -143,19 +141,19 @@ class ResearchMarketinfoListPipeline:
         await download_report(self.sess, research_report, item)
         return item
 
-async def download_report(sess, research_report_orm: ResearchReportOrm, item: dict):
+async def download_report(sess, research_report_orm: ResearchReportOrm, item: Dict[str, Any]):
     try:
-        report_item = item.get('report_item')
+        report_item: Dict[str, Any] = item.get('report_item', {})
         save_path = (
             f"./datasets/research_report/{report_item['date']}/"
             f"{report_item['category']}/"
             f"{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf"
-        )
+        ) 
         await async_download_pdf(url=research_report_orm.file_url, save_path=save_path)
     except Exception as e:
         raise e
     else:
-        research_report_orm.downloaded = True
+        research_report_orm.downloaded = True # type: ignore
         sess.add(research_report_orm)
         sess.commit()
         

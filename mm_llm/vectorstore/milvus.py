@@ -2,15 +2,14 @@
 from dataclasses import dataclass
 from typing import Any, List, Optional
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema
-
-import os
-from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, MilvusClient, utility 
-from mm_backend.constant import DEFAULT_EMBEDDING_DIM
+from pymilvus import MilvusClient, utility 
 from pymilvus import connections
 
-from mm_llm.constant import MILVUS_INDEX_TYPE, MILVUS_METRIC_TYPE, MILVUS_NLIST
+import os
 
-def get_client() -> MilvusClient:   
+from mm_llm.constant import DEFAULT_EMBEDDING_DIM, MILVUS_INDEX_TYPE, MILVUS_METRIC_TYPE, MILVUS_NLIST
+
+def get_milvus_client() -> MilvusClient:   
     client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_API_KEY"))
     connections.connect(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_API_KEY"))
     return client
@@ -58,7 +57,7 @@ class MilvusSearchParams:
     data: Any
     anns_field: str
     metric_type: str
-    nprobe: str
+    nprobe: int 
     limit: int
     expr: str = ""
     output_fields: Optional[List[str]] = None 

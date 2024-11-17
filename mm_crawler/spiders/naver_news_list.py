@@ -29,7 +29,7 @@ class FinanceNewsList(scrapy.Spider):
                 errback=self.errback,
             )
         
-    def _get_target_url(self, ticker: str, page: str=1):
+    def _get_target_url(self, ticker: str, page: int=1):
         return f"https://finance.naver.com/item/news_news.naver?code={ticker:06d}&page={page}"
 
 

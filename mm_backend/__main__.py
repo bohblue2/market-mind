@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import Body, FastAPI, Depends, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from mm_backend.schemas import ChatCompletionResponse, ChatRequest, HealthCheck, RoleEnum
-from mm_llm.generator import LlmService
+from mm_llm.generator import GeneratorService 
 
 from dotenv import load_dotenv
 load_dotenv('./.dev.env')
@@ -23,8 +23,8 @@ def get_app() -> FastAPI:
     
     return app  
 
-def get_llm_service():
-    service = LlmService()
+def get_generator_service():
+    service = GeneratorService()
     try:
         yield service
     finally:
@@ -63,7 +63,7 @@ async def health_check() -> HealthCheck:
     response_model=ChatCompletionResponse
 )
 async def chat_completion(
-    llm_service: LlmService = Depends(get_llm_service),    
+    generator_service: GeneratorService  = Depends(get_generator_service),    
     request: ChatRequest = Body(
         ...,
         example={
@@ -82,7 +82,7 @@ async def chat_completion(
     )
 ):
     last_message = request.messages[LATEST_INDEX].content
-    response_text = llm_service.generate_answer(content=last_message)
+    response_text = generator_service.generate_answer(content=last_message)
     if response_text == "" or response_text is None:
         response_text = "I'm sorry, I don't have an answer to that question."
     return ChatCompletionResponse(role=RoleEnum.assistant, content=response_text)

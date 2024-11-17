@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import re
 from datetime import datetime
-import pytz
+import pytz # type: ignore
 
 from scrapy.http.response.html import HtmlResponse
 

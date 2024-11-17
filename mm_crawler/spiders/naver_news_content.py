@@ -1,7 +1,7 @@
 import logging
 import os
 from time import sleep
-from typing import Iterable, Union
+from typing import Any, Iterable, Union
 from datetime import datetime
 
 import scrapy
@@ -14,8 +14,8 @@ from mm_crawler.database.models import ArticleContentOrm, ArticleOrm
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem 
 
-ArticleId = Union[str, int]
-OfficeId = Union[str, int]
+ArticleId = Union[str, int, Any]
+OfficeId = Union[str, int, Any]
 
 def _get_target_url(article_id: ArticleId, office_id: OfficeId):
     article_id = int(article_id) if isinstance(article_id, str) else article_id

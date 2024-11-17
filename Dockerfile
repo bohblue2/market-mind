@@ -32,4 +32,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["/app/.venv/bin/uvicorn", "mm_backend/__main__:app", "--host=0.0.0.0", "--port=8080"]
+CMD ["/app/.venv/bin/uvicorn", "mm_backend.__main__:app", "--host=0.0.0.0", "--port=8080"]

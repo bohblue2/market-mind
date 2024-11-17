@@ -1,4 +1,5 @@
 # Market Mind
+
 <p align="center">
     <img src="assets/main.png" alt="Logo">
 </p>
@@ -9,12 +10,14 @@ It also aims to utilize the [LangChain-ai](https://github.com/langchain-ai) and 
 For additional information, please refer to the [Team Notion](https://www.notion.so/yb98/097de26b8c5f4b5c83a4cd5b18c78103).
 
 ## Key Features
+
 - **Analyze the causes of price fluctuations**: Infer the causes of price fluctuations in your holdings from analyst reports, electronic disclosures, and news data, and automatically report them.
 - **Real-time data collection and ultra-short-term trading**: Collect analyst reports, electronic disclosures, and news data in real-time to execute ultra-short-term directional trading strategies.
 
 This project aims to use advanced natural language processing (NLP) techniques to reduce information asymmetries in financial markets and maximize the performance of quantitative trading strategies.
 
 ## Usage
+
 ```bash
 poetry install
 poetry shell
@@ -32,7 +35,15 @@ scrapy crawl naver_news_content
 scrapy crawl naver_news_list
 ```
 
+## Deployment
+
+```bash
+docker build -t mm_backend:latest .
+docker run -d -p 8080:8080 --name mm_backend_container mm_backend:latest
+```
+
 ## Scrapy-extension
+
 - [scrapy-fake-agent](https://github.com/alecxe/scrapy-fake-useragent)
 - [scrapy-playwright](https://github.com/scrapy-plugins/scrapy-playwright)
 

@@ -4,13 +4,14 @@ from typing import List
 
 from langchain_openai import OpenAIEmbeddings
 from pymilvus import Hit, Hits, SearchResult
-from mm_llm.vectorstore.milvus import MilvusSearchParams, get_client, get_naver_news_article_collection
+from mm_llm.vectorstore.milvus import MilvusSearchParams, get_milvus_client, get_naver_news_article_collection
+from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
 
 
 class VectorService:
     def __init__(self):
-        self._embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
-        self._client = get_client() 
+        self._embeddings = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL)
+        self._client = get_milvus_client() 
         self._collection = get_naver_news_article_collection()
     
     def find_similar(self, content: str, limit: int) -> List[dict]:
@@ -30,7 +31,7 @@ class VectorService:
         
         similar_cases = []
         for hit in hits:
-            hit: Hit
+            hit: Hit # type: ignore
             similar_cases.append(
                 {
                     "case_id": hit.get("case_id"),
