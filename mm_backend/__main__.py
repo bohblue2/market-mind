@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import Body, FastAPI, Depends, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from mm_backend.schemas import ChatCompletionResponse, ChatRequest, HealthCheck, RoleEnum
-from mm_backend.service.llm import LlmService
+from mm_llm.generator import LlmService
 
 from dotenv import load_dotenv
 load_dotenv('./.dev.env')

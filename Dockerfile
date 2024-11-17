@@ -22,7 +22,7 @@ RUN poetry config virtualenvs.create true && \
     poetry config virtualenvs.in-project true && \
     poetry install --no-interaction --no-root --only main
 
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim-bookworm as runtime
 WORKDIR /app
 
 COPY --from=builder /app/.venv .venv/
@@ -32,4 +32,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["/app/.venv/bin/uvicorn", "main:app", "--host=0.0.0.0", "--port=8080"]
+CMD ["/app/.venv/bin/uvicorn", "mm_backend/__main__:app", "--host=0.0.0.0", "--port=8080"]

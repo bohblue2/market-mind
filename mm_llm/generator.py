@@ -4,13 +4,10 @@ from typing import Optional
 
 from pymilvus import MilvusClient
 
-from mm_backend.vectorstore import get_naver_news_article_collection, get_client
-from langchain_milvus.retrievers import MilvusCollectionHybridSearchRetriever
+from mm_llm.vectorstore.milvus import get_naver_news_article_collection, get_client
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_milvus.retrievers import MilvusCollectionHybridSearchRetriever
-from langchain_milvus.utils.sparse import BM25SparseEmbedding
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 PROMPT_TEMPLATE = """
@@ -38,14 +35,14 @@ Assistant:"""
 prompt = PromptTemplate(
     template=PROMPT_TEMPLATE, input_variables=["context", "question"]
 )
-from langchain_milvus import Milvus, Zilliz
+from langchain_milvus import Zilliz
 
 
 # Define a function to format the retrieved documents
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-class LlmService:
+class GeneratorService:
     def __init__(self):
         self._client: MilvusClient = get_client()
         collection = get_naver_news_article_collection()
@@ -79,7 +76,3 @@ class LlmService:
     
     def close(self):
         self._client.close()
-
-if __name__ == "__main__":
-    service = LlmService()
-    print(service.generate_answer("코닉오토메이션에 대해서 알려주세요."))
