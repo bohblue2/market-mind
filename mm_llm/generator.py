@@ -2,52 +2,29 @@
 import os
 from typing import Optional
 
-from pymilvus import MilvusClient
 from langchain_milvus import Zilliz
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
+from mm_llm.prompt_templates.default import PROMPT_TEMPLATE
 from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection 
+from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
 
-PROMPT_TEMPLATE = """
-Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
-Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
-<context>
-{context}
-</context>
-
-컨텍스트가 제공되지 않을 경우, "정보가 제공되지 않았습니다. 잘 모르겠습니다." 라고 답변해주세요.
-
-<question>
-{question}
-</question>
-
-The response should be specific and use statistics or numbers when possible.
-
-Write the answer in korean.
-
-Assistant:"""
-
-# Create a PromptTemplate instance with the defined template and input variables
 prompt = PromptTemplate(
     template=PROMPT_TEMPLATE, input_variables=["context", "question"]
 )
 
-
-# Define a function to format the retrieved documents
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 class GeneratorService:
     def __init__(self):
-        self._client: MilvusClient = get_milvus_client()
+        self._client = get_milvus_client()
         collection = get_naver_news_article_collection()
         vectorstore = Zilliz(
-            embedding_function = OpenAIEmbeddings(model="text-embedding-3-large"),
+            embedding_function = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL),
             collection_name = collection.name,
             connection_args = {
                 "uri": os.getenv("MILVUS_URI"),
