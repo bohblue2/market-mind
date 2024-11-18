@@ -1,7 +1,7 @@
 # Market Mind
 
 <p align="center">
-    <img src="./github/assets/main.png" alt="Logo">
+    <img src="./.github/assets/main.png" alt="Logo">
 </p>
 
 This project aims to develop algorithmic trading models that crawl news articles to predict and trade the direction of stocks and financial instruments.
