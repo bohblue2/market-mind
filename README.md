@@ -42,6 +42,10 @@ docker build -t mm_backend:latest .
 docker run -d -p 8080:8080 --name mm_backend_container mm_backend:latest
 ```
 
+```bash
+streamlit run examples/poc_agent.py --server.port 8080
+```
+
 ## Scrapy-extension
 
 - [scrapy-fake-agent](https://github.com/alecxe/scrapy-fake-useragent)
@@ -50,3 +54,28 @@ docker run -d -p 8080:8080 --name mm_backend_container mm_backend:latest
 ## html compression algorithm
 
 The crawled HTML code is stored as binary, compressed using the `lzma` algorithm. [Simple tests](https://chat.openai.com/share/a0a256b4-6e04-4920-8f4e-7b7285977476) showed that among `lz4`, `gzip`, `bz2`, and `lzma`, `lzma` had the best compression ratio. Compression time was not considered.
+
+## Errors
+
+### downloading grit and executing grit CLI
+
+```bash
+$ openai migrate
+Downloading Grit CLI from https://github.com/getgrit/gritql/releases/latest/download/marzano-x86_64-unknown-linux-gnu.tar.gz
+Error: Failed to download Grit CLI from https://github.com/getgrit/gritql/releases/latest/download/marzano-x86_64-unknown-linux-gnu.tar.gz
+
+$ curl -fsSL https://docs.grit.io/install | bash
+downloading grit 0.1.0-alpha.1730315451 x86_64-unknown-linux-gnu
+installing to /home/marcus/.grit/bin
+  grit
+everything's installed!
+
+To add $HOME/.grit/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.grit/bin/env (sh, bash, zsh)
+    source $HOME/.grit/bin/env.fish (fish)
+
+$  source $HOME/.grit/bin/env 
+
+$ grit apply openai
+```
