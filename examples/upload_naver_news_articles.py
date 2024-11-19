@@ -3,7 +3,7 @@ load_dotenv('./.dev.env')
 
 import pandas as pd
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///./datasets/naver_news.db')
+engine = create_engine('sqlite://./examples/datasets/naver_news.db')
 query = "SELECT * FROM article_contents"
 df = pd.read_sql(query, engine)
 

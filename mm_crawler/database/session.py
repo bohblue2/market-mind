@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from mm_crawler import project_path
 from mm_crawler.database.models import ArticleOrm
 
-DATABASE_URL = f'sqlite:///datasets/naver_news.db'
+DATABASE_URL = f'sqlite:///examples/datasets/naver_news.db'
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

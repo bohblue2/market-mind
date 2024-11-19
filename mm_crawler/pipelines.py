@@ -145,7 +145,7 @@ async def download_report(sess, research_report_orm: ResearchReportOrm, item: Di
     try:
         report_item: Dict[str, Any] = item.get('report_item', {})
         save_path = (
-            f"./datasets/research_report/{report_item['date']}/"
+            f"./examples/datasets/research_report/{report_item['date']}/"
             f"{report_item['category']}/"
             f"{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf"
         ) 

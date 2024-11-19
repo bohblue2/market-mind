@@ -5,7 +5,7 @@ from mm_crawler.database.models import ArticleOrm
 
 @pytest.fixture(scope='module')
 def session():
-    DATABASE_URL = 'sqlite:///datasets/test.db'
+    DATABASE_URL = 'sqlite:///examples/datasets/test.db'
     engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SessionLocal()

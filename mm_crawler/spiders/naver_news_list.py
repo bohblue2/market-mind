@@ -15,7 +15,7 @@ class FinanceNewsList(scrapy.Spider):
         ITEM_PIPELINES = {"language_crawler.pipelines.FinanceNewsListPipeline": 1}
     )
 
-    df = pd.read_csv('datasets/test_code.csv')
+    df = pd.read_csv('./examplesdatasets/test_code.csv')
     tickers = df['종목코드'].tolist()
 
     def start_requests(self):
