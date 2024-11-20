@@ -46,6 +46,10 @@ docker run -d -p 8080:8080 --name mm_backend_container mm_backend:latest
 streamlit run examples/poc_agent.py --server.port 8080
 ```
 
+```bash
+PYTHONPATH=$(pwd)/.. alembic check
+```
+
 ## Scrapy-extension
 
 - [scrapy-fake-agent](https://github.com/alecxe/scrapy-fake-useragent)
