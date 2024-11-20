@@ -59,6 +59,16 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+  redis:
+    container_name: redis-standalone
+    image: redis:latest
+    restart: always
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/redis:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
 
 networks:
   default:
