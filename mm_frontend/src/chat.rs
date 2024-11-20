@@ -18,8 +18,8 @@ use crate::futures::{sleep, spawn};
 use crate::shared_state::SharedState;
 
 pub const CHAT_EXAMPLE: Example = Example {
-    name: "Chat",
-    slug: "chat",
+    name: "Market Wizard",
+    slug: "market_wizard",
     get: || Box::new(ChatExample::new()),
 };
 
@@ -60,7 +60,7 @@ impl HistoryLoader {
         let messages = vec![
             (
                 ChatMessage {
-                    content: "안녕하세요".to_string(),
+                    content: "Hi".to_string(),
                     from: Some("me".to_string()),
                 },
                 Duration::from_secs_f32(0.5),
@@ -173,7 +173,7 @@ impl ChatExample {
         });
 
         let title = "Chat";
-        demo_area(ui, title, 200.0, |ui| {
+        demo_area(ui, title, 800.0, |ui| {
             ScrollArea::vertical()
                 .animated(false)
                 .max_height(800.0)

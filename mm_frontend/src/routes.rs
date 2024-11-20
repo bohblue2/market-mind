@@ -25,7 +25,7 @@ pub fn router(state: &mut SharedState) -> EguiRouter<SharedState> {
         .history({
             let default_path = "/hello_egui/#".to_string();
             #[cfg(target_arch = "wasm32")]
-            let history = egui_router::history::BrowserHistory::new(default_path);
+            let history = egui_router::history::BrowserHistory::new(Some(default_path));
             #[cfg(not(target_arch = "wasm32"))]
             let history = egui_router::history::DefaultHistory::default();
 

@@ -13,6 +13,7 @@ mod chat;
 
 use hello_egui::inbox::UiInbox;
 use hello_egui::router::EguiRouter;
+use hello_egui::thumbhash;
 use hello_egui_utils::center::Center;
 use shared_state::SharedState;
 use sidebar::SideBar;
@@ -91,24 +92,37 @@ impl eframe::App for App {
     }
 }
 
-// Helper function to create a demo area(center) with a title.
+// // Helper function to create a demo area(center) with a title.
+// pub fn demo_area(ui: &mut Ui, title: &'static str, width: f32, content: impl FnOnce(&mut Ui)) {
+//     Center::new(title).ui(ui, |ui| {
+//         let width = f32::min(ui.available_width() - 20.0, width);
+//         ui.set_max_width(width);
+//         ui.set_max_height(ui.available_height() - 20.0);
+
+//         egui::Frame::none()
+//             .fill(ui.style().visuals.panel_fill)
+//             .rounding(10.0)
+//             .inner_margin(20.0)
+//             .show(ui, |ui| {
+//                 ui.heading(title);
+//                 ui.add_space(5.0);
+
+//                 content(ui);
+//             });
+//     });
+// }
+
 pub fn demo_area(ui: &mut Ui, title: &'static str, width: f32, content: impl FnOnce(&mut Ui)) {
-    Center::new(title).ui(ui, |ui| {
-        let width = f32::min(ui.available_width() - 20.0, width);
-        ui.set_max_width(width);
-        ui.set_max_height(ui.available_height() - 20.0);
-
-        egui::Frame::none()
-            .fill(ui.style().visuals.panel_fill)
-            .rounding(4.0)
-            .inner_margin(20.0)
-            .show(ui, |ui| {
-                ui.heading(title);
-                ui.add_space(5.0);
-
-                content(ui);
-            });
-    });
+    let mut open = true; // Window의 열림/닫힘 상태를 추적
+    
+    egui::Window::new(title)
+        .default_width(width)
+        .resizable(true)
+        .collapsible(true)
+        .open(&mut open)
+        .show(ui.ctx(), |ui| {
+            content(ui);
+        });
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -173,7 +187,7 @@ fn main() {
                 web_options,
                 Box::new(|ctx| {
                     egui_extras::install_image_loaders(&ctx.egui_ctx);
-                    egui_thumbhash::register(&ctx.egui_ctx);
+                    hello_egui::thumbhash::register(&ctx.egui_ctx);
                     Ok(Box::new(App::new(&ctx.egui_ctx)) as Box<dyn eframe::App>)
                 }),
             )

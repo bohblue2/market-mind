@@ -4,7 +4,7 @@ use egui::Ui;
 
 pub const EXAMPLES: &[Category] = &[
     Category {
-        name: "Infinite Scroll",
+        name: "Q&A Chatbot",
         examples: &[CHAT_EXAMPLE],
     },
 ];
