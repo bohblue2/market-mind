@@ -31,6 +31,7 @@ streamlit = "^1.40.1"
 langchainhub = "^0.1.21"
 duckduckgo-search = "^6.3.5"
 wikipedia = "^1.4.0"
+langgraph-checkpoint-sqlite = "^2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
