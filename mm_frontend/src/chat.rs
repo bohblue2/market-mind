@@ -342,7 +342,7 @@ impl ChatExample {
             ui.add_space(8.0);
             ui.horizontal(|ui| {
                 let text_edit = egui::TextEdit::singleline(&mut self.input_text)
-                    .hint_text("메시지를 입력하세요...")
+                    .hint_text("Hi")
                     .desired_width(ui.available_width() - 60.0)
                     .id("chat_input".into()); // 고유 ID 추가
                     
@@ -353,7 +353,7 @@ impl ChatExample {
                     text_edit_response.request_focus();
                 }
                 
-                if ui.button("전송").clicked() || 
+                if ui.button("<").clicked() || 
                    (ui.input(|i| i.key_pressed(egui::Key::Enter))) {
                     if !self.input_text.trim().is_empty() {
                         let new_message = ChatMessage {
