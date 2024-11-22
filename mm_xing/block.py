@@ -6415,6 +6415,9 @@ class o3101OutBlock(BaseModel):
     MntncMgnR: float = Field(description="유지증거금율", default=0.0)
     DotGb: int = Field(description="유효소수점자리수", default=0)
 
+    class Config:
+        from_attributes = True
+
 
 # 해외선물마스터조회(o3101)-API용
 class o3101(BaseModel):
@@ -10965,6 +10968,9 @@ class t1764OutBlock(BaseModel):
     tradno: str = Field(description="거래원번호", default="")
     tradname: str = Field(description="거래원이름", default="")
 
+    class Config:
+        from_attributes = True
+
 
 # 회원사리스트(t1764)
 class t1764(BaseModel):
@@ -14352,6 +14358,9 @@ class t8401OutBlock(BaseModel):
     expcode: str = Field(description="확장코드", default="")
     basecode: str = Field(description="기초자산코드", default="")
 
+    class Config:
+        from_attributes = True
+
 
 # 주식선물마스터조회(API용)(t8401)
 class t8401(BaseModel):
@@ -15287,6 +15296,9 @@ class t8424OutBlock(BaseModel):
     hname: str = Field(description="업종명", default="")
     upcode: str = Field(description="업종코드", default="")
 
+    class Config:
+        from_attributes = True
+
 
 # 전체업종(t8424)
 class t8424(BaseModel):
@@ -15309,6 +15321,9 @@ class t8425InBlock(BaseModel):
 class t8425OutBlock(BaseModel):
     tmname: str = Field(description="테마명", default="")
     tmcode: str = Field(description="테마코드", default="")
+
+    class Config:
+        from_attributes = True
 
 
 # 전체테마(t8425)
@@ -15333,6 +15348,9 @@ class t8426OutBlock(BaseModel):
     hname: str = Field(description="종목명", default="")
     shcode: str = Field(description="단축코드", default="")
     expcode: str = Field(description="확장코드", default="")
+
+    class Config:
+        from_attributes = True
 
 
 # 상품선물마스터조회(API용)(t8426)
@@ -15689,6 +15707,9 @@ class t8436OutBlock(BaseModel):
     spac_gubun: str = Field(description="기업인수목적회사여부(Y/N)", default="")
     filler: str = Field(description="filler(미사용)", default="")
 
+    class Config:
+        from_attributes = True
+
 
 # 주식종목조회 API용(t8436)
 class t8436(BaseModel):
@@ -15809,6 +15830,9 @@ class t9943OutBlock(BaseModel):
     hname: str = Field(description="종목명", default="")
     shcode: str = Field(description="단축코드", default="")
     expcode: str = Field(description="확장코드", default="")
+    
+    class Config:
+        from_attributes = True
 
 
 # 지수선물마스터조회API용(t9943)

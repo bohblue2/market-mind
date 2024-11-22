@@ -35,12 +35,12 @@ from mm_xing.schemas import XingDataConfig, XingTrHeaders
 
 
 # TODO: make config_type enum for "code" and "ticker"
-def get_data_config(tr_code: str, config_type: str = "code") -> Optional[XingDataConfig]:
+def get_data_config(config_type: str, tr_code: str) -> Optional[XingDataConfig]:
     """Get data configuration for a given TR code and type.
     
     Args:
-        tr_code: Trading request code
         config_type: Type of configuration ("code" or "ticker")
+        tr_code: Trading request code
     
     Returns:
         XingDataConfig if found, None otherwise
@@ -118,13 +118,6 @@ def get_data_config(tr_code: str, config_type: str = "code") -> Optional[XingDat
         }
     }
     return configs.get(config_type, {}).get(tr_code, None)
-
-# Maintain backwards compatibility
-def get_data_config_code(tr_code: str) -> Optional[XingDataConfig]:
-    return get_data_config(tr_code, "code")
-
-def get_data_config_ticker(tr_code: str) -> Optional[XingDataConfig]:
-    return get_data_config(tr_code, "ticker")
 
 class SingleOutBlockHandler:
     def __init__(self, outblock_cls: Any):

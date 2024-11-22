@@ -19,11 +19,28 @@ T8425 = "t8425"
 T8436 = "t8436"
 T8401 = "t8401"
 T8426 = "t8426"
-T9943 = "t9943"
 T9943V = "t9943V"
-T9943S = "t9943V"
+T9943S = "t9943S"
+T9943 = "t9943"
 T9944 = "t9944"
 O3101 = "o3101"
+
+CODE = 'code'
+TICKER = 'ticker'
+
+TR_CODE_TO_TYPE = {
+    T1764: CODE,
+    T8424: CODE,
+    T8425: CODE,
+    T8436: TICKER,
+    T8401: TICKER,
+    T8426: TICKER,
+    T9943: TICKER,
+    T9943V: TICKER,
+    T9943S: TICKER,
+    T9944: TICKER,
+    O3101: TICKER,
+}
 
 STOCK_EXCHANGE_PATH = "/stock/exchange"
 INDTP_MARKET_DATA_PATH = "/indtp/market-data"
