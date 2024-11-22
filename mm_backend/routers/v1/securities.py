@@ -1,7 +1,9 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Dict, List, Optional, Type, Union
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from mm_backend.database.session import get_db
+from mm_xing.block import o3101OutBlock, t1764OutBlock, t8401OutBlock, t8424OutBlock, t8425OutBlock, t8426OutBlock, t8436OutBlock, t9943OutBlock, t9944OutBlock
 from mm_xing.constant import TR_CODE_TO_TYPE
 from mm_xing.tasks.master import fetch_market_data, get_data_config, initialize_client
 from mm_backend.database.models import RountineTaskOrm, o3101OutBlockOrm, t1764OutBlockOrm, t8401OutBlockOrm, t8424OutBlockOrm, t8425OutBlockOrm, t8426OutBlockOrm, t8436OutBlockOrm, t9943OutBlockOrm, t9943SOutBlockOrm, t9943VOutBlockOrm, t9944OutBlockOrm
@@ -12,12 +14,80 @@ router = APIRouter(
     tags=["securities"]
 )
 
+# Define a Union of all possible response models
+ResponseModel = Union[
+    t1764OutBlock, t8424OutBlock, t8425OutBlock, t8436OutBlock,
+    t8401OutBlock, t8426OutBlock, t9943OutBlock, t9944OutBlock, o3101OutBlock
+]
+
 @router.get(
-    "/code")
+    "/code",
+    response_model=List[ResponseModel],
+    summary="Fetch Market Data by TR Code",
+    description=(
+        "Retrieve market data for a specified TR code. This endpoint checks if the data "
+        "has already been fetched and stored in the database for the current day. If not, "
+        "it fetches new data, stores it, and returns the result."
+    ),
+    responses={
+        200: {
+            "description": "Successful retrieval of market data.",
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "rank": 1,
+                            "tradno": "001",
+                            "tradname": "Example Trading Company"
+                        }
+                    ]
+                }
+            }
+        },
+        400: {
+            "description": "Unsupported TR code provided.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Unsupported TR code: {tr_code}"}
+                }
+            }
+        },
+        404: {
+            "description": "Data config code not found for the provided TR code.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Data config code not found for {tr_code}"}
+                }
+            }
+        },
+        500: {
+            "description": "Internal server error occurred while fetching data.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Error message"}
+                }
+            }
+        }
+    }
+)
 async def fetch_code_data(
-    tr_code: str, 
+    tr_code: str = Query(..., description="The TR code representing the type of market data to fetch."),
     db: Session = Depends(get_db)
 ):
+    """
+    Fetch market data based on the provided TR code.
+
+    This endpoint retrieves market data for a specific TR code. If the data has already been fetched
+    and stored in the database for today, it returns the cached data. Otherwise, it fetches new data,
+    stores it in the database, and returns the result.
+
+    Args:
+        tr_code (str): The TR code representing the type of market data to fetch.
+        db (Session): The database session used for querying and storing data.
+
+    Returns:
+        List[ResponseModel]: A list of response models containing the market data.
+    """
     # 오늘 날짜의 시작 시간
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     
@@ -77,8 +147,22 @@ def get_orm_model_for_tr_code(tr_code: str):
     }
     return orm_mapping.get(tr_code)
 
-        
-    
+def get_schema_model_for_tr_code(tr_code: str) -> Optional[Type[ResponseModel]]:
+    """TR 코드에 따른 적절한 스키마 모델을 반환하는 함수"""
+    schema_mapping: Dict[str, Type[ResponseModel]] = {
+        't1764': t1764OutBlock,
+        't8424': t8424OutBlock,
+        't8425': t8425OutBlock,
+        't8436': t8436OutBlock,
+        't8401': t8401OutBlock,
+        't8426': t8426OutBlock,
+        't9943V': t9943OutBlock,
+        't9943S': t9943OutBlock,
+        't9943': t9943OutBlock,
+        't9944': t9944OutBlock,
+        'o3101': o3101OutBlock,
+    }
+    return schema_mapping.get(tr_code, None) 
 
         
 
