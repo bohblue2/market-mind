@@ -1,6 +1,6 @@
 use eframe;
 use eframe::{egui, Frame};
-use egui::{Context, SidePanel, Ui};
+use egui::{Context, SidePanel, Ui, FontDefinitions, FontFamily};
 use routes::router;
 use std::num::NonZeroUsize;
 
@@ -23,6 +23,24 @@ pub enum AppMessage {
     Navigate(String),
 }
 
+// 폰트 설정 함수
+fn configure_fonts(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+
+    // 외부 폰트 데이터 추가
+    fonts.font_data.insert(
+        "NotoSansKR".to_owned(),
+        egui::FontData::from_static(include_bytes!("../assets/fonts/NotoSansKR-Regular.ttf")),
+    );
+
+    // Proportional과 Monospace에 외부 폰트를 연결
+    fonts.families.get_mut(&egui::FontFamily::Proportional).unwrap().insert(0, "NotoSansKR".to_owned());
+    fonts.families.get_mut(&egui::FontFamily::Monospace).unwrap().insert(0, "NotoSansKR".to_owned());
+
+    // 업데이트된 폰트를 egui에 적용
+    ctx.set_fonts(fonts);
+}
+
 pub struct App {
     sidebar_expanded: bool,
     shared_state: SharedState,
@@ -32,6 +50,8 @@ pub struct App {
 
 impl App {
     pub fn new(ctx: &Context) -> Self {
+        // 폰트 설정 호출
+        configure_fonts(ctx);
         let (tx, inbox) = UiInbox::channel();
         let mut state = SharedState::new(tx);
 
