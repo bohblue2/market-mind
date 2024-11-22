@@ -53,3 +53,10 @@ class GeneratorService:
     
     def close(self):
         self._client.close()
+
+def get_generator_service():
+    service = GeneratorService()
+    try:
+        yield service
+    finally:
+        service.close()

@@ -47,6 +47,10 @@ streamlit run examples/poc_agent.py --server.port 8080
 ```
 
 ```bash
+fastapi dev mm_backend/__main__.py --reload
+```
+
+```bash
 PYTHONPATH=$(pwd)/.. alembic check
 ```
 
