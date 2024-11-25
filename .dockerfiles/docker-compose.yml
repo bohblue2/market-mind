@@ -59,8 +59,9 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+
   redis:
-    container_name: redis-standalone
+    container_name: mm-redis-standalone
     image: redis:latest
     restart: always
     volumes:
@@ -69,6 +70,19 @@ services:
     ports:
       - "6379:6379"
     command: redis-server /usr/local/etc/redis/redis.conf
+
+  postgres:
+    container_name: mm-postgres-standalone
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: market_mind 
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 networks:
   default:

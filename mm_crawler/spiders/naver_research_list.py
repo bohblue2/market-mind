@@ -1,17 +1,17 @@
 import abc
-import time
-from typing import List
-from bs4 import BeautifulSoup
-import scrapy
-import pandas as pd
 import os
 import re
+import time
 from datetime import datetime
-import pytz # type: ignore
+from typing import List
 
+import pandas as pd
+import pytz  # type: ignore
+import scrapy
+from bs4 import BeautifulSoup
 from scrapy.http.response.html import HtmlResponse
 
-from mm_crawler.items import ArticleItem, NaverResearchItem 
+from mm_crawler.items import ArticleItem, NaverResearchItem
 from mm_crawler.spiders.commons import parse_report_url
 
 KST = pytz.timezone('Asia/Seoul')
@@ -50,7 +50,7 @@ class NaverResearchBase(scrapy.Spider):
         
     async def errback(self, failure):
         self.log(type(failure))
-        meta = failure.request.meta
+        _ = failure.request.meta
 
     async def parse(self, response: HtmlResponse):
         meta = response.meta
@@ -158,7 +158,7 @@ class NaverResearchMarketInfo(NaverResearchBase):
     name = 'naver_research_market_info'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}"
+    _get_target_url = lambda page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}" # noqa
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
@@ -169,7 +169,7 @@ class NaverResearchCompanyList(NaverResearchBase):
     name = 'naver_research_company_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/company_list.naver?&page={page}"
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/company_list.naver?&page={page}" # noqa
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
@@ -180,7 +180,7 @@ class NaverResearchDebentureList(NaverResearchBase):
     name = 'naver_research_debenture_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}"
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}" # noqa
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
@@ -191,7 +191,7 @@ class NaverResearchEconomyList(NaverResearchBase):
     name = 'naver_research_economy_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda page: f"https://finance.naver.com/research/economy_list.naver?&page={page}"
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/economy_list.naver?&page={page}" # noqa
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
@@ -202,7 +202,7 @@ class NaverResearchIndustryList(NaverResearchBase):
     name = 'naver_research_industry_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}"
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}" # noqa
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
@@ -214,7 +214,7 @@ class NaverResearchInvestList(NaverResearchBase):
     name = 'naver_research_invest_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}"
+    _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}" # noqa
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()

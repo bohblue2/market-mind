@@ -1,7 +1,8 @@
+from httpx import Client
+
 from mm_xing.constant import XING_AUTH_URL
 from mm_xing.schemas import XingAuthHeaders, XingAuthParams
 
-from httpx import Client
 
 def get_access_token(
     client: Client, 

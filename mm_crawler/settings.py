@@ -1,3 +1,5 @@
+
+
 # Scrapy settings for market_mind project
 #
 # For simplicity, this file contains only settings considered important or

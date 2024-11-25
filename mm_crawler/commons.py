@@ -1,7 +1,9 @@
 import os
+
 import aiofiles
-import requests
 import httpx
+import requests
+
 
 def download_pdf(url: str, save_path: str) -> None:
     response = requests.get(url)

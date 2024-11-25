@@ -4,7 +4,9 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 from datetime import datetime
+
 import scrapy
+
 
 class ItemBase(scrapy.Item):
     response = scrapy.Field()
@@ -31,12 +33,6 @@ class ArticleContentItem(ItemBase):
     language = scrapy.Field()
     article_published_at: str = scrapy.Field()
     article_modified_at: str = scrapy.Field()
-
-    def __repr__(self):
-        return self.__str__()
-    
-    def __str__(self) -> str:
-        return ""
 
 class NaverReportItem(ItemBase):
     category = scrapy.Field()

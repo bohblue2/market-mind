@@ -1,5 +1,7 @@
 from typing import List
+
 import pymupdf
+
 
 def split_pdf(filepath: str, batch_size: int=10) -> List[str]:
     input_pdf = pymupdf.open(filepath)

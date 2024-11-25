@@ -1,6 +1,5 @@
 import asyncio
 import os
-
 from datetime import datetime
 from time import sleep
 from typing import Any, Dict, List, Optional
@@ -9,28 +8,18 @@ from httpx import Client, Response
 from pydantic import BaseModel
 
 from mm_xing.auth import get_access_token
-from mm_xing.block import (
-    o3101OutBlock,
-    t1764InBlock,
-    t1764OutBlock,
-    t8401OutBlock,
-    t8424InBlock,
-    t8424OutBlock,
-    t8425InBlock,
-    t8425OutBlock,
-    t8426OutBlock,
-    t8436InBlock,
-    t8401InBlock,
-    t8426InBlock,
-    t8436OutBlock,
-    t9943InBlock,
-    t9943OutBlock,
-    t9944InBlock,
-    o3101InBlock,
-    t9944OutBlock,
-)
+from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
+                           t1764OutBlock, t8401InBlock, t8401OutBlock,
+                           t8424InBlock, t8424OutBlock, t8425InBlock,
+                           t8425OutBlock, t8426InBlock, t8426OutBlock,
+                           t8436InBlock, t8436OutBlock, t9943InBlock,
+                           t9943OutBlock, t9944InBlock, t9944OutBlock)
 # TODO: Refactor this import (mm_xing.constant -> mm_xing.config)
-from mm_xing.constant import INDTP_MARKET_DATA_PATH, O3101, STOCK_EXCHANGE_PATH, STOCK_SECTOR_PATH, T1764, T8401, T8424, T8425, T8426, T8436, T9943, T9943S, T9943V, T9944, TR_CODE_TO_URL, XING_APP_SECRET, XING_APP_KEY, XING_REST_URL, MM_DB_PATH
+from mm_xing.constant import (INDTP_MARKET_DATA_PATH, MM_DB_PATH, O3101,
+                              STOCK_EXCHANGE_PATH, STOCK_SECTOR_PATH, T1764,
+                              T8401, T8424, T8425, T8426, T8436, T9943, T9943S,
+                              T9943V, T9944, TR_CODE_TO_URL, XING_APP_KEY,
+                              XING_APP_SECRET, XING_REST_URL)
 from mm_xing.schemas import XingDataConfig, XingTrHeaders
 
 

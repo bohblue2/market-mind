@@ -2,15 +2,16 @@
 import os
 from typing import Optional
 
-from langchain_milvus import Zilliz
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_milvus import Zilliz
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-from mm_llm.prompt_templates.default import PROMPT_TEMPLATE
-from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection 
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
+from mm_llm.prompt_templates.default import PROMPT_TEMPLATE
+from mm_llm.vectorstore.milvus import (get_milvus_client,
+                                       get_naver_news_article_collection)
 
 prompt = PromptTemplate(
     template=PROMPT_TEMPLATE, input_variables=["context", "question"]

@@ -1,14 +1,10 @@
-import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from mm_crawler import project_path
-from mm_crawler.database.models import ArticleOrm
+from mm_crawler.config import settings
 
-DATABASE_URL = f'sqlite:///examples/datasets/naver_news.db'
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URL))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():

@@ -1,7 +1,8 @@
 # main.py
+from typing import List
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-from typing import List
 
 app = FastAPI()
 

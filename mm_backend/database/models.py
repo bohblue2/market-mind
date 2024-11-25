@@ -1,7 +1,9 @@
 import datetime
 
-from sqlalchemy import Column, Float, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Float, Integer, String
+
 from mm_backend.database.base import Base
+
 
 class BaseOrm(Base):
     __abstract__ = True

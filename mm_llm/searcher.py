@@ -4,8 +4,10 @@ from typing import List
 
 from langchain_openai import OpenAIEmbeddings
 from pymilvus import Hit, Hits, SearchResult
-from mm_llm.vectorstore.milvus import MilvusSearchParams, get_milvus_client, get_naver_news_article_collection
+
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
+from mm_llm.vectorstore.milvus import (MilvusSearchParams, get_milvus_client,
+                                       get_naver_news_article_collection)
 
 
 class VectorService:

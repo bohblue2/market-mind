@@ -1,13 +1,14 @@
 
+import os
 from dataclasses import dataclass
 from typing import Any, List, Optional
-from pymilvus import Collection, CollectionSchema, DataType, FieldSchema
-from pymilvus import MilvusClient, utility 
-from pymilvus import connections
 
-import os
+from pymilvus import (Collection, CollectionSchema, DataType, FieldSchema,
+                      MilvusClient, connections, utility)
 
-from mm_llm.constant import DEFAULT_EMBEDDING_DIM, MILVUS_INDEX_TYPE, MILVUS_METRIC_TYPE, MILVUS_NLIST
+from mm_llm.constant import (DEFAULT_EMBEDDING_DIM, MILVUS_INDEX_TYPE,
+                             MILVUS_METRIC_TYPE, MILVUS_NLIST)
+
 
 def get_milvus_client() -> MilvusClient:   
     client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_API_KEY"))

@@ -1,18 +1,13 @@
 from contextlib import asynccontextmanager
-from typing import List 
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mm_backend.routers.api import router
+
+from mm_backend.config import settings
 from mm_backend.database.session import init_db
+from mm_backend.routers.api import router
 
-from dotenv import load_dotenv
-load_dotenv('./.dev.env')
-
-DEBUG = True
-
-ORIGINS: List[str] = []
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,16 +20,11 @@ async def lifespan(app: FastAPI):
 def get_app() -> FastAPI:
     app = FastAPI(lifespan=lifespan)
 
-    @app.get("/")
-    async def root():
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url="/docs")
-
-    if DEBUG:
+    if settings.DEBUG:
         origins = ["*"]
     else:
         origins = [
-            str(origin).strip(",") for origin in ORIGINS
+            str(origin).strip(",") for origin in settings.ORIGINS 
         ]
 
     # Add CORS middleware
@@ -50,8 +40,12 @@ def get_app() -> FastAPI:
     
     return app  
 
-
 app = get_app()
+@app.get("/")
+async def root():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/docs")
+
 
 if __name__ == "__main__":
     app = get_app()

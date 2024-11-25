@@ -1,16 +1,17 @@
 from dotenv import load_dotenv
+
 load_dotenv('./.dev.env')
 
 import pandas as pd
 from sqlalchemy import create_engine
+
 engine = create_engine('sqlite://./examples/datasets/naver_news.db')
 query = "SELECT * FROM article_contents"
 df = pd.read_sql(query, engine)
 
-from mm_backend.constant import NAVER_NEWS_ARTICLE_COLLECTION 
-
 from mm_vector.vectorstore import get_client
 
+from mm_backend.constant import NAVER_NEWS_ARTICLE_COLLECTION
 
 client = get_client()
 if client.has_collection(NAVER_NEWS_ARTICLE_COLLECTION):
@@ -18,10 +19,10 @@ if client.has_collection(NAVER_NEWS_ARTICLE_COLLECTION):
 
 from langchain_openai import OpenAIEmbeddings
 
-
 embedding = OpenAIEmbeddings(model="text-embedding-3-large")
 
 from mm_vector.vectorstore import get_naver_news_article_collection
+
 collection = get_naver_news_article_collection()
 for row in df.itertuples():
     collection.insert([

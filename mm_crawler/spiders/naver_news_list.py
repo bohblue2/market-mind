@@ -1,12 +1,13 @@
-import time
-import scrapy
-import pandas as pd
 import os
 import re
+import time
 
+import pandas as pd
+import scrapy
 from scrapy.http.response.html import HtmlResponse
 
 from mm_crawler.items import ArticleItem
+
 
 class FinanceNewsList(scrapy.Spider):
     name = os.path.basename(__file__).replace('.py', '')
@@ -137,4 +138,4 @@ class FinanceNewsList(scrapy.Spider):
     
     async def errback(self, failure):
         self.log(type(failure))
-        meta = failure.request.meta
+        _ = failure.request.meta

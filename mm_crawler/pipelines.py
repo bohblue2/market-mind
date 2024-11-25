@@ -3,16 +3,17 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
-from typing import Any, Dict
-import pytz # type: ignore
 import lzma
 from datetime import datetime
+from typing import Any, Dict
+
+import pytz  # type: ignore
 
 from mm_crawler.commons import async_download_pdf
-from mm_crawler.database.models import ArticleContentOrm, ArticleOrm, ResearchReportOrm
+from mm_crawler.database.models import (ArticleContentOrm, ArticleOrm,
+                                        ResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem, ArticleItem
-
 
 kst = pytz.timezone('Asia/Seoul')
 

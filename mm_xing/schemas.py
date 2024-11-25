@@ -1,5 +1,7 @@
 from typing import Callable, List, Optional
+
 from pydantic import BaseModel
+
 
 class XingAuthHeaders(BaseModel):
     content_type: str = "application/x-www-form-urlencoded"
