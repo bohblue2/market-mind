@@ -1,4 +1,4 @@
-use crate::AppMessage;
+use crate::{chat::ChatMessage, AppMessage};
 use hello_egui::inbox::UiInboxSender;
 
 pub struct SharedState {
@@ -12,5 +12,6 @@ impl SharedState {
             tx,
             active_route: "/example".to_string(),
         }
+
     }
 }

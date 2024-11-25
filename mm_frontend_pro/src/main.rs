@@ -13,8 +13,7 @@ mod chat;
 
 use hello_egui::inbox::UiInbox;
 use hello_egui::router::EguiRouter;
-use hello_egui::thumbhash;
-use hello_egui_utils::center::Center;
+// use hello_egui_utils::center::Center;
 use shared_state::SharedState;
 use sidebar::SideBar;
 
@@ -112,63 +111,62 @@ impl eframe::App for App {
     }
 }
 
-// // Helper function to create a demo area(center) with a title.
-// pub fn demo_area(ui: &mut Ui, title: &'static str, width: f32, content: impl FnOnce(&mut Ui)) {
-//     Center::new(title).ui(ui, |ui| {
-//         let width = f32::min(ui.available_width() - 20.0, width);
-//         ui.set_max_width(width);
-//         ui.set_max_height(ui.available_height() - 20.0);
-
-//         egui::Frame::none()
-//             .fill(ui.style().visuals.panel_fill)
-//             .rounding(10.0)
-//             .inner_margin(20.0)
-//             .show(ui, |ui| {
-//                 ui.heading(title);
-//                 ui.add_space(5.0);
-
-//                 content(ui);
-//             });
-//     });
-// }
-
 pub fn demo_area(ui: &mut Ui, title: &'static str, width: f32, content: impl FnOnce(&mut Ui)) {
     let mut open = true; // Window의 열림/닫힘 상태를 추적
-    
-    egui::Window::new(title)
-        .default_width(width)
-        .resizable(true)
-        .collapsible(true)
-        .open(&mut open)
-        .show(ui.ctx(), |ui| {
-            content(ui);
+    let use_center = false;
+    if use_center {
+        // Center::new(title).ui(ui, |ui| {
+        //     let width = f32::min(ui.available_width() - 20.0, width);
+        //     ui.set_max_width(width);
+        //     ui.set_max_height(ui.available_height() - 20.0);
+        //     egui::Frame::none()
+        //         .fill(ui.style().visuals.panel_fill)
+        //         .rounding(10.0)
+        //         .inner_margin(20.0)
+        //         .show(ui, |ui| {
+        //             ui.heading(title);
+        //             ui.add_space(5.0);
+        //             content(ui);
+        //         });
+        // });
+    } else {
+        egui::Window::new(title)
+            .default_width(width)
+            .resizable(true)
+            .collapsible(true)
+            .open(&mut open)
+            .show(ui.ctx(), |ui| {
+                ui.heading(title);
+                ui.add_space(5.0);
+                content(ui);
         });
+    }
+    
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn main() -> eframe::Result<()> {
+#[tokio::main]
+async fn main() -> eframe::Result<()> {
     use eframe::NativeOptions;
     use egui::ViewportBuilder;
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("Unable to create Runtime");
+    // let rt = tokio::runtime::Builder::new_current_thread()
+    //     .enable_all()
+    //     .build()
+    //     .expect("Unable to create Runtime");
 
-    // Enter the runtime so that `tokio::spawn` is available immediately.
-    let _enter = rt.enter();
+    // // Enter the runtime so that `tokio::spawn` is available immediately.
+    // let _enter = rt.enter();
 
-    // Execute the runtime in its own thread.
-    // The future doesn't have to do anything. In this example, it just sleeps forever.
-    std::thread::spawn(move || {
-        rt.block_on(async {
-            loop {
-                tokio::time::sleep(std::time::Duration::from_secs(3600)).await;
-            }
-        });
-    });
+    // // Execute the runtime in its own thread.
+    // // The future doesn't have to do anything. In this example, it just sleeps forever.
+    // std::thread::spawn(move || {
+    //     rt.spawn(async move {
+    //         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    //     });
+    // });
 
     let native_options = NativeOptions {
         viewport: ViewportBuilder::default()

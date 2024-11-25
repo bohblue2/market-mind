@@ -1,6 +1,10 @@
-use std::iter::repeat;
 use std::sync::Arc;
 use std::time::Duration;
+
+use futures::{SinkExt, StreamExt, TryStreamExt};
+// use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use tokio_tungstenite_wasm::{connect, Message};
+use std::sync::mpsc::{self, Receiver, Sender};
 
 use eframe::emath::Vec2;
 use egui::{
@@ -49,14 +53,8 @@ impl HistoryLoader {
         //     .rev()
         //     .collect();
 
-        // Repeat the history 5 times to make it longer.
-        // let history = repeat(history)
-        //     .take(5)
-        //     .flat_map(|history| history.clone())
-        //     .collect();
 
         let history = vec![];
-
         let messages = vec![
             (
                 ChatMessage {
@@ -71,11 +69,8 @@ impl HistoryLoader {
         //         .filter(|line| !line.is_empty())
         //         .map(|line| {
         //             let (name, content) = line.split_once(": ").unwrap();
-
         //             let (name, duration) = name.split_once(", ").unwrap();
-
         //             let duration = Duration::from_secs_f32(duration.parse::<f32>().unwrap());
-
         //             (
         //                 ChatMessage {
         //                     content: content.to_string(),
@@ -122,13 +117,31 @@ pub struct ChatExample {
     shown: bool,
     msgs_received: usize,
     input_text: String,  // 새로 추가
+    ws_receiver: Receiver<Message>,
+    outer_ws_sender: Sender<Message>,
 }
+
+
 
 impl ChatExample {
     pub fn new() -> Self {
         let history_loader = Arc::new(HistoryLoader::new());
         let history_loader_clone = history_loader.clone();
         let inbox = UiInbox::new();
+
+        // Shared state for WebSocket communication
+        let ws_url = "ws://localhost:8000/ws";
+        let(ws_sender, ws_receiver) = mpsc::channel();
+        let(outer_ws_sender, outer_ws_receiver) = mpsc::channel();
+        let inner_ws_sender = ws_sender.clone();
+
+        spawn(async move {
+            println!("Connecting to WebSocket at {}", ws_url);
+            if let Err(e) = Self::connect_to_webscoket(ws_url, inner_ws_sender, outer_ws_receiver).await {
+                eprintln!("Failed to connect to WebSocket: {}", e);
+            }
+            println!()
+        });
 
         ChatExample {
             messages: InfiniteScroll::new().start_loader(move |cursor, cb| {
@@ -144,7 +157,40 @@ impl ChatExample {
             shown: false,
             msgs_received: 0,
             input_text: String::new(),  // 새로 추가
+            ws_receiver,
+            outer_ws_sender
         }
+    }
+
+    async fn connect_to_webscoket(url: &str, inner_ws_sender: Sender<Message>, outer_ws_receiver: Receiver<Message>) -> Result<(), Box<dyn std::error::Error>> {
+        let ws = connect(url).await?;
+        let (mut ws_sender, mut ws_receiver) = ws.split();
+
+        spawn(async move {
+            while let Ok(msg) = outer_ws_receiver.recv() {
+                ws_sender.send(msg).await.ok();
+            }
+        });
+
+        spawn(async move {
+            while let Some(msg) = ws_receiver.next().await {
+                match msg {
+                    Ok(message) => {
+                        if message.is_text() {
+                            let content = message.to_text().unwrap();
+                            println!("Received message: {}", content);
+                            inner_ws_sender.send(message).ok();
+                        }
+                    }
+                    Err(e) => {
+                        println!("Error receiving message: {}", e);
+                        break;
+                    }
+                }
+            }
+        });
+
+        Ok(())
     }
 
     #[allow(clippy::too_many_lines)] // It's an example
@@ -171,6 +217,23 @@ impl ChatExample {
             self.messages.items.push(message);
             self.msgs_received += 1;
         });
+
+        self.ws_receiver.try_iter().for_each(|msg| {
+            if let Ok(content) = msg.to_text() {
+                println!("Received message: {}", content);
+                let message = ChatMessage {
+                    content: content.to_string(),
+                    from: Some("server".to_string()),
+                };
+                self.messages.items.push(message);
+                self.msgs_received += 1;
+            } else {
+                eprintln!("Failed to convert message to text");
+            }
+        });
+
+
+
 
         let title = "Chat";
         demo_area(ui, title, 800.0, |ui| {
@@ -339,11 +402,12 @@ impl ChatExample {
                     }
                 });
 
-            ui.add_space(8.0);
+            ui.add_space(10.0);
             ui.horizontal(|ui| {
+                ui.add_space(5.0);
                 let text_edit = egui::TextEdit::singleline(&mut self.input_text)
                     .hint_text("Hi")
-                    .desired_width(ui.available_width() - 60.0)
+                    .desired_width(ui.available_width() - 40.0)
                     .id("chat_input".into()); // 고유 ID 추가
                     
                 let text_edit_response = ui.add(text_edit);
@@ -360,6 +424,7 @@ impl ChatExample {
                             content: self.input_text.clone(),
                             from: None,
                         };
+                        self.outer_ws_sender.send(Message::Text(self.input_text.clone())).ok();
                         self.messages.items.push(new_message);
                         self.input_text.clear();
                     }
