@@ -64,7 +64,7 @@ TR_CODE_TO_URL = {
     O3101: OVERSEAS_FUTUREOPTION_MARKET_DATA_PATH,
 }
 
-from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
+from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,  # noqa: E402
                            t1764OutBlock, t8401InBlock, t8401OutBlock,
                            t8424InBlock, t8424OutBlock, t8425InBlock,
                            t8425OutBlock, t8426InBlock, t8426OutBlock,

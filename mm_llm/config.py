@@ -1,4 +1,5 @@
-from pydantic import PostgresDsn, computed_field
+import os
+from pydantic import AnyUrl, PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings
 
@@ -9,6 +10,18 @@ class LlmSettings(BaseSettings):
     POSTGRES_SERVER: str
     POSTGRES_PORT: int
     POSTGRES_DB: str
+
+    ALEMBIC_DB_URL: str
+    OPENAI_API_KEY: str
+    TAVILY_API_KEY: str
+    LANGCHAIN_TRACING_V2: bool
+    LANGCHAIN_ENDPOINT: AnyUrl
+    LANGCHAIN_API_KEY: str
+    LANGCHAIN_PROJECT: str
+    MILVUS_API_KEY: str
+    MILVUS_URI: AnyUrl
+    MILVUS_READ_USER_ID: str
+    MILVUS_READ_PASSWORD: str
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -21,5 +34,9 @@ class LlmSettings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
+
+    class Config:
+        env_file = ".dev.llm.env" if os.getenv("ENVIRONMENT") == 'DEV' else ".prod.llm.env"
+        env_file_encoding = "utf-8"
 
 settings = LlmSettings() # type: ignore
