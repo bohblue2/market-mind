@@ -18,6 +18,7 @@ from langchain_core.runnables import (ConfigurableField, Runnable,
                                       chain)
 from langchain_milvus import Milvus
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from pydantic import SecretStr
 from pymilvus import Collection
 
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
@@ -25,6 +26,7 @@ from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
+from mm_llm.vectorstore.milvus import get_naver_news_article_collection
 
 
 def get_retriever(
@@ -117,16 +119,29 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
         | response_synthesizer
     )
 
-gpt4o = ChatOpenAI(
+gpt4_o = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
     streaming=True,
 )
-claude_3_haiku = ChatAnthropic(
-    model="claude-3-haiku-20240307",
+claude_3_sonnet = ChatAnthropic(
+    model_name="claude-3-5-sonnet-20240620",
     temperature=0,
-    max_tokens=4096,
-    anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY", "not_provided"),
+    timeout=None,
+    max_retries=2,
+    stop=["\n"],
+    api_key=SecretStr(os.environ.get("ANTHROPIC_API_KEY", "not_provided")),
 )
 
-llm = 
+llm = gpt4_o.configurable_alternatives(
+    ConfigurableField("llm"),
+    default_key="openai_gpt4_o",
+    antropic_claude_3_sonnet=claude_3_sonnet
+).with_fallbacks(
+    [gpt4_o, claude_3_sonnet]
+)
+
+retriever = get_retriever(
+    get_naver_news_article_collection(),
+)
+answer_chain = create_chain(llm, retriever)

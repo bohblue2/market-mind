@@ -24,6 +24,8 @@ class LlmSettings(BaseSettings):
     MILVUS_READ_USER_ID: str
     MILVUS_READ_PASSWORD: str
 
+    ANTHROPIC_API_KEY: str
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> PostgresDsn:

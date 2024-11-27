@@ -11,8 +11,14 @@ from mm_llm.constant import (DEFAULT_EMBEDDING_DIM, MILVUS_INDEX_TYPE,
 
 
 def get_milvus_client() -> MilvusClient:   
-    client = MilvusClient(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_API_KEY"))
-    connections.connect(uri=os.getenv("MILVUS_URI"), token=os.getenv("MILVUS_API_KEY"))
+    client = MilvusClient(
+        uri=os.getenv("MILVUS_URI", ""), 
+        token=os.getenv("MILVUS_API_KEY", "")
+    )
+    connections.connect(
+        uri=os.getenv("MILVUS_URI"), 
+        token=os.getenv("MILVUS_API_KEY", "")
+    )
     return client
 
 def get_naver_news_article_collection() -> Collection:
