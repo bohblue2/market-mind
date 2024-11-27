@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
+from pydantic import AnyUrl
 from pymilvus import (Collection, CollectionSchema, DataType, FieldSchema,
                       MilvusClient, connections, utility)
 
@@ -10,13 +11,13 @@ from mm_llm.constant import (DEFAULT_EMBEDDING_DIM, MILVUS_INDEX_TYPE,
                              MILVUS_METRIC_TYPE, MILVUS_NLIST)
 
 
-def get_milvus_client() -> MilvusClient:   
+def get_milvus_client(uri: str) -> MilvusClient:   
     client = MilvusClient(
-        uri=os.getenv("MILVUS_URI", ""), 
+        uri=uri,
         token=os.getenv("MILVUS_API_KEY", "")
     )
     connections.connect(
-        uri=os.getenv("MILVUS_URI"), 
+        uri=uri,
         token=os.getenv("MILVUS_API_KEY", "")
     )
     return client
@@ -27,7 +28,8 @@ def get_naver_news_article_collection() -> Collection:
         FieldSchema(name="ticker", dtype=DataType.VARCHAR, max_length=50),
         FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
         FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000),
-        FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM), # NOTE: This is a vector field
+        FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
+        FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=10, max_length=50),
         FieldSchema(name="article_published_at", dtype=DataType.VARCHAR, max_length=30),
         FieldSchema(name="article_modified_at", dtype=DataType.VARCHAR, max_length=30),
     ]

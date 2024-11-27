@@ -3,7 +3,7 @@
 
 import os
 from operator import itemgetter
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models import LanguageModelLike
@@ -26,25 +26,26 @@ from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
-from mm_llm.vectorstore.milvus import get_naver_news_article_collection
+from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection
+from mm_llm.config import settings
 
 
 def get_retriever(
     collection: Collection,
     *,
-    search_type: Optional[str] = "",
+    search_type: Optional[str] = None, 
     search_kwargs: Optional[dict] = {"k": 5},
 ) -> BaseRetriever:
     return Milvus(
         collection_name = collection.name,
         embedding_function = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL),
-        connection_args = {"uri": os.getenv("MILVUS_URI"),},
+        connection_args = {"uri": settings.MILVUS_URI},
         primary_field="doc_id",
         vector_field="content_embedding",
         text_field="content",
         drop_old=False
     ).as_retriever(
-        search_type=search_type,
+        search_type=search_type if search_type else "mmr",
         search_kwargs=search_kwargs
     )
  
@@ -76,8 +77,8 @@ def create_retriever_chain(
     ).with_config(run_name=RunNames.ROUTE_DEPENDING_ON_CHAT_HISTORY.value)
 
 
-def serialize_history(request: ChatRequest) -> List[BaseMessage]:
-    chat_history = request.chat_history or []
+def serialize_history(request: Dict[str, Any]) -> List[BaseMessage]:
+    chat_history = request.get("chat_history", [])
     converted_chat_history: List[BaseMessage] = []
     for message in chat_history:
         if message.get("human") is not None:
@@ -123,6 +124,7 @@ gpt4_o = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
     streaming=True,
+    api_key=SecretStr(settings.OPENAI_API_KEY),
 )
 claude_3_sonnet = ChatAnthropic(
     model_name="claude-3-5-sonnet-20240620",
@@ -130,7 +132,7 @@ claude_3_sonnet = ChatAnthropic(
     timeout=None,
     max_retries=2,
     stop=["\n"],
-    api_key=SecretStr(os.environ.get("ANTHROPIC_API_KEY", "not_provided")),
+    api_key=SecretStr(os.environ.get("ANTHROPIC_API_KEY", "default")),
 )
 
 llm = gpt4_o.configurable_alternatives(
@@ -141,7 +143,12 @@ llm = gpt4_o.configurable_alternatives(
     [gpt4_o, claude_3_sonnet]
 )
 
+_client = get_milvus_client(settings.MILVUS_URI)
 retriever = get_retriever(
     get_naver_news_article_collection(),
 )
 answer_chain = create_chain(llm, retriever)
+
+if __name__ == "__main__":
+    print(settings.OPENAI_API_KEY)
+    answer_chain.invoke(ChatRequest(question="What is the capital of France?", chat_history=[{"human": "What is the capital of France?"}]).model_dump())

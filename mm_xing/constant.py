@@ -1,10 +1,6 @@
 import os
 
-import dotenv
-
 from mm_xing.block import t9943InBlock
-
-dotenv.load_dotenv('.dev.env')
 
 XING_AUTH_URL = "oauth2/token"
 

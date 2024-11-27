@@ -20,7 +20,7 @@ class LlmSettings(BaseSettings):
     LANGCHAIN_API_KEY: str
     LANGCHAIN_PROJECT: str
     MILVUS_API_KEY: str
-    MILVUS_URI: AnyUrl
+    MILVUS_URI: str
     MILVUS_READ_USER_ID: str
     MILVUS_READ_PASSWORD: str
 
@@ -39,7 +39,8 @@ class LlmSettings(BaseSettings):
         )
 
     class Config:
-        env_file = ".dev.llm.env" if os.getenv("ENVIRONMENT") == 'DEV' else ".prod.llm.env"
+        env_file = ".dev.llm.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else ".prod.llm.env"
         env_file_encoding = "utf-8"
 
 settings = LlmSettings() # type: ignore
+print(settings.OPENAI_API_KEY)
