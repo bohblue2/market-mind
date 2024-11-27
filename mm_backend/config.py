@@ -1,9 +1,10 @@
 import os
 from typing import Annotated, Any
 
-from pydantic import PostgresDsn, AnyUrl, computed_field, BeforeValidator
+from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings
+
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):

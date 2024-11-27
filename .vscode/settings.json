@@ -1,8 +1,15 @@
 {
-    // "python.linting.enabled": true,
     "files.autoSave": "afterDelay",
-    "python.analysis.typeCheckingMode": "off",
-    "ruff.importStrategy": "fromEnvironment",
+    "python.analysis.typeCheckingMode": "basic",
     "mypy-type-checker.importStrategy": "fromEnvironment",
+    "ruff.enable": true,
+    "ruff.importStrategy": "fromEnvironment",
+    "ruff.interpreter": ["python"],
+    "ruff.nativeServer": "on",
+    "ruff.configuration": "${workspaceFolder}/ruff.toml",
     "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "never" // This might need to be adjusted
+    }
 }

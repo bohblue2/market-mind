@@ -9,16 +9,11 @@ from langchain_milvus import Zilliz
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
-from mm_llm.prompt_templates.default import PROMPT_TEMPLATE
+from mm_llm.prompts.default import PROMPT_TEMPLATE
+from mm_llm.spliter import format_docs
 from mm_llm.vectorstore.milvus import (get_milvus_client,
                                        get_naver_news_article_collection)
 
-prompt = PromptTemplate(
-    template=PROMPT_TEMPLATE, input_variables=["context", "question"]
-)
-
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
 
 class GeneratorService:
     def __init__(self):
@@ -38,7 +33,9 @@ class GeneratorService:
         )
         retriever = vectorstore.as_retriever()
         llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
-
+        prompt = PromptTemplate(
+            template=PROMPT_TEMPLATE, input_variables=["context", "question"]
+        )
         self._rag_chain = (
             {"context": retriever | format_docs, "question": RunnablePassthrough()}
             | prompt

@@ -31,6 +31,7 @@ streamlit = "^1.40.1"
 duckduckgo-search = "^6.3.5"
 wikipedia = "^1.4.0"
 fastapi = {extras = ["standard"], version = "^0.115.5"}
+langchain-anthropic = "^0.3.0"
 
 
 [tool.poetry.group.dev.dependencies]

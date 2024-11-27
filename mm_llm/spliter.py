@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Sequence
 
 import pymupdf
+from langchain_core.documents import Document
 
 
 def split_pdf(filepath: str, batch_size: int=10) -> List[str]:
@@ -22,4 +23,14 @@ def split_pdf(filepath: str, batch_size: int=10) -> List[str]:
     input_pdf.close()
     return ret
 
-    
+
+def format_docs_with_page_break(docs: List[Document]) -> str:
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+def format_docs_with_ids(docs: Sequence[Document]) -> str:
+    formatted_docs = []
+    for i, doc in enumerate(docs):
+        doc_string = f"<doc id='{i}'>{doc.page_content}</doc>"
+        formatted_docs.append(doc_string)
+    return "\n".join(formatted_docs)
