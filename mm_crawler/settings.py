@@ -9,10 +9,10 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "market_mind"
+BOT_NAME = "mm_crawler"
 
-SPIDER_MODULES = ["market_mind.spiders"]
-NEWSPIDER_MODULE = "market_mind.spiders"
+SPIDER_MODULES = ["mm_crawler.spiders"]
+NEWSPIDER_MODULE = "mm_crawler.spiders"
 
 # LOG_LEVEL = 'INFO'
 
@@ -49,19 +49,19 @@ ROBOTSTXT_OBEY = True
 # for both our http and https requests.
 
 # Disable the scrapy-playwright download handler
-# DOWNLOAD_HANDLERS = {
-#     "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-#     "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-# }
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
 
-# PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = (
-#     30 * 1000
-# )
+PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = (
+    30 * 1000
+)
 
 # PLAYWRIGHT_BROWSER_TYPE = "chromium"
-# PLAYWRIGHT_LAUNCH_OPTIONS = {
-#     "headless": False,
-# } 
+PLAYWRIGHT_LAUNCH_OPTIONS = {
+    "headless": False,
+} 
 
 # Disable the Scrapy User-Agent middleware
 # DOWNLOADER_MIDDLEWARES = {

@@ -26,10 +26,12 @@ def get_naver_news_article_collection() -> Collection:
     fields = [
         FieldSchema(name="article_id", dtype=DataType.INT64, is_primary=True),
         FieldSchema(name="ticker", dtype=DataType.VARCHAR, max_length=50),
+        FieldSchema(name="media_id", dtype=DataType.VARCHAR, max_length=50),
         FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
         FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000),
         FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
-        FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=10, max_length=50),
+        FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=10),
+        FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
         FieldSchema(name="article_published_at", dtype=DataType.VARCHAR, max_length=30),
         FieldSchema(name="article_modified_at", dtype=DataType.VARCHAR, max_length=30),
     ]
@@ -37,13 +39,48 @@ def get_naver_news_article_collection() -> Collection:
     collection = Collection(
         name="naver_news_articles",
         schema=schema,
-        description="Collection for Naver News Articles"
+        description=(
+            "This collection is dedicated to storing Naver News Articles, "
+            "including essential metadata such as article ID, ticker, media ID, "
+            "title, content, and language. It also captures the publication and "
+            "modification timestamps, along with content embeddings for advanced "
+            "search and analysis. The collection is structured to support efficient "
+            "retrieval and processing of news articles, facilitating comprehensive "
+            "data analysis and insights extraction."
+        )
     )
     return collection
     
 def get_research_report_collection() -> Collection:
-    # TODO: Implement research report collection schema
-    ...
+    fields = [
+        FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=64, is_primary=True),  # Unique ID for each chunk
+        FieldSchema(name="report_id", dtype=DataType.VARCHAR, max_length=50),
+        FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
+        FieldSchema(name="issuer_company_name", dtype=DataType.VARCHAR, max_length=200),
+        FieldSchema(name="issuer_company_id", dtype=DataType.VARCHAR, max_length=50),
+        FieldSchema(name="report_category", dtype=DataType.VARCHAR, max_length=100),
+        FieldSchema(name="target_company", dtype=DataType.VARCHAR, max_length=200, nullable=True),
+        FieldSchema(name="target_industry", dtype=DataType.VARCHAR, max_length=200, nullable=True),
+        FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000),  # Chunked content
+        FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
+        FieldSchema(name="date", dtype=DataType.VARCHAR, max_length=30),
+        FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
+        FieldSchema(name="updated_at", dtype=DataType.VARCHAR, max_length=30 ),
+        FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=30),
+    ]
+    schema = CollectionSchema(fields=fields, description="Collection for Naver Research Reports")
+    collection = Collection(
+        name="naver_research_reports",
+        schema=schema,
+        description=(
+            "This collection stores chunks of research reports, "
+            "including metadata such as report ID, title, issuer details, "
+            "category, target information, and timestamps for creation and "
+            "updates. It is designed to facilitate efficient storage and "
+            "retrieval of segmented report content for analysis and search operations."
+        )
+    )
+    return collection
 
 
 def create_index(collection: Collection, wait_for_building:bool=True) -> None:

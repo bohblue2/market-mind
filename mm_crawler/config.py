@@ -34,10 +34,10 @@ class CrawlerSettings(BaseSettings):
             """
             for field_name, field_value in self.__dict__.items():
                 print(f"{field_name}: {field_value}")
-        display_all_fields()
+        display_all_fields(self)
     
     class Config:
-        env_file = ".dev.crawler.env" if os.getenv("ENVIRONMENT") == 'DEV' else ".prod.crawler.env"
+        env_file = ".dev.crawler.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else ".prod.crawler.env"
         env_file_encoding = "utf-8"
 
 settings = CrawlerSettings() # type: ignore

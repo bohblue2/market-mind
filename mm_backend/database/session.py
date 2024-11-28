@@ -2,9 +2,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DATABASE_URL = 'sqlite:///examples/datasets/naver_news.db'
+from mm_backend.config import settings
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URL))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
@@ -14,6 +14,6 @@ def init_db():
 def get_db() -> Session: # type: ignore
     db = SessionLocal()
     try:
-        yield db
+        yield db # type: ignore
     finally:
         db.close()

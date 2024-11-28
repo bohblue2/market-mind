@@ -23,12 +23,12 @@ def _get_target_url(article_id: ArticleId, office_id: OfficeId):
 
 logging.getLogger('faker').setLevel(logging.WARNING)
 
-class NewsContents(scrapy.Spider):
+class NaverFinanceNewsContents(scrapy.Spider):
     verbose = False
     name = os.path.basename(__file__).replace('.py', '')
     allowed_domains = ["naver.com"]
     custom_settings = dict( 
-        ITEM_PIPELINES = {"language_crawler.pipelines.FinanceNewsContentPipeline": 1},
+        ITEM_PIPELINES = {"mm_crawler.pipelines.FinanceNewsContentPipeline": 1},
         DOWNLOADER_MIDDLEWARES={
             "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
             "scrapy.downloadermiddlewares.retry.RetryMiddleware": None,
@@ -61,7 +61,7 @@ class NewsContents(scrapy.Spider):
             )
     
     async def parse(self, response: HtmlResponse):
-        if self.verbose: 
+        if self.verbose and response.request is not None:
             # Print out the user-agent of the request to check they are random
             self.log(response.request.headers.get("User-Agent"))
             self.log(response.url)

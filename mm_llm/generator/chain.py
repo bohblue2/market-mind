@@ -21,13 +21,14 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import SecretStr
 from pymilvus import Collection
 
+from mm_llm.config import settings
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
 from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
-from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection
-from mm_llm.config import settings
+from mm_llm.vectorstore.milvus import (get_milvus_client,
+                                       get_naver_news_article_collection)
 
 
 def get_retriever(

@@ -8,7 +8,7 @@ class XingSettings(BaseSettings):
     XING_APP_SECRET: str
 
     class Config:
-        env_file = ".dev.xing.env" if os.getenv("ENVIRONMENT") == 'DEV' else ".prod.xing.env"
+        env_file = ".dev.xing.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else ".prod.xing.env"
         env_file_encoding = "utf-8"
 
 settings = XingSettings() # type: ignore

@@ -1,6 +1,8 @@
 import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, LargeBinary, String
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
+                        LargeBinary, String)
+from sqlalchemy.orm import relationship
 
 from mm_crawler.database.base import Base
 
@@ -20,6 +22,13 @@ class ArticleOrm(Base):
     latest_scraped_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
 
+    def __repr__(self):
+        return (f"<ArticleOrm(id={self.id}, article_id='{self.article_id}', ticker='{self.ticker}', "
+                f"media_id='{self.media_id}', media_name='{self.media_name}', title='{self.title}', "
+                f"link='{self.link}', is_origin={self.is_origin}, original_id='{self.original_id}', "
+                f"article_published_at='{self.article_published_at}', latest_scraped_at='{self.latest_scraped_at}', "
+                f"created_at='{self.created_at}')>")
+
 class ArticleContentOrm(Base):
     __tablename__ = 'article_contents'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -27,12 +36,18 @@ class ArticleContentOrm(Base):
     ticker = Column(String, nullable=False)
     media_id = Column(String, nullable=False)
     html = Column(LargeBinary, nullable=False)
-    content = Column(String, nullable=True)
     title = Column(String, nullable=True)
+    content = Column(String, nullable=True)
     language = Column(String, nullable=False)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
+
+    def __repr__(self):
+        return (f"<ArticleContentOrm(id={self.id}, article_id='{self.article_id}', ticker='{self.ticker}', "
+                f"media_id='{self.media_id}', title='{self.title}', language='{self.language}', "
+                f"article_published_at='{self.article_published_at}', article_modified_at='{self.article_modified_at}', "
+                f"created_at='{self.created_at}')>")
 
 class ResearchReportOrm(Base):
     __tablename__ = 'research_reports'
@@ -48,8 +63,23 @@ class ResearchReportOrm(Base):
     target_company  = Column(String, nullable=True)
     target_industry = Column(String, nullable=True)
     downloaded = Column(Boolean, nullable=True)
+    files = relationship('ResearchReportFileOrm', backref='research_report', cascade='all, delete-orphan')
     updated_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=False)
 
     def __repr__(self):
-        return f"<ResearchReport(id={self.id}, title='{self.title}', date='{self.date}', securities_company='{self.issuer_company_name}')>"
+        return (f"<ResearchReportOrm(id={self.id}, report_id='{self.report_id}', title='{self.title}', "
+                f"date='{self.date}', file_url='{self.file_url}', issuer_company_name='{self.issuer_company_name}', "
+                f"issuer_company_id='{self.issuer_company_id}', report_category='{self.report_category}', "
+                f"target_company='{self.target_company}', target_industry='{self.target_industry}', "
+                f"downloaded={self.downloaded}, updated_at='{self.updated_at}', created_at='{self.created_at}')>")
+
+class ResearchReportFileOrm(Base):
+    __tablename__ = 'research_report_files'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    report_id = Column(Integer, ForeignKey('research_reports.id'), nullable=False)
+    file_data = Column(LargeBinary, nullable=False)
+
+    def __repr__(self):
+        return f"<ResearchReportFileOrm(id={self.id}, report_id={self.report_id})>"

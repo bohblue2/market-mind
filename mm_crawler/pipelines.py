@@ -9,8 +9,9 @@ from typing import Any, Dict
 
 import pytz  # type: ignore
 
-from mm_crawler.commons import async_download_pdf
+from mm_crawler.commons import async_download_pdf, async_load_to_buffer
 from mm_crawler.database.models import (ArticleContentOrm, ArticleOrm,
+                                        ResearchReportFileOrm,
                                         ResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem, ArticleItem
@@ -79,7 +80,13 @@ class FinanceNewsContentPipeline:
             article_id=response.meta['article_id'],
             media_id=response.meta['media_id']
         ).first()
-        article.latest_scraped_at = datetime.now(kst)
+
+        if article is not None:
+            article.latest_scraped_at = datetime.now(kst) # type: ignore
+            self.sess.add(article)
+            self.sess.commit()
+        else:
+            raise ValueError(f"Article not found: {response.meta['article_id']}")
                 
         article_content = ArticleContentOrm(
             ticker=item['ticker'],
@@ -139,22 +146,29 @@ class ResearchMarketinfoListPipeline:
         # NOTE: Check downloaded
         self.sess.add(research_report)
         self.sess.commit()
-        await download_report(self.sess, research_report, item)
+        await fetch_and_store_report(self.sess, research_report, item)
         return item
 
-async def download_report(sess, research_report_orm: ResearchReportOrm, item: Dict[str, Any]):
+async def fetch_and_store_report(sess, report_orm: ResearchReportOrm, item: Dict[str, Any]):
+    report_item: Dict[str, Any] = item.get('report_item', {})
+    print(
+        f"Fetching and storing: "
+        f"research_report/"
+        f"{report_item['date']}/"
+        f"{report_item['category']}/"
+        f"{report_item['report_id']}.pdf"
+    )
     try:
-        report_item: Dict[str, Any] = item.get('report_item', {})
-        save_path = (
-            f"./examples/datasets/research_report/{report_item['date']}/"
-            f"{report_item['category']}/"
-            f"{report_item['date']}_{report_item['category']}_{report_item['report_id']}.pdf"
-        ) 
-        await async_download_pdf(url=research_report_orm.file_url, save_path=save_path)
+        buffer = bytearray()
+        await async_load_to_buffer(url=str(report_orm.file_url), buffer=buffer)
+        report_file = ResearchReportFileOrm(report_id=report_orm.id, file_data=buffer)
+        sess.add(report_file)
+        sess.commit()
     except Exception as e:
         raise e
     else:
-        research_report_orm.downloaded = True # type: ignore
-        sess.add(research_report_orm)
+        report_orm.downloaded = True # type: ignore
+        sess.add(report_orm)
         sess.commit()
+        
         

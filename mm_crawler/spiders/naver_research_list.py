@@ -22,7 +22,7 @@ DEFAULT_END_PAGE: int = 3
 class NaverResearchBase(scrapy.Spider):
     allowed_domains = ['naver.com']
     custom_settings =dict(
-        ITEM_PIPELINES = {"language_crawler.pipelines.ResearchMarketinfoListPipeline": 1}
+        ITEM_PIPELINES = {"mm_crawler.pipelines.ResearchMarketinfoListPipeline": 1}
     )
 
     wait_time = DEFAULT_WAIT_TIME
@@ -59,6 +59,10 @@ class NaverResearchBase(scrapy.Spider):
         self.log(f"Extracted {len(items)} reports from page {current_page}")
         for item in items:
             yield item
+    
+    @abc.abstractmethod
+    def _get_target_url(self, page: int) -> str:
+        raise NotImplementedError
    
     @abc.abstractmethod 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -146,7 +150,7 @@ class NaverResearchBase(scrapy.Spider):
                     securities_company_name=securities_company,
                     report_item=parse_report_url(file_url)
                 )
-                item['report_item'][extra_col_name] = extra_col_value
+                item['report_item'][extra_col_name] = extra_col_value # type: ignore
                 results.append(item)
         
         if len(results) < 30:
@@ -158,55 +162,55 @@ class NaverResearchMarketInfo(NaverResearchBase):
     name = 'naver_research_market_info'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}" # noqa
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}" # type: ignore
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchCompanyList(NaverResearchBase):
     name = 'naver_research_company_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/company_list.naver?&page={page}" # noqa
+    _get_target_url = lambda self, page: f"https://finance.naver.com/research/company_list.naver?&page={page}" # type: ignore 
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_extra_columns(reports_list_soup, 'target_company')
 
 class NaverResearchDebentureList(NaverResearchBase):
     name = 'naver_research_debenture_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}" # noqa
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}" # type: ignore 
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchEconomyList(NaverResearchBase):
     name = 'naver_research_economy_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/economy_list.naver?&page={page}" # noqa
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/economy_list.naver?&page={page}" # type: ignore 
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)
 
 class NaverResearchIndustryList(NaverResearchBase):
     name = 'naver_research_industry_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}" # noqa
+    _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}" # type: ignore 
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_extra_columns(reports_list_soup, 'target_industry')
 
         
@@ -214,9 +218,9 @@ class NaverResearchInvestList(NaverResearchBase):
     name = 'naver_research_invest_list'
     start_page = 1
     end_page = 3
-    _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}" # noqa
+    _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}" # type: ignore
 
     async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
-        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser')
+        reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)

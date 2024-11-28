@@ -3,7 +3,6 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-from datetime import datetime
 
 import scrapy
 
@@ -20,7 +19,7 @@ class ArticleItem(ItemBase):
     link = scrapy.Field()
     is_origin = scrapy.Field()
     origin_id = scrapy.Field()
-    article_published_at: str = scrapy.Field()
+    article_published_at = scrapy.Field()
 
 
 class ArticleContentItem(ItemBase):
@@ -31,8 +30,8 @@ class ArticleContentItem(ItemBase):
     content = scrapy.Field()
     title = scrapy.Field()
     language = scrapy.Field()
-    article_published_at: str = scrapy.Field()
-    article_modified_at: str = scrapy.Field()
+    article_published_at = scrapy.Field()
+    article_modified_at = scrapy.Field()
 
 class NaverReportItem(ItemBase):
     category = scrapy.Field()
@@ -48,7 +47,7 @@ class NaverResearchItem(ItemBase):
     company = scrapy.Field()
     title = scrapy.Field()
     date_str = scrapy.Field()
-    date_obj: datetime = scrapy.Field()
+    date_obj = scrapy.Field()
     file_url = scrapy.Field()
     securities_company_name = scrapy.Field()
-    report_item: NaverReportItem = scrapy.Field()
+    report_item: NaverReportItem = scrapy.Field() # type: ignore

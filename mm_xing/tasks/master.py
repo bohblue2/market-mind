@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 from httpx import Client, Response
 from pydantic import BaseModel
 
+from mm_xing.config import settings
 from mm_xing.auth import get_access_token
 from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
                            t1764OutBlock, t8401InBlock, t8401OutBlock,
@@ -171,8 +172,8 @@ async def initialize_client() -> tuple[Client, XingTrHeaders]:
     client = Client(verify=False, base_url=XING_REST_URL)
     access_token = get_access_token(
         client,
-        app_key=XING_APP_KEY,
-        app_secret=XING_APP_SECRET,
+        app_key=settings.XING_APP_KEY,
+        app_secret=settings.XING_APP_SECRET,
     )
     headers = XingTrHeaders.update_access_token(access_token)
     return client, headers

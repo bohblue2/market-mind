@@ -19,7 +19,7 @@ from mm_xing.tasks.master import (fetch_market_data, get_data_config,
                                   initialize_client)
 
 router = APIRouter(
-    prefix="/securies",
+    prefix="/securities",
     tags=["securities"]
 )
 
@@ -81,6 +81,7 @@ ResponseModel = Union[
 )
 async def fetch_code_data(
     tr_code: str = Query(..., description="The TR code representing the type of market data to fetch."),
+    limit: int = Query(100, description="The maximum number of records to return."),
     db: Session = Depends(get_db)
 ):
     """
@@ -108,7 +109,10 @@ async def fetch_code_data(
     ).all()
 
     if not tasks:
-        data_config_code = get_data_config(config_type=TR_CODE_TO_TYPE[tr_code], tr_code=tr_code)
+        try:
+            data_config_code = get_data_config(config_type=TR_CODE_TO_TYPE[tr_code], tr_code=tr_code)
+        except KeyError:
+            raise HTTPException(status_code=400, detail=f"Unsupported TR code: {tr_code}")
         if not data_config_code:
             raise HTTPException(status_code=404, detail=f"Data config code not found for {tr_code}")
 
@@ -125,18 +129,21 @@ async def fetch_code_data(
             db.add_all([orm_model(**row.model_dump()) for row in data if row is not None])
             db.add(RountineTaskOrm(task_name=tr_code, status='done'))
             db.commit()
-            return data
+            return data[:limit]
         except Exception as e:
             db.rollback()
+            # {'detail': '"Response does not contain expected outblock data: {\'rsp_cd\': \'00000\', \'rsp_msg\': \'해당자료가 없습니다.\'}"'}
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             client.close()
     else:
         # 캐시된 데이터 반환
         orm_model = get_orm_model_for_tr_code(tr_code)
+        if orm_model is None:
+            raise HTTPException(status_code=400, detail=f"Unsupported TR code: {tr_code}")
         cached_data = db.query(orm_model).filter(
-            orm_model.created_at >= today_start
-        ).all()
+            orm_model.created_at >= today_start # type: ignore
+        ).limit(limit).all()
         return cached_data
     
 def get_orm_model_for_tr_code(tr_code: str):

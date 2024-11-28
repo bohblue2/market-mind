@@ -59,6 +59,10 @@ PYTHONPATH=$(pwd)/.. alembic check
 - [scrapy-fake-agent](https://github.com/alecxe/scrapy-fake-useragent)
 - [scrapy-playwright](https://github.com/scrapy-plugins/scrapy-playwright)
 
+```bash
+playwright install
+```
+
 ## html compression algorithm
 
 The crawled HTML code is stored as binary, compressed using the `lzma` algorithm. [Simple tests](https://chat.openai.com/share/a0a256b4-6e04-4920-8f4e-7b7285977476) showed that among `lz4`, `gzip`, `bz2`, and `lzma`, `lzma` had the best compression ratio. Compression time was not considered.
@@ -86,4 +90,11 @@ To add $HOME/.grit/bin to your PATH, either restart your shell or run:
 $  source $HOME/.grit/bin/env 
 
 $ grit apply openai
+```
+
+## Dependencies
+```
+pip install psycopg
+sudo apt-get install libpq-dev
+brew install postgresql
 ```

@@ -32,6 +32,10 @@ duckduckgo-search = "^6.3.5"
 wikipedia = "^1.4.0"
 fastapi = {extras = ["standard"], version = "^0.115.5"}
 langchain-anthropic = "^0.3.0"
+psycopg = "^3.2.3"
+twisted = {extras = ["asyncio"], version = "^24.10.0"}
+playwright = "^1.49.0"
+scrapy-playwright = "^0.0.42"
 
 
 [tool.poetry.group.dev.dependencies]
