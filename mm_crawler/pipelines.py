@@ -5,14 +5,14 @@
 
 import lzma
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from scrapy.exceptions import DropItem
 
 import pytz  # type: ignore
 
 from mm_crawler.commons import async_download_pdf, async_load_to_buffer
-from mm_crawler.database.models import (ArticleContentOrm, ArticleOrm,
-                                        ResearchReportFileOrm,
-                                        ResearchReportOrm)
+from mm_crawler.database.models import (NaverArticleListOrm, NaverArticleContentOrm, NaverResearchReportFileOrm, NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem, ArticleItem
 
@@ -45,12 +45,12 @@ class FinanceNewsListPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    def process_item(self, item: ArticleItem, spider):
-        if item.get('article_id') is None:
-            # TODO: This should be handled by the spider
-            return item
+    def process_item(self, item: Optional[ArticleItem], spider):
+        if item is None:
+            # TODO: Handle this case 
+            return DropItem("Item is None")
 
-        article = ArticleOrm(
+        article = NaverArticleListOrm(
             ticker=item['ticker'],
             article_id=item['article_id'],
             media_id=item['media_id'],
@@ -76,7 +76,7 @@ class FinanceNewsContentPipeline:
 
     def process_item(self, item: ArticleContentItem, spider):
         response = item['response']
-        article = self.sess.query(ArticleOrm).filter_by(
+        article = self.sess.query(NaverArticleListOrm).filter_by(
             article_id=response.meta['article_id'],
             media_id=response.meta['media_id']
         ).first()
@@ -88,7 +88,7 @@ class FinanceNewsContentPipeline:
         else:
             raise ValueError(f"Article not found: {response.meta['article_id']}")
                 
-        article_content = ArticleContentOrm(
+        article_content = NaverArticleContentOrm(
             ticker=item['ticker'],
             article_id=item['article_id'],
             media_id=item['media_id'],
@@ -131,7 +131,7 @@ class ResearchMarketinfoListPipeline:
                 'security_company_id': '61'}
             }
         """
-        research_report = ResearchReportOrm(
+        research_report = NaverResearchReportOrm(
             title=item.get('title'),
             date=item.get('date_obj'),
             file_url=item.get('file_url'),
@@ -149,7 +149,7 @@ class ResearchMarketinfoListPipeline:
         await fetch_and_store_report(self.sess, research_report, item)
         return item
 
-async def fetch_and_store_report(sess, report_orm: ResearchReportOrm, item: Dict[str, Any]):
+async def fetch_and_store_report(sess, report_orm: NaverResearchReportOrm, item: Dict[str, Any]):
     report_item: Dict[str, Any] = item.get('report_item', {})
     print(
         f"Fetching and storing: "
@@ -161,7 +161,7 @@ async def fetch_and_store_report(sess, report_orm: ResearchReportOrm, item: Dict
     try:
         buffer = bytearray()
         await async_load_to_buffer(url=str(report_orm.file_url), buffer=buffer)
-        report_file = ResearchReportFileOrm(report_id=report_orm.id, file_data=buffer)
+        report_file = NaverResearchReportFileOrm(report_id=report_orm.id, file_data=buffer)
         sess.add(report_file)
         sess.commit()
     except Exception as e:

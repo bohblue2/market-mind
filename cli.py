@@ -1,11 +1,6 @@
 import os
-from collections import OrderedDict, defaultdict
-from datetime import datetime
-from typing import List
 
 import click
-
-# Assuming parse_res, create_res_file_mapping, create_pydantic_model, and create_msgspec_model_for_websocket are defined elsewhere in the file
 
 @click.group()
 def cli():
@@ -44,7 +39,7 @@ def res_converter(task, path):
 def mm_llm(): ...
 
 
-from scrapy.crawler import CrawlerProcess, CrawlerRunner
+from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from twisted.internet import defer, reactor
 
@@ -77,41 +72,6 @@ def run_spider_with_runner(spider_name, arg):
     
     crawl()
     reactor.run() # type: ignore
-
-@mm_crawler.command()
-@click.argument('spider_name')
-@click.option('--arg', '-a', multiple=True, type=(str, str), help='Additional arguments for the spider in key=value format.')
-def run_spider_with_process(spider_name, arg):
-    """
-    Run a Scrapy spider with additional arguments.
-
-    Usage:
-    python cli.py run_spider <spider_name> --arg <key1> <value1> --arg <key2> <value2>
-
-    Parameters:
-    spider_name: The name of the Scrapy spider to run.
-    arg: Additional arguments for the spider in key=value format, passed as multiple --arg options.
-
-    Example:
-    To run a spider named 'my_spider' with additional arguments 'key1=value1' and 'key2=value2', use:
-    python cli.py run_spider my_spider --arg key1 value1 --arg key2 value2
-    """
-    import sys
-    # Check if the correct reactor is already installed
-    if 'twisted.internet.reactor' not in sys.modules:
-        from twisted.internet import asyncioreactor
-        asyncioreactor.install()
-
-    process = CrawlerProcess(get_project_settings())
-    
-    # Convert the list of tuples into a dictionary
-    additional_args = {key: value for key, value in arg}
-    
-    process.crawl(spider_name, **additional_args)
-    process.start()
-
-
-
 
 if __name__ == "__main__":
     cli()

@@ -8,7 +8,7 @@ from scrapy.http import Request
 from scrapy.http.response.html import HtmlResponse
 from twisted.python.failure import Failure
 
-from mm_crawler.database.models import ArticleOrm
+from mm_crawler.database.models import NaverArticleListOrm 
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem
 
@@ -23,7 +23,7 @@ def _get_target_url(article_id: ArticleId, office_id: OfficeId):
 
 logging.getLogger('faker').setLevel(logging.WARNING)
 
-class NaverFinanceNewsContents(scrapy.Spider):
+class NaverNewsArticleContents(scrapy.Spider):
     verbose = False
     name = os.path.basename(__file__).replace('.py', '')
     allowed_domains = ["naver.com"]
@@ -45,8 +45,8 @@ class NaverFinanceNewsContents(scrapy.Spider):
     def start_requests(self) -> Iterable[Request]:
         session = SessionLocal()
         articles = session\
-            .query(ArticleOrm)\
-            .filter(ArticleOrm.latest_scraped_at == None)\
+            .query(NaverArticleListOrm)\
+            .filter(NaverArticleListOrm.latest_scraped_at == None)\
             .all()
         for article in articles:
             yield Request(

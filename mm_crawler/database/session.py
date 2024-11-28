@@ -10,3 +10,5 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db():
     from mm_crawler.database.models import Base
     Base.metadata.create_all(bind=engine)
+
+init_db()

@@ -17,7 +17,7 @@ from mm_crawler.spiders.commons import parse_report_url
 KST = pytz.timezone('Asia/Seoul')
 DEFAULT_WAIT_TIME: int = 10
 DEFAULT_START_PAGE: int = 1
-DEFAULT_END_PAGE: int = 3
+DEFAULT_END_PAGE: int = 10
 
 class NaverResearchBase(scrapy.Spider):
     allowed_domains = ['naver.com']

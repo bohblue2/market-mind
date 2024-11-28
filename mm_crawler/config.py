@@ -19,7 +19,7 @@ class CrawlerSettings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> PostgresDsn:
         return MultiHostUrl.build(
-            scheme="postgresql+psycopg",
+            scheme="postgresql",
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_SERVER,

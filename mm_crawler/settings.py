@@ -49,19 +49,19 @@ ROBOTSTXT_OBEY = True
 # for both our http and https requests.
 
 # Disable the scrapy-playwright download handler
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
+# DOWNLOAD_HANDLERS = {
+#     "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+#     "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+# }
 
-PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = (
-    30 * 1000
-)
+# PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = (
+#     30 * 1000
+# )
 
 # PLAYWRIGHT_BROWSER_TYPE = "chromium"
-PLAYWRIGHT_LAUNCH_OPTIONS = {
-    "headless": False,
-} 
+# PLAYWRIGHT_LAUNCH_OPTIONS = {
+#     "headless": False,
+# } 
 
 # Disable the Scrapy User-Agent middleware
 # DOWNLOADER_MIDDLEWARES = {
