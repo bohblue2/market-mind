@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, DateTime, Float, Integer, String
+from sqlalchemy import Column, DateTime, Float, Integer, String, func
 
 from mm_backend.database.base import Base
 
@@ -9,8 +9,8 @@ class BaseOrm(Base):
     __abstract__ = True
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
-    updated_at = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
 
 class RountineTaskOrm(BaseOrm):
     __tablename__ = 'routine_tasks'
