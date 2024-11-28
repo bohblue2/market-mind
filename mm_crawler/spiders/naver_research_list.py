@@ -47,6 +47,7 @@ class NaverResearchBase(scrapy.Spider):
                 callback=self.parse, 
                 errback=self.errback,
             )
+            # TODO: Make the spider wait for a random amount of time before sending the next request.
         
     async def errback(self, failure):
         self.log(type(failure))

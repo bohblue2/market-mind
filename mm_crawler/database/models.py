@@ -20,7 +20,7 @@ class NaverArticleListOrm(Base):
     original_id = Column(String, nullable=True)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     latest_scraped_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
 
     def __repr__(self):
         return (f"<NaverArticleListOrm(id={self.id}, article_id='{self.article_id}', ticker='{self.ticker}', "
@@ -41,7 +41,7 @@ class NaverArticleContentOrm(Base):
     language = Column(String, nullable=False)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
 
     def __repr__(self):
         return (f"<NaverArticleContentOrm(id={self.id}, article_id='{self.article_id}', ticker='{self.ticker}', "
@@ -55,7 +55,7 @@ class NaverArticleFailureOrm(Base):
     article_id = Column(String, nullable=False)
     media_id = Column(String, nullable=False)
     link = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
 
     def __repr__(self):
         return (f"<NaverArticleFailureOrm(id={self.id}, article_id='{self.article_id}', media_id='{self.media_id}', "
@@ -77,7 +77,7 @@ class NaverResearchReportOrm(Base):
     downloaded = Column(Boolean, nullable=True)
     files = relationship('NaverResearchReportFileOrm', backref='naver_research_report', cascade='all, delete-orphan')
     updated_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime(timezone=True), default=func.now, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     def __repr__(self):
         return (f"<NaverResearchReportOrm(id={self.id}, report_id='{self.report_id}', title='{self.title}', "
@@ -92,6 +92,7 @@ class NaverResearchReportFileOrm(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     report_id = Column(Integer, ForeignKey('naver_research_reports.id'), nullable=False)
     file_data = Column(LargeBinary, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     def __repr__(self):
         return f"<NaverResearchReportFileOrm(id={self.id}, report_id={self.report_id})>"
