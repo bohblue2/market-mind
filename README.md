@@ -33,6 +33,8 @@ scrapy crawl naver_news_content
 
 # TASK2: 저장된 네이버 뉴스 링크 리스트에서 하나씩 뉴스 본문 파싱
 scrapy crawl naver_news_list
+
+scrapy crawl naver_news_list -a end_page=5
 ```
 
 ## Deployment
