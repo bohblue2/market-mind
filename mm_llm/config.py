@@ -43,4 +43,3 @@ class LlmSettings(BaseSettings):
         env_file_encoding = "utf-8"
 
 settings = LlmSettings() # type: ignore
-print(settings.OPENAI_API_KEY)
