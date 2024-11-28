@@ -48,7 +48,7 @@ class FinanceNewsListPipeline:
     def process_item(self, item: Optional[ArticleItem], spider):
         if item is None:
             # TODO: Handle this case 
-            return DropItem("Item is None")
+            raise DropItem("Item is None")
 
         article = NaverArticleListOrm(
             ticker=item['ticker'],
@@ -86,7 +86,7 @@ class FinanceNewsContentPipeline:
             self.sess.add(article)
             self.sess.commit()
         else:
-            raise ValueError(f"Article not found: {response.meta['article_id']}")
+            raise DropItem(f"Article not found: {response.meta['article_id']}")
                 
         article_content = NaverArticleContentOrm(
             ticker=item['ticker'],
@@ -143,7 +143,6 @@ class ResearchMarketinfoListPipeline:
             target_industry=item['report_item'].get('target_industry', None),  # Not provided in the input data
             updated_at=datetime.now(pytz.UTC),
         )
-        # NOTE: Check downloaded
         self.sess.add(research_report)
         self.sess.commit()
         await fetch_and_store_report(self.sess, research_report, item)
@@ -165,7 +164,7 @@ async def fetch_and_store_report(sess, report_orm: NaverResearchReportOrm, item:
         sess.add(report_file)
         sess.commit()
     except Exception as e:
-        raise e
+        raise DropItem(f"Failed to download and store report: {e}") 
     else:
         report_orm.downloaded = True # type: ignore
         sess.add(report_orm)
