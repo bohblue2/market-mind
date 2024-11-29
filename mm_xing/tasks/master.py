@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Optional
 from httpx import Client, Response
 from pydantic import BaseModel
 
-from mm_xing.config import settings
 from mm_xing.auth import get_access_token
 from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
                            t1764OutBlock, t8401InBlock, t8401OutBlock,
@@ -15,6 +14,7 @@ from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
                            t8425OutBlock, t8426InBlock, t8426OutBlock,
                            t8436InBlock, t8436OutBlock, t9943InBlock,
                            t9943OutBlock, t9944InBlock, t9944OutBlock)
+from mm_xing.config import settings
 # TODO: Refactor this import (mm_xing.constant -> mm_xing.config)
 from mm_xing.constant import (INDTP_MARKET_DATA_PATH, MM_DB_PATH, O3101,
                               STOCK_EXCHANGE_PATH, STOCK_SECTOR_PATH, T1764,

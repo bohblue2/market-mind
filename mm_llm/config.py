@@ -26,6 +26,8 @@ class LlmSettings(BaseSettings):
 
     ANTHROPIC_API_KEY: str
 
+    UPSTAGE_API_KEY: str
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> PostgresDsn:

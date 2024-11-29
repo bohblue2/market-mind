@@ -1,8 +1,8 @@
 import asyncio
-from enum import Enum
 import os
 import re
 import time
+from enum import Enum
 from typing import Any, Dict
 
 import requests
@@ -10,6 +10,7 @@ import scrapy
 from scrapy.http.response.html import HtmlResponse
 
 from mm_crawler.items import ArticleItem
+
 
 class NaverArticleErrorEnum(Enum):
     END_OF_PAGE = "End of page reached"

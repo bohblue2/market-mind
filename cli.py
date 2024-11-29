@@ -2,6 +2,7 @@ import os
 
 import click
 
+
 @click.group()
 def cli():
     """Main CLI group."""

@@ -7,12 +7,14 @@ import lzma
 from datetime import datetime
 from typing import Any, Dict, Optional
 
+import pytz  # type: ignore
 from scrapy.exceptions import DropItem
 
-import pytz  # type: ignore
-
 from mm_crawler.commons import async_download_pdf, async_load_to_buffer
-from mm_crawler.database.models import (NaverArticleListOrm, NaverArticleContentOrm, NaverResearchReportFileOrm, NaverResearchReportOrm)
+from mm_crawler.database.models import (NaverArticleContentOrm,
+                                        NaverArticleListOrm,
+                                        NaverResearchReportFileOrm,
+                                        NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem, ArticleItem
 

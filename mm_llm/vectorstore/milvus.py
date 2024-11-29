@@ -3,7 +3,6 @@ import os
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from pydantic import AnyUrl
 from pymilvus import (Collection, CollectionSchema, DataType, FieldSchema,
                       MilvusClient, connections, utility)
 
@@ -51,7 +50,7 @@ def get_naver_news_article_collection() -> Collection:
     )
     return collection
     
-def get_research_report_collection() -> Collection:
+def get_naver_research_report_collection() -> Collection:
     fields = [
         FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=64, is_primary=True),  # Unique ID for each chunk
         FieldSchema(name="report_id", dtype=DataType.VARCHAR, max_length=50),
@@ -83,9 +82,9 @@ def get_research_report_collection() -> Collection:
     return collection
 
 
-def create_index(collection: Collection, wait_for_building:bool=True) -> None:
+def create_index(collection: Collection, field_name: str = "content_embeddin", wait_for_building:bool=True) -> None:
     collection.create_index(
-        field_name="content_embedding", 
+        field_name=field_name, 
         index_params={
             "metric_type": MILVUS_METRIC_TYPE,
             "index_type": MILVUS_INDEX_TYPE,

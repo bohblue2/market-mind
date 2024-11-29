@@ -8,7 +8,7 @@ from scrapy.http import Request
 from scrapy.http.response.html import HtmlResponse
 from twisted.python.failure import Failure
 
-from mm_crawler.database.models import NaverArticleListOrm 
+from mm_crawler.database.models import NaverArticleListOrm
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem
 

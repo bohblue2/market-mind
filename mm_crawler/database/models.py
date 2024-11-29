@@ -1,8 +1,8 @@
 
-from sqlalchemy.sql import func
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
                         LargeBinary, String)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from mm_crawler.database.base import Base
 

@@ -3,11 +3,11 @@ import os
 import re
 import time
 
-from bs4 import BeautifulSoup
 import requests
 import scrapy
-from scrapy.http.response.html import HtmlResponse
+from bs4 import BeautifulSoup
 from scrapy.http.request import Request
+from scrapy.http.response.html import HtmlResponse
 from scrapy_playwright.page import PageMethod
 
 from mm_crawler.items import ArticleItem

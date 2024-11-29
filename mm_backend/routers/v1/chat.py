@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, Depends
 
 from mm_backend.constant import LATEST_INDEX
 from mm_backend.schemas import ChatCompletionResponse, ChatRequest, RoleEnum
+
 # from mm_llm.generator import GeneratorService, get_generator_service
 
 router = APIRouter(
