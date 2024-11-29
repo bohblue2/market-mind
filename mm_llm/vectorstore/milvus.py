@@ -24,15 +24,16 @@ def get_milvus_client(uri: str) -> MilvusClient:
 def get_naver_news_article_collection() -> Collection:
     fields = [
         FieldSchema(name="article_id", dtype=DataType.INT64, is_primary=True),
+        FieldSchema(name="chunk_num", dtype=DataType.INT64),
         FieldSchema(name="ticker", dtype=DataType.VARCHAR, max_length=50),
         FieldSchema(name="media_id", dtype=DataType.VARCHAR, max_length=50),
         FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
-        FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000),
+        FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000, description="Chunked content"),
         FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
         FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=10),
         FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
         FieldSchema(name="article_published_at", dtype=DataType.VARCHAR, max_length=30),
-        FieldSchema(name="article_modified_at", dtype=DataType.VARCHAR, max_length=30),
+        FieldSchema(name="latest_scraped_at", dtype=DataType.VARCHAR, max_length=30),
     ]
     schema = CollectionSchema(fields=fields, description="Collection for Naver News Articles")
     collection = Collection(
@@ -52,18 +53,18 @@ def get_naver_news_article_collection() -> Collection:
     
 def get_naver_research_report_collection() -> Collection:
     fields = [
-        FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=64, is_primary=True),  # Unique ID for each chunk
-        FieldSchema(name="report_id", dtype=DataType.VARCHAR, max_length=50),
+        FieldSchema(name="report_id", dtype=DataType.VARCHAR, max_length=50, is_primary=True),  # Unique ID for each report
+        FieldSchema(name="chunk_num", dtype=DataType.VARCHAR, max_length=64),  
         FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
         FieldSchema(name="issuer_company_name", dtype=DataType.VARCHAR, max_length=200),
         FieldSchema(name="issuer_company_id", dtype=DataType.VARCHAR, max_length=50),
         FieldSchema(name="report_category", dtype=DataType.VARCHAR, max_length=100),
         FieldSchema(name="target_company", dtype=DataType.VARCHAR, max_length=200, nullable=True),
         FieldSchema(name="target_industry", dtype=DataType.VARCHAR, max_length=200, nullable=True),
-        FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000),  # Chunked content
+        FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000, description="Chunked content"),  
         FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
-        FieldSchema(name="date", dtype=DataType.VARCHAR, max_length=30),
         FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
+        FieldSchema(name="date", dtype=DataType.VARCHAR, max_length=30, description="Report publication date"),
         FieldSchema(name="updated_at", dtype=DataType.VARCHAR, max_length=30 ),
         FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=30),
     ]

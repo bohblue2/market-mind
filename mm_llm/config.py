@@ -28,6 +28,8 @@ class LlmSettings(BaseSettings):
 
     UPSTAGE_API_KEY: str
 
+    DEFAULT_EMBEDDING_MODEL: str
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> PostgresDsn:

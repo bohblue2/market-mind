@@ -30,13 +30,15 @@ def upstage_layout_analysis(input_stream: bytes, report_id: str):
     
     
 
-def ingest_research_report_to_milvus(sess: Session):
-    report_pdf_files: List[NaverResearchReportFileOrm] = sess.query(NaverResearchReportFileOrm).yield_per(10).all() # type: ignore
+def ingest_research_report_to_milvus(sess: Session, yield_size: int = 1000):
+    report_pdf_files: List[NaverResearchReportFileOrm] = sess.query(
+        NaverResearchReportFileOrm
+    ).yield_per(yield_size).all() # type: ignore
     
     for report in report_pdf_files: # type ignore
         bytes_buffer: bytearray = report.file_data # type: ignore
         report_id: int = report.report_id # type: ignore
-        ret = split_pdf(bytes_buffer, report_id_formatter(report_id), batch_size =1) # type: ignore
+        ret = split_pdf(bytes_buffer, report_id_formatter(report_id), batch_size=1) # type: ignore
 
 if __name__ == "__main__":
     sess = SessionLocal()

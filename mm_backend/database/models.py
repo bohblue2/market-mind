@@ -21,7 +21,7 @@ class RountineTaskOrm(BaseOrm):
         return f"<RountineTaskOrm(id={self.id}, task_name='{self.task_name}', status='{self.status}')>"
     
 class t1764OutBlockOrm(BaseOrm):
-    __tablename__ = 't1764_outblock'
+    __tablename__ = 'xing_t1764_outblock'
     rank = Column(Integer, nullable=False, default=0, comment='순위')  
     tradno = Column(String, nullable=False, default='', comment='거래원번호')
     tradname = Column(String, nullable=False, default='', comment='거래원이름')
@@ -30,7 +30,7 @@ class t1764OutBlockOrm(BaseOrm):
         return f"<T1764OutBlockOrm(id={self.id}, rank={self.rank}, tradno='{self.tradno}', tradname='{self.tradname}')>"
 
 class t8424OutBlockOrm(BaseOrm):
-    __tablename__ = 't8424_outblock'
+    __tablename__ = 'xing_t8424_outblock'
     hname = Column(String, nullable=False, default='', comment='업종명')
     upcode = Column(String, nullable=False, default='', comment='업종코드')
 
@@ -38,7 +38,7 @@ class t8424OutBlockOrm(BaseOrm):
         return f"<T8424OutBlockOrm(id={self.id}, hname='{self.hname}', upcode='{self.upcode}')>"
 
 class t8425OutBlockOrm(BaseOrm):
-    __tablename__ = 't8425_outblock'
+    __tablename__ = 'xing_t8425_outblock'
     tmname = Column(String, nullable=False, default='', comment='테마명')
     tmcode = Column(String, nullable=False, default='', comment='테마코드')
 
@@ -46,7 +46,7 @@ class t8425OutBlockOrm(BaseOrm):
         return f"<T8425OutBlockOrm(id={self.id}, tmname='{self.tmname}', tmcode='{self.tmcode}')>"
 
 class t8436OutBlockOrm(BaseOrm):
-    __tablename__ = 't8436_outblock'
+    __tablename__ = 'xing_t8436_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드')
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -65,7 +65,7 @@ class t8436OutBlockOrm(BaseOrm):
         return f"<T8436OutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class t8401OutBlockOrm(BaseOrm):
-    __tablename__ = 't8401_outblock'
+    __tablename__ = 'xing_t8401_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드')
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -75,7 +75,7 @@ class t8401OutBlockOrm(BaseOrm):
         return f"<T8401OutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class t8426OutBlockOrm(BaseOrm):
-    __tablename__ = 't8426_outblock'
+    __tablename__ = 'xing_t8426_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드')
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -84,7 +84,7 @@ class t8426OutBlockOrm(BaseOrm):
         return f"<T8426OutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class t9943VOutBlockOrm(BaseOrm):
-    __tablename__ = 't9943V_outblock'
+    __tablename__ = 'xing_t9943V_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드') 
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -93,7 +93,7 @@ class t9943VOutBlockOrm(BaseOrm):
         return f"<T9943VOutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class t9943SOutBlockOrm(BaseOrm):
-    __tablename__ = 't9943S_outblock'
+    __tablename__ = 'xing_t9943S_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드') 
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -102,7 +102,7 @@ class t9943SOutBlockOrm(BaseOrm):
         return f"<T9943SOutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class t9943OutBlockOrm(BaseOrm):
-    __tablename__ = 't9943_outblock'
+    __tablename__ = 'xing_t9943_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드') 
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -113,7 +113,7 @@ class t9943OutBlockOrm(BaseOrm):
 
 
 class t9944OutBlockOrm(BaseOrm):
-    __tablename__ = 't9944_outblock'
+    __tablename__ = 'xing_t9944_outblock'
     hname = Column(String, nullable=False, default='', comment='종목명')
     shcode = Column(String, nullable=False, default='', comment='단축코드')
     expcode = Column(String, nullable=False, default='', comment='확장코드')
@@ -122,7 +122,7 @@ class t9944OutBlockOrm(BaseOrm):
         return f"<T9944OutBlockOrm(id={self.id}, hname='{self.hname}', shcode='{self.shcode}')>"
 
 class o3101OutBlockOrm(BaseOrm):
-    __tablename__ = 'o3101_outblock'
+    __tablename__ = 'xing_o3101_outblock'
     Symbol = Column(String, nullable=False, default='', comment='종목코드')
     SymbolNm = Column(String, nullable=False, default='', comment='종목명')
     ApplDate = Column(String, nullable=False, default='', comment='종목배치수신일(한국일자)')
