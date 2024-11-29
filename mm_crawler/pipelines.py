@@ -11,12 +11,12 @@ import pytz  # type: ignore
 from scrapy.exceptions import DropItem
 
 from mm_crawler.commons import async_download_pdf, async_load_to_buffer
-from mm_crawler.database.models import (NaverArticleContentOrm,
+from mm_crawler.database.models import (NaverArticleContentOrm, NaverArticleFailureOrm,
                                         NaverArticleListOrm,
                                         NaverResearchReportFileOrm,
                                         NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
-from mm_crawler.items import ArticleContentItem, ArticleItem
+from mm_crawler.items import ArticleContentItem, ArticleItem, NaverArticleListFailedItem
 
 kst = pytz.timezone('Asia/Seoul')
 
@@ -49,8 +49,15 @@ class FinanceNewsListPipeline:
 
     def process_item(self, item: Optional[ArticleItem], spider):
         if item is None:
-            # TODO: Handle this case 
             raise DropItem("Item is None")
+        if isinstance(item, NaverArticleListFailedItem):
+            failed_orm = NaverArticleFailureOrm(
+                ticker=item['ticker'],
+                error_code=item['error_code'].value,
+            )
+            self.sess.add(failed_orm)
+            self.sess.commit()
+            return item
 
         article = NaverArticleListOrm(
             ticker=item['ticker'],

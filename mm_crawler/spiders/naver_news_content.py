@@ -1,7 +1,9 @@
+from datetime import datetime
 import logging
 import os
 from typing import Any, Iterable, Union
 
+import pytz # type: ignore
 import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import Request
@@ -22,6 +24,7 @@ def _get_target_url(article_id: ArticleId, office_id: OfficeId):
 
 
 logging.getLogger('faker').setLevel(logging.WARNING)
+kst = pytz.timezone('Asia/Seoul')
 
 class NaverNewsArticleContents(scrapy.Spider):
     verbose = False
@@ -41,13 +44,24 @@ class NaverNewsArticleContents(scrapy.Spider):
             "scrapy_fake_useragent.providers.FixedUserAgentProvider",
         ],
     )
+    def __init__(self, ticker:str, from_date, to_date, *args, **kwargs):
+        super(NaverNewsArticleContents, self).__init__(*args, **kwargs)
+        self.ticker = ticker
+        self.from_date = kst.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
+        self.to_date = kst.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
 
     def start_requests(self) -> Iterable[Request]:
         session = SessionLocal()
         articles = session\
             .query(NaverArticleListOrm)\
-            .filter(NaverArticleListOrm.latest_scraped_at == None)\
+            .filter(
+                NaverArticleListOrm.latest_scraped_at == None,
+                NaverArticleListOrm.ticker == self.ticker,
+                NaverArticleListOrm.article_published_at.between(self.from_date, self.to_date)
+            )\
+            .yield_per(1000)\
             .all()
+        
         for article in articles:
             yield Request(
                 _get_target_url(article.article_id, article.media_id),

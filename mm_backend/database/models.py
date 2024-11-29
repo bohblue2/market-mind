@@ -9,8 +9,8 @@ class BaseOrm(Base):
     __abstract__ = True
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
-    updated_at = Column(DateTime(timezone=True), default=func.now, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
 
 class RountineTaskOrm(BaseOrm):
     __tablename__ = 'routine_tasks'

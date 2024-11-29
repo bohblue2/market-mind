@@ -10,6 +10,12 @@ import scrapy
 class ItemBase(scrapy.Item):
     response = scrapy.Field()
 
+class NaverArticleListFailedItem(ItemBase):
+    ticker = scrapy.Field()
+    error_code = scrapy.Field()
+    response = scrapy.Field()
+    created_at = scrapy.Field()
+
 class ArticleItem(ItemBase):
     ticker = scrapy.Field()
     article_id = scrapy.Field()

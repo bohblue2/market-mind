@@ -52,14 +52,16 @@ class NaverArticleContentOrm(Base):
 class NaverArticleFailureOrm(Base):
     __tablename__ = 'naver_article_failures'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    article_id = Column(String, nullable=False)
-    media_id = Column(String, nullable=False)
-    link = Column(String, nullable=False)
+    error_code = Column(String, nullable=False)
+    ticker = Column(String, nullable=False)
+    article_id = Column(String, nullable=True)
+    media_id = Column(String, nullable=True)
+    link = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
 
     def __repr__(self):
-        return (f"<NaverArticleFailureOrm(id={self.id}, article_id='{self.article_id}', media_id='{self.media_id}', "
-                f"created_at='{self.created_at}')>")
+        return (f"<NaverArticleFailureOrm(id={self.id}, ticker='{self.ticker}', article_id='{self.article_id}', "
+                f"media_id='{self.media_id}', link='{self.link}', created_at='{self.created_at}')>")
 
 class NaverResearchReportOrm(Base):
     __tablename__ = 'naver_research_reports'

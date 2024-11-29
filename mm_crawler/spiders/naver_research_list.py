@@ -17,7 +17,7 @@ from mm_crawler.spiders.commons import parse_report_url
 KST = pytz.timezone('Asia/Seoul')
 DEFAULT_WAIT_TIME: int = 10
 DEFAULT_START_PAGE: int = 1
-DEFAULT_END_PAGE: int = 10
+DEFAULT_END_PAGE: int = 1000
 
 class NaverResearchBase(scrapy.Spider):
     allowed_domains = ['naver.com']
@@ -29,9 +29,12 @@ class NaverResearchBase(scrapy.Spider):
     start_page = DEFAULT_START_PAGE
     end_page = DEFAULT_END_PAGE
 
-    def __init__(self, end_page=DEFAULT_END_PAGE, *args, **kwargs):
+    def __init__(self, from_date: str, to_date: str, start_page: int=1, end_page=DEFAULT_END_PAGE, *args, **kwargs):
         super(NaverResearchBase, self).__init__(*args, **kwargs)
-        self.end_page = int(end_page)
+        self.from_date = KST.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
+        self.to_date = KST.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
+        self.start_page = start_page
+        self.end_page = end_page
     
     def start_requests(self):
         for page in range(
@@ -59,6 +62,8 @@ class NaverResearchBase(scrapy.Spider):
         items: List[NaverResearchItem] = await self._inner_parse(response=response)
         self.log(f"Extracted {len(items)} reports from page {current_page}")
         for item in items:
+            if item['date_obj'] < self.from_date or item['date_obj'] > self.to_date:
+               return 
             yield item
     
     @abc.abstractmethod
@@ -187,7 +192,7 @@ class NaverResearchDebentureList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}" # type: ignore 
 
-    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)
@@ -198,7 +203,7 @@ class NaverResearchEconomyList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/economy_list.naver?&page={page}" # type: ignore 
 
-    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)
@@ -209,7 +214,7 @@ class NaverResearchIndustryList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}" # type: ignore 
 
-    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_extra_columns(reports_list_soup, 'target_industry')
@@ -221,7 +226,7 @@ class NaverResearchInvestList(NaverResearchBase):
     end_page = 3
     _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}" # type: ignore
 
-    async def parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
+    async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
         reports_list_xpath = response.xpath('/html/body/div[3]/div[2]/div[2]/div[1]/div[2]/table[1]').get()
         reports_list_soup = BeautifulSoup(reports_list_xpath, 'html.parser') # type: ignore
         return self.parse_with_common_columns(reports_list_soup)

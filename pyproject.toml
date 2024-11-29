@@ -36,6 +36,7 @@ twisted = {extras = ["asyncio"], version = "^24.10.0"}
 playwright = "^1.49.0"
 scrapy-playwright = "^0.0.42"
 psycopg2 = "^2.9.10"
+pytz = "^2024.2"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,21 +1,22 @@
 import asyncio
+from datetime import datetime
 import os
 import re
-import time
 from enum import Enum
 from typing import Any, Dict
 
+import pytz  # type: ignore
 import requests
 import scrapy
-from scrapy.http.response.html import HtmlResponse
+from scrapy.http import HtmlResponse
 
-from mm_crawler.items import ArticleItem
+from mm_crawler.items import ArticleItem, NaverArticleListFailedItem
 
+kst = pytz.timezone('Asia/Seoul')
 
 class NaverArticleErrorEnum(Enum):
     END_OF_PAGE = "End of page reached"
     NO_CONTENT = "No content found"
-
 
 class NaverNewsArticleList(scrapy.Spider):
     name = os.path.basename(__file__).replace('.py', '')
@@ -35,24 +36,50 @@ class NaverNewsArticleList(scrapy.Spider):
         ],
     }
 
+    def __init__(self, ticker: str, from_date: str, to_date: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ticker = ticker
+        self.from_date = kst.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
+        self.to_date = kst.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
+
     def start_requests(self):
-        self.tickers = self._fetch_tickers()
-        self.log(f"Extracted {len(self.tickers)} tickers from API")
+        tickers = self._fetch_tickers()
+        self.log(f"Extracted {len(tickers)} tickers from API")
+        if self.ticker in tickers:
+            yield self._create_request(self.ticker)
 
-        for ticker in self.tickers:
-            # TODO: 
-            time.sleep(1)
-            yield self._create_request(ticker)
+    async def parse(self, response: HtmlResponse) -> Any:
+        meta = response.meta
+        current_page = meta['page']
 
-    def _fetch_tickers(self):
+        # TODO: Implement a way to handle the case when the page is not vaild.
+        
+        if self._is_end_of_page(response):
+            yield await self._handle_error(NaverArticleErrorEnum.END_OF_PAGE, response)
+            return
+
+        processed_ids: set[str] = set()
+        for row in response.css('table.type5 tr'):
+            if row.css('th::text').get() == "제목":
+                self.log("Skipping header row")
+                continue
+
+            article_data = self._extract_article_data(meta.get('ticker', "None"), row, processed_ids)
+            if not article_data:
+                yield await self._handle_error(NaverArticleErrorEnum.NO_CONTENT, response)
+                return
+
+            yield ArticleItem(**article_data)
+
+        yield self._create_next_page_request(meta, current_page)
+
+    def _fetch_tickers(self) -> list:
         response = requests.get("http://127.0.0.1:8080/api/securities/code?tr_code=t8436")
-        tickers = [ticker['shcode'] for ticker in response.json()]
-        return [ticker for ticker in tickers if not ticker.endswith('K')]
+        return [ticker['shcode'] for ticker in response.json() if not ticker['shcode'].endswith('K')]
 
-    def _create_request(self, ticker):
-        target_url = self._get_target_url(ticker)
+    def _create_request(self, ticker: str) -> scrapy.Request:
         return scrapy.Request(
-            target_url,
+            self._get_target_url(ticker),
             headers=self._get_headers(ticker),
             meta={'ticker': ticker, 'page': 1},
             callback=self.parse,
@@ -60,7 +87,7 @@ class NaverNewsArticleList(scrapy.Spider):
         )
 
     @classmethod
-    def _get_target_url(cls, ticker: str, page: int = 1):
+    def _get_target_url(cls, ticker: str, page: int = 1) -> str:
         return f"https://finance.naver.com/item/news_news.naver?code={ticker}&page={page}"
 
     @classmethod
@@ -70,45 +97,25 @@ class NaverNewsArticleList(scrapy.Spider):
             "Accept": "application/json, text/plain, */*",
         }
 
-    async def parse(self, response: HtmlResponse):
-        meta = response.meta
-        current_page = meta['page']
-
-        if self._is_end_of_page(response):
-            yield await self.handle_error(NaverArticleErrorEnum.END_OF_PAGE, response)
-
-        processed_ids: set[str] = set()
-        for row in response.css('table.type5 tr'):
-            article_data = self._extract_article_data(meta.get('ticker', "None"), row, processed_ids)
-            if not article_data:
-                yield await self.handle_error(NaverArticleErrorEnum.NO_CONTENT, response)
-            else:
-                yield ArticleItem(**article_data)
-
-        yield self._create_next_page_request(meta, current_page)
-
-    def _is_end_of_page(self, response):
+    def _is_end_of_page(self, response: HtmlResponse) -> bool:
         info_text_area = response.css('div').get()
-        is_end_of_page = False
+        return not info_text_area or '없습니다.' in info_text_area
 
-        if not info_text_area:
-            is_end_of_page = True
-        if info_text_area and '없습니다.' in info_text_area:
-            is_end_of_page = True
-
-        return is_end_of_page
-
-    def _extract_article_data(self, ticker, row, processed_ids):
+    def _extract_article_data(self, ticker: str, row, processed_ids: set) -> Dict[str, Any] | None:
         content_url = row.css('td.title a::attr(href)').extract_first()
         title = row.css('td.title a::text').get()
         source = row.css('td.info::text').get()
         date = row.css('td.date::text').get()
-        
+
         if not content_url or not title or not source or not date:
             return None
-            
+
         article_id, office_id = self._extract_article_and_office_ids(content_url)
         if not article_id or not office_id or f"{office_id}{article_id}" in processed_ids:
+            return None
+
+        article_published_at = kst.localize(datetime.strptime(date.strip(), "%Y.%m.%d %H:%M"))
+        if article_published_at < self.from_date or article_published_at > self.to_date:
             return None
 
         processed_ids.add(f"{office_id}{article_id}")
@@ -131,7 +138,7 @@ class NaverNewsArticleList(scrapy.Spider):
             'origin_id': relation_origin_id if is_related else None,
         }
 
-    def _get_relation_origin_id(self, row_class, is_related):
+    def _get_relation_origin_id(self, row_class: str, is_related: bool) -> str:
         if is_related:
             rel_office_id, rel_article_id = self._extract_cluster_ids(row_class)
             if rel_office_id and rel_article_id:
@@ -139,7 +146,7 @@ class NaverNewsArticleList(scrapy.Spider):
             return f"{rel_office_id}{rel_article_id}"
         return ''
 
-    def _create_next_page_request(self, meta, current_page):
+    def _create_next_page_request(self, meta: Dict[str, Any], current_page: int) -> scrapy.Request:
         return scrapy.Request(
             self._get_target_url(meta['ticker'], current_page + 1),
             headers=self._get_headers(meta['ticker']),
@@ -148,77 +155,41 @@ class NaverNewsArticleList(scrapy.Spider):
             errback=self.errback,
         )
 
-    def _extract_cluster_ids(self, row_class: str):
-        """
-        Extracts the office ID and article ID from a given row class string.
-
-        The row class string is expected to contain a pattern like 
-        'relation_lst _clusterId0310000829596', where '_clusterId0310000829596' 
-        is the target substring. The first three digits represent the unique 
-        office ID, and the remaining digits represent the unique article ID.
-
-        Args:
-            row_class (str): The class attribute of a table row element, 
-                             which includes the cluster ID information.
-
-        Returns:
-            tuple: A tuple containing the office ID (str) and article ID (str) 
-                   if the pattern is found, otherwise (None, None).
-
-        Example:
-            >>> _extract_cluster_ids('relation_lst _clusterId0310000829596')
-            ('031', '0000829596')
-
-            >>> _extract_cluster_ids('some_other_class')
-            (None, None)
-        """
+    def _extract_cluster_ids(self, row_class: str) -> tuple:
         match = re.search(r'_clusterId(\d{3})(\d+)', row_class)
         return match.groups() if match else (None, None)
 
-    def _extract_article_and_office_ids(self, content_url: str):
-        """
-        Extracts the article ID and office ID from a given content URL.
-
-        This method searches for the article ID and office ID within the 
-        query parameters of a URL. The URL is expected to contain parameters 
-        in the format 'article_id=<article_id>&office_id=<office_id>'.
-
-        Args:
-            content_url (str): The URL string from which to extract the 
-                               article ID and office ID.
-
-        Returns:
-            tuple: A tuple containing the article ID (str) and office ID (str) 
-                   if both are found in the URL, otherwise (None, None).
-
-        Example:
-            >>> _extract_article_and_office_ids("/item/news_read.naver?article_id=0000365184&office_id=374&code=060310&page=1&sm=")
-            ('0000365184', '374')
-
-            >>> _extract_article_and_office_ids("/item/news_read.naver?code=060310&page=1&sm=")
-            (None, None)
-        """
+    def _extract_article_and_office_ids(self, content_url: str) -> tuple:
         match = re.search(r'article_id=(\d+)&office_id=(\d+)', content_url)
         return match.groups() if match else (None, None)
-    
-    async def handle_error(self, error_code: NaverArticleErrorEnum, response: Any) -> Any:
+
+    async def _handle_error(self, error_code: NaverArticleErrorEnum, response: HtmlResponse) -> Any:
         error_handler = {
             NaverArticleErrorEnum.END_OF_PAGE: self._handle_end_of_page,
             NaverArticleErrorEnum.NO_CONTENT: self._handle_no_content,
-        }[error_code]
-        
-        ret = await error_handler(response)
-        return ret
-    
-    async def _handle_end_of_page(self, response: Any):
-        self.log("End of page reached")
-        # TODO: Handle end of page
+        }.get(error_code)
+
+        if error_handler:
+            return await error_handler(response)
         return None
-    
-    async def _handle_no_content(self, response: Any):
+
+    async def _handle_end_of_page(self, response: HtmlResponse) -> NaverArticleListFailedItem:
+        self.log("End of page reached")
+        return NaverArticleListFailedItem(
+            ticker=response.meta['ticker'],
+            error_code=NaverArticleErrorEnum.END_OF_PAGE,
+            response=response,
+            created_at=datetime.now()
+        )
+
+    async def _handle_no_content(self, response: HtmlResponse) -> NaverArticleListFailedItem:
         self.log("No content found")
-        # TODO: Handle no content
-        return None 
-            
-    def errback(self, failure):
+        return NaverArticleListFailedItem(
+            ticker=response.meta['ticker'],
+            error_code=NaverArticleErrorEnum.NO_CONTENT,
+            response=response,
+            created_at=datetime.now()
+        )
+
+    def errback(self, failure: Any) -> None:
         self.log(f"Errback: [{type(failure)}]{failure}")
