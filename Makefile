@@ -6,7 +6,7 @@ b:
 .PHONY: c1 
 c1:
 	@echo "Crawl naver_research_market_info"
-	scrapy crawl naver_research_market_info
+	scrapy crawl naver_research_market_info -a from_date=2024-11-27 -a to_date=2024-11-29
 
 .PHONY: c2 
 c2:
