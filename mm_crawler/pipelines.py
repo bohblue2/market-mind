@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional
 import pytz  # type: ignore
 from scrapy.exceptions import DropItem
 
-from mm_crawler.commons import async_download_pdf, async_load_to_buffer
+from mm_crawler.commons import async_load_to_buffer
 from mm_crawler.database.models import (NaverArticleContentOrm, NaverArticleFailureOrm,
                                         NaverArticleListOrm,
                                         NaverResearchReportFileOrm,
@@ -125,21 +125,6 @@ class ResearchMarketinfoListPipeline:
         self.sess.close()
 
     async def process_item(self, item: Dict[str, Any], spider):
-        """
-        {
-            'title': '불거지는 중동 사태와 크레딧 시장 영향은?', 
-            'date_str': '24.10.07', 
-            'date_obj': datetime.datetime(2024, 10, 7, 0, 0, tzinfo=<DstTzInfo 'Asia/Seoul' KST+9:00:00 STD>), 
-            'file_url': 'https://stock.pstatic.net/stock-research/debenture/61/20241007_debenture_545326000.pdf', 
-            'securities_company_name': 'iM증권', 
-            'report_item': 
-                {'category': 'debenture', 
-                'date': '20241007',
-                'report_id': '545326000',
-                'report_type': 'debenture',
-                'security_company_id': '61'}
-            }
-        """
         research_report = NaverResearchReportOrm(
             title=item.get('title'),
             date=item.get('date_obj'),
@@ -169,6 +154,7 @@ async def fetch_and_store_report(sess, report_orm: NaverResearchReportOrm, item:
     try:
         buffer = bytearray()
         await async_load_to_buffer(url=str(report_orm.file_url), buffer=buffer)
+
         report_file = NaverResearchReportFileOrm(report_id=report_orm.id, file_data=buffer)
         sess.add(report_file)
         sess.commit()

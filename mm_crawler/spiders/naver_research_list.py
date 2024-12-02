@@ -35,6 +35,7 @@ class NaverResearchBase(scrapy.Spider):
         self.to_date = KST.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
         self.start_page = start_page
         self.end_page = end_page
+        self.is_end = False
     
     def start_requests(self):
         for page in range(
@@ -43,14 +44,15 @@ class NaverResearchBase(scrapy.Spider):
             1
         ):
             target_url = self._get_target_url(page)
-
+            if self.is_end:
+                break
             yield scrapy.Request(
                 target_url,
                 meta=dict(page=page, url=target_url,),
                 callback=self.parse, 
                 errback=self.errback,
             )
-            # TODO: Make the spider wait for a random amount of time before sending the next request.
+        return
         
     async def errback(self, failure):
         self.log(type(failure))
@@ -63,8 +65,10 @@ class NaverResearchBase(scrapy.Spider):
         self.log(f"Extracted {len(items)} reports from page {current_page}")
         for item in items:
             if item['date_obj'] < self.from_date or item['date_obj'] > self.to_date:
-               return 
+                self.is_end = True
+                break
             yield item
+        return
     
     @abc.abstractmethod
     def _get_target_url(self, page: int) -> str:
@@ -166,8 +170,6 @@ class NaverResearchBase(scrapy.Spider):
 
 class NaverResearchMarketInfo(NaverResearchBase):
     name = 'naver_research_market_info'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/market_info_list.naver?&page={page}" # type: ignore
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -177,8 +179,6 @@ class NaverResearchMarketInfo(NaverResearchBase):
 
 class NaverResearchCompanyList(NaverResearchBase):
     name = 'naver_research_company_list'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda self, page: f"https://finance.naver.com/research/company_list.naver?&page={page}" # type: ignore 
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -188,8 +188,6 @@ class NaverResearchCompanyList(NaverResearchBase):
 
 class NaverResearchDebentureList(NaverResearchBase):
     name = 'naver_research_debenture_list'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/debenture_list.naver?&page={page}" # type: ignore 
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -199,8 +197,6 @@ class NaverResearchDebentureList(NaverResearchBase):
 
 class NaverResearchEconomyList(NaverResearchBase):
     name = 'naver_research_economy_list'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/economy_list.naver?&page={page}" # type: ignore 
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -210,8 +206,6 @@ class NaverResearchEconomyList(NaverResearchBase):
 
 class NaverResearchIndustryList(NaverResearchBase):
     name = 'naver_research_industry_list'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda _, page: f"https://finance.naver.com/research/industry_list.naver?&page={page}" # type: ignore 
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
@@ -222,8 +216,6 @@ class NaverResearchIndustryList(NaverResearchBase):
         
 class NaverResearchInvestList(NaverResearchBase):
     name = 'naver_research_invest_list'
-    start_page = 1
-    end_page = 3
     _get_target_url = lambda _,page: f"https://finance.naver.com/research/invest_list.naver?&page={page}" # type: ignore
 
     async def _inner_parse(self, response: HtmlResponse) -> List[NaverResearchItem]:
