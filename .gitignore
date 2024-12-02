@@ -1,6 +1,7 @@
 examples
 .examples
 .dockerfiles/volumes
+.README.md
 
 .DS_Store
 .startup.sh
