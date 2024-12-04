@@ -19,6 +19,9 @@ def get_milvus_client(uri: str) -> MilvusClient:
         uri=uri,
         token=os.getenv("MILVUS_API_KEY", "")
     )
+    if client.has_collection("naver_news_articles"):
+        client.drop_collection("naver_news_articles")
+
     return client
 
 def get_naver_news_article_collection() -> Collection:
@@ -32,8 +35,7 @@ def get_naver_news_article_collection() -> Collection:
         FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
         FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=10),
         FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
-        FieldSchema(name="article_published_at", dtype=DataType.VARCHAR, max_length=30),
-        FieldSchema(name="latest_scraped_at", dtype=DataType.VARCHAR, max_length=30),
+        FieldSchema(name="article_published_at", dtype=DataType.INT64, max_length=30),
     ]
     schema = CollectionSchema(fields=fields, description="Collection for Naver News Articles")
     collection = Collection(

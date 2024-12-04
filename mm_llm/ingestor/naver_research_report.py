@@ -28,7 +28,6 @@ def upstage_layout_analysis(input_stream: bytes, report_id: str):
     else:
         raise ValueError(f"Unexpected status code {response.status_code}.")
     
-    
 
 def ingest_research_report_to_milvus(sess: Session, yield_size: int = 1000):
     report_pdf_files: List[NaverResearchReportFileOrm] = sess.query(

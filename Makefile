@@ -11,14 +11,9 @@ c1:
 .PHONY: c2 
 c2:
 	@echo "Crawl naver_news_content"
-	scrapy crawl naver_news_content 
-
-.PHONY: c3 
-c3:
-	@echo "Crawl naver_news_list"
-	scrapy crawl naver_news_list
+	scrapy crawl naver_news_content -a ticker=005930 -a from_date=2023-11-27 -a to_date=2024-12-04
 
 .PHONY: c4
 c4:
 	@echo "Crawl naver_news_list"
-	scrapy crawl naver_news_list -a ticker=000145 -a from_date=2022-11-27 -a to_date=2024-11-29
+	scrapy crawl naver_news_list -a ticker=005930 -a from_date=2023-11-27 -a to_date=2024-12-04

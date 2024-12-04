@@ -15,6 +15,7 @@ class NaverArticleListFailedItem(ItemBase):
     error_code = scrapy.Field()
     response = scrapy.Field()
     created_at = scrapy.Field()
+    is_fatal = scrapy.Field()
 
 class ArticleItem(ItemBase):
     ticker = scrapy.Field()

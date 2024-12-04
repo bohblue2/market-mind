@@ -15,8 +15,17 @@ from mm_crawler.items import ArticleItem, NaverArticleListFailedItem
 kst = pytz.timezone('Asia/Seoul')
 
 class NaverArticleErrorEnum(Enum):
+    # Fatal errors
+    MISSING_FIELD_EXISTS = "Missing field exists"
     END_OF_PAGE = "End of page reached"
     NO_CONTENT = "No content found"
+
+    # Non-fatal errors(skip the article)
+    OUT_OF_DATE_RANGE = "Out of date range"
+    PROCESSED_ID_EXISTS = "Processed ID exists"
+    
+    FATAL_ERROR = "Fatal error"
+    NON_FATAL_ERROR = "Non-fatal error"
 
 class NaverNewsArticleList(scrapy.Spider):
     name = os.path.basename(__file__).replace('.py', '')
@@ -65,16 +74,18 @@ class NaverNewsArticleList(scrapy.Spider):
                 continue
 
             article_data = self._extract_article_data(meta.get('ticker', "None"), row, processed_ids)
-            if not article_data:
-                yield await self._handle_error(NaverArticleErrorEnum.NO_CONTENT, response)
-                return
-
-            yield ArticleItem(**article_data)
-
+            # TODO: 특정 date range에 해당하는 article이 없을 때 몇 번째 페이지 까지 찾아볼지 정해야 함.
+            if isinstance(article_data, NaverArticleErrorEnum):
+                ret = await self._handle_error(article_data, response)
+                yield ret
+                if ret.get('is_fatal', False) is True:
+                    return
+            else:
+                yield ArticleItem(**article_data)
         yield self._create_next_page_request(meta, current_page)
 
-    def _fetch_tickers(self) -> list:
-        response = requests.get("http://127.0.0.1:8080/api/securities/code?tr_code=t8436")
+    def _fetch_tickers(self, limit:int = 5000) -> list:
+        response = requests.get(f"http://127.0.0.1:8080/api/securities/code?tr_code=t8436&limit={limit}")
         return [ticker['shcode'] for ticker in response.json() if not ticker['shcode'].endswith('K')]
 
     def _create_request(self, ticker: str) -> scrapy.Request:
@@ -101,22 +112,22 @@ class NaverNewsArticleList(scrapy.Spider):
         info_text_area = response.css('div').get()
         return not info_text_area or '없습니다.' in info_text_area
 
-    def _extract_article_data(self, ticker: str, row, processed_ids: set) -> Dict[str, Any] | None:
+    def _extract_article_data(self, ticker: str, row, processed_ids: set) -> Dict[str, Any] | NaverArticleErrorEnum:
         content_url = row.css('td.title a::attr(href)').extract_first()
         title = row.css('td.title a::text').get()
         source = row.css('td.info::text').get()
         date = row.css('td.date::text').get()
 
         if not content_url or not title or not source or not date:
-            return None
+            return NaverArticleErrorEnum.MISSING_FIELD_EXISTS
 
         article_id, office_id = self._extract_article_and_office_ids(content_url)
         if not article_id or not office_id or f"{office_id}{article_id}" in processed_ids:
-            return None
+            return NaverArticleErrorEnum.PROCESSED_ID_EXISTS 
 
         article_published_at = kst.localize(datetime.strptime(date.strip(), "%Y.%m.%d %H:%M"))
         if article_published_at < self.from_date or article_published_at > self.to_date:
-            return None
+            return NaverArticleErrorEnum.OUT_OF_DATE_RANGE 
 
         processed_ids.add(f"{office_id}{article_id}")
         self.log(f"Article ID: {article_id}, Office ID: {office_id}")
@@ -163,33 +174,38 @@ class NaverNewsArticleList(scrapy.Spider):
         match = re.search(r'article_id=(\d+)&office_id=(\d+)', content_url)
         return match.groups() if match else (None, None)
 
-    async def _handle_error(self, error_code: NaverArticleErrorEnum, response: HtmlResponse) -> Any:
-        error_handler = {
-            NaverArticleErrorEnum.END_OF_PAGE: self._handle_end_of_page,
-            NaverArticleErrorEnum.NO_CONTENT: self._handle_no_content,
-        }.get(error_code)
-
-        if error_handler:
-            return await error_handler(response)
-        return None
-
-    async def _handle_end_of_page(self, response: HtmlResponse) -> NaverArticleListFailedItem:
-        self.log("End of page reached")
-        return NaverArticleListFailedItem(
-            ticker=response.meta['ticker'],
-            error_code=NaverArticleErrorEnum.END_OF_PAGE,
-            response=response,
-            created_at=datetime.now()
-        )
-
-    async def _handle_no_content(self, response: HtmlResponse) -> NaverArticleListFailedItem:
-        self.log("No content found")
-        return NaverArticleListFailedItem(
-            ticker=response.meta['ticker'],
-            error_code=NaverArticleErrorEnum.NO_CONTENT,
-            response=response,
-            created_at=datetime.now()
-        )
+    async def _handle_error(self, error_code: NaverArticleErrorEnum, response: HtmlResponse) -> NaverArticleListFailedItem:
+        if error_code in [
+            NaverArticleErrorEnum.MISSING_FIELD_EXISTS,
+            NaverArticleErrorEnum.END_OF_PAGE,
+            NaverArticleErrorEnum.NO_CONTENT
+        ]:
+            return NaverArticleListFailedItem(
+                ticker=response.meta['ticker'],
+                error_code=error_code,
+                response=response,
+                created_at=datetime.now(),
+                is_fatal=True
+            )
+        elif error_code in [
+            NaverArticleErrorEnum.OUT_OF_DATE_RANGE,
+            NaverArticleErrorEnum.PROCESSED_ID_EXISTS
+        ]:
+            return NaverArticleListFailedItem(
+                ticker=response.meta['ticker'],
+                error_code=error_code,
+                response=response,
+                created_at=datetime.now(),
+                is_fatal=False
+            )
+        else:
+            return NaverArticleListFailedItem(
+                ticker=response.meta['ticker'],
+                error_code=NaverArticleErrorEnum.FATAL_ERROR,
+                response=response,
+                created_at=datetime.now(),
+                is_fatal=True
+            )
 
     def errback(self, failure: Any) -> None:
         self.log(f"Errback: [{type(failure)}]{failure}")

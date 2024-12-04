@@ -112,7 +112,7 @@ class NaverDelayMiddleware(RetryMiddleware):
 
     def process_request(self, request, spider):
         print(f"[Middleware] request.url: {request.url}")
-        if "finance.naver.com" in request.url and request.meta.get("delay", None) is None:
+        if "finance.naver.com" in request.url and request.meta.get("delay", None) is not None:
             time.sleep(self.delay)
         return None
     
@@ -120,7 +120,7 @@ class NaverDelayMiddleware(RetryMiddleware):
         # 서버 응답 상태 코드에 따라 지연
         if response.status in [429, 503]:  # Too Many Requests or Service Unavailable
             print("[Middleware] Too Many Requests or Service Unavailable. Sleep 10 seconds.")
-            time.sleep(10)  # 10초 지연
+            time.sleep(1)  # 10초 지연
             request.meta['download_slot'] = 'slow-server'
             return self._retry(request, f"Response status: {response.status}", spider) or response
         else:
