@@ -7,3 +7,4 @@ export default async function Page() {
   const { data: resources } = await supabase.from('resources').select('*, tags(*)')
   return <ResourcesList resources={resources || []} />
 }
+

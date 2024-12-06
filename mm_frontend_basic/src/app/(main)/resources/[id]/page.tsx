@@ -27,17 +27,6 @@ interface Props {
   }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = await createClient(cookies())
-  const { data: resource } = await supabase
-    .from('resources')
-    .select('*')
-    .eq('id', params.id)
-  return {
-    title: resource?.title || '',
-  }
-}
-
 export default async function Page({ params, searchParams }: Props) {
   const supabase = await createClient(cookies())
   const { data: resource } = await supabase
@@ -80,7 +69,6 @@ export default async function Page({ params, searchParams }: Props) {
                         href={`/tags/${tag.slug}`}
                         key={tag.slug}
                       >
-                        {tag.name}
                       </Link>
                     ))}
                   </div>
