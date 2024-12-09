@@ -37,7 +37,7 @@ alembic current
 # Upgrade the database
 alembic upgrade head
 # Create a new revision
-alembic revision --autogenerate -m "migration"
+alembic revision --autogenerate -m "init"
 # Upgrade the database
 alembic upgrade head
 # check the current revision
@@ -53,4 +53,11 @@ ACL SETUSER redis on >redis
 ACL SETUSER redis +@all
 # Check the list of users
 ACL LIST
+```
+
+## Deployments-postgresql
+
+```sql
+'execute the following commands in the psql shell'
+echo "CREATE EXTENSION vector;" | psql -U postgres -d market_mind
 ```

@@ -36,7 +36,7 @@ class NaverArticleListOrm(Base):
 class NaverArticleContentOrm(Base):
     __tablename__ = 'naver_article_contents'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    article_id = Column(String, nullable=False)
+    article_id = Column(String, nullable=False, unique=True)
     ticker = Column(String, nullable=False)
     media_id = Column(String, nullable=False)
     html = Column(LargeBinary, nullable=False)
