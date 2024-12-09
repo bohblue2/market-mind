@@ -1,8 +1,11 @@
 
+from typing import Optional
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
                         LargeBinary, String)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from pgvector.sqlalchemy import Vector  
+from sqlalchemy.types import TypeEngine 
 
 from mm_crawler.database.base import Base
 
@@ -18,6 +21,7 @@ class NaverArticleListOrm(Base):
     link = Column(String, nullable=False)
     is_origin = Column(Boolean, nullable=False)
     original_id = Column(String, nullable=True)
+    chunks = relationship('NaverArticleChunkOrm', backref='article_content', cascade='all, delete-orphan')
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     latest_scraped_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
@@ -39,6 +43,7 @@ class NaverArticleContentOrm(Base):
     title = Column(String, nullable=True)
     content = Column(String, nullable=True)
     language = Column(String, nullable=False)
+
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
@@ -47,6 +52,22 @@ class NaverArticleContentOrm(Base):
         return (f"<NaverArticleContentOrm(id={self.id}, article_id='{self.article_id}', ticker='{self.ticker}', "
                 f"media_id='{self.media_id}', title='{self.title}', language='{self.language}', "
                 f"article_published_at='{self.article_published_at}', article_modified_at='{self.article_modified_at}', "
+                f"created_at='{self.created_at}')>")
+
+class NaverArticleChunkOrm(Base):
+    __tablename__ = 'naver_article_chunks'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    article_id = Column(String, ForeignKey('naver_article_contents.article_id'), nullable=False)
+    chunk_num = Column(Integer, nullable=False)
+    content = Column(String, nullable=False)
+    content_embedding: Column[TypeEngine] = Column(Vector(3072), nullable=False)
+    tags = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    def __repr__(self):
+        return (f"<NaverArticleChunkOrm(id={self.id}, article_id='{self.article_id}', chunk_num={self.chunk_num}, "
+                f"content='{self.content}', content_embedding={self.content_embedding}, tags='{self.tags}', "
                 f"created_at='{self.created_at}')>")
 
 class NaverArticleFailureOrm(Base):
@@ -78,6 +99,7 @@ class NaverResearchReportOrm(Base):
     target_industry = Column(String, nullable=True)
     downloaded = Column(Boolean, nullable=True)
     files = relationship('NaverResearchReportFileOrm', backref='naver_research_report', cascade='all, delete-orphan')
+    chunks = relationship('NaverResearchReportChunkOrm', backref='naver_research_report', cascade='all, delete-orphan')
     updated_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
@@ -95,6 +117,23 @@ class NaverResearchReportFileOrm(Base):
     report_id = Column(Integer, ForeignKey('naver_research_reports.id'), nullable=False)
     file_data = Column(LargeBinary, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    embedded_at = Column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self):
         return f"<NaverResearchReportFileOrm(id={self.id}, report_id={self.report_id})>"
+
+class NaverResearchReportChunkOrm(Base):
+    __tablename__ = 'naver_research_report_chunks'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    report_id = Column(Integer, ForeignKey('naver_research_reports.id'), nullable=False)
+    chunk_num = Column(Integer, nullable=False)
+    content = Column(String, nullable=False)
+    content_embedding = Column(Vector(3072), nullable=False) # type: ignore
+    tags = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    def __repr__(self):
+        return (f"<NaverResearchReportChunkOrm(id={self.id}, report_id={self.report_id}, chunk_num={self.chunk_num}, "
+                f"content='{self.content}', content_embedding={self.content_embedding}, tags='{self.tags}', "
+                f"created_at='{self.created_at}')>")

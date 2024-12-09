@@ -7,7 +7,7 @@ from langchain_core.documents import Document
 def split_pdf(
     stream: bytearray | bytes, 
     report_id: str,
-    batch_size: int = 10,
+    batch_size: int = 1,
     save: bool = False
 ) -> List[bytes]:
     """Splits a PDF file into multiple smaller PDF files, each containing a specified number of pages.

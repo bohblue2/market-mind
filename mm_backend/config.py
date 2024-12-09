@@ -57,7 +57,11 @@ class BackendSettings(BaseSettings):
         display_all_fields(self)
     
     class Config:
-        env_file = ".dev.backend.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else ".prod.backend.env"
+        env_file = (
+            ".dev.backend.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".stage.backend.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".prod.backend.env"
+        )
         env_file_encoding = "utf-8"
 
 settings = BackendSettings() # type: ignore

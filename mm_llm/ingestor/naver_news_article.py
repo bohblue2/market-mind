@@ -2,7 +2,7 @@ import asyncio
 from typing import Any, List
 
 from datetime import datetime
-from langchain_openai import ChatOpenAI, OpenAI, OpenAIEmbeddings 
+from langchain_openai import OpenAIEmbeddings 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymilvus import MilvusClient
 from sqlalchemy.orm.session import Session
@@ -10,58 +10,12 @@ from sqlalchemy.orm.session import Session
 from mm_crawler.database.models import (NaverArticleContentOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_llm.config import settings
+from mm_llm.ingestor.commons import process_chunk
 from mm_llm.vectorstore.milvus import get_milvus_client, get_naver_news_article_collection
 from langchain_core.documents import Document
 
 
-async def generate_chunk_context(
-    whole_document: str, 
-    chunk_content: str,
-    model: ChatOpenAI 
-) -> str:
-    prompt = f"""
-    <document>
-    {whole_document}
-    </document>
-    Here is the chunk we want to situate within the whole document
-    <chunk>
-    {chunk_content}
-    </chunk>
-    Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk. Answer only with the succinct context and nothing else.
-
-    please answer in korean.
-    """
-    response = await model.ainvoke(prompt, max_tokens=5_000, temperature=0.5)
-
-    # Assuming response.content is a list, join the strings if they are present
-    if isinstance(response.content, list):
-        content = ''.join(
-            item if isinstance(item, str) else '' for item in response.content
-        )
-    else:
-        content = response.content
-    return content.strip()
-
-async def process_chunk(
-    chunk_text: str,
-    whole_document: str,
-    embeddings: OpenAIEmbeddings
-) -> tuple[str, list[float]]:
-    model = ChatOpenAI(model="gpt-4o")
-    context = await generate_chunk_context(whole_document, chunk_text, model)
-    enhanced_chunk = f"""
-<context>
-{context} 
-</context>
-
-<chunk>
-{chunk_text}
-</chunk>
-"""
-    enhanced_embeddings = await embeddings.aembed_query(enhanced_chunk)
-    return enhanced_chunk, enhanced_embeddings 
-
-async def ingest_research_report_to_milvus(
+async def ingest_news_articles_to_milvus(
     sess: Session,
     ticker: str, 
     from_datetime: str,
@@ -80,7 +34,6 @@ async def ingest_research_report_to_milvus(
         NaverArticleContentOrm.article_published_at.between(from_datetime_obj, to_datetime_obj)
     ).yield_per(yield_size).all() 
 
-    embeddings = OpenAIEmbeddings(model=settings.DEFAULT_EMBEDDING_MODEL)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
     collection = get_naver_news_article_collection()
 
@@ -94,9 +47,8 @@ async def ingest_research_report_to_milvus(
         enhanced_embeddings: list[Any] = []
         tasks = [
             process_chunk(
-                chunk_text=chunk.page_content,
                 whole_document=document_content,
-                embeddings=embeddings
+                chunk_content=chunk.page_content,
             )
             for chunk in chunk_documents
         ]
@@ -106,7 +58,7 @@ async def ingest_research_report_to_milvus(
         enhanced_embeddings = list(enhanced_embeddings)
                 
         data = []
-        for chunk_num, (content, embedding) in enumerate(zip(enhanced_chunks, enhanced_embeddings)):
+        for chunk_num, (content, content_embedding) in enumerate(zip(enhanced_chunks, enhanced_embeddings)):
             tags: List[str] = []
             data.append(
                 dict(
@@ -116,7 +68,7 @@ async def ingest_research_report_to_milvus(
                     media_id=article.media_id,
                     title=article.title,
                     content=content,
-                    content_embedding=embedding,
+                    content_embedding=content_embedding,
                     language=article.language,
                     tags=tags,
                     article_published_at=int(article.article_published_at.timestamp()),
@@ -140,7 +92,7 @@ async def ingest_research_report_to_milvus(
 if __name__ == "__main__":
     sess = SessionLocal()
     milvus_client = get_milvus_client(uri=settings.MILVUS_URI)
-    asyncio.run(ingest_research_report_to_milvus(
+    asyncio.run(ingest_news_articles_to_milvus(
         sess=sess, 
         ticker="005930",
         from_datetime="2024-12-02 00:00:00",

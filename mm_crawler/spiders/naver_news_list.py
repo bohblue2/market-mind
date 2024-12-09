@@ -122,6 +122,8 @@ class NaverNewsArticleList(scrapy.Spider):
             return NaverArticleErrorEnum.MISSING_FIELD_EXISTS
 
         article_id, office_id = self._extract_article_and_office_ids(content_url)
+        # TODO: 1. Implement a way to handle the case when the article_id or office_id is None.
+        # TODO: 2. Implement a way to handle the case when the article_id or office_id is not unique.
         if not article_id or not office_id or f"{office_id}{article_id}" in processed_ids:
             return NaverArticleErrorEnum.PROCESSED_ID_EXISTS 
 
@@ -175,6 +177,7 @@ class NaverNewsArticleList(scrapy.Spider):
         return match.groups() if match else (None, None)
 
     async def _handle_error(self, error_code: NaverArticleErrorEnum, response: HtmlResponse) -> NaverArticleListFailedItem:
+        # NOTE: The following error codes are fatal
         if error_code in [
             NaverArticleErrorEnum.MISSING_FIELD_EXISTS,
             NaverArticleErrorEnum.END_OF_PAGE,
@@ -187,6 +190,8 @@ class NaverNewsArticleList(scrapy.Spider):
                 created_at=datetime.now(),
                 is_fatal=True
             )
+        
+        # NOTE: The following error codes are non-fatal
         elif error_code in [
             NaverArticleErrorEnum.OUT_OF_DATE_RANGE,
             NaverArticleErrorEnum.PROCESSED_ID_EXISTS

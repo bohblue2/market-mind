@@ -1,6 +1,7 @@
 
 import os
 from dataclasses import dataclass
+from time import sleep
 from typing import Any, List, Optional
 
 from pymilvus import (Collection, CollectionSchema, DataType, FieldSchema,
@@ -19,8 +20,12 @@ def get_milvus_client(uri: str) -> MilvusClient:
         uri=uri,
         token=os.getenv("MILVUS_API_KEY", "")
     )
+    # TODO: Remove this after testing
     if client.has_collection("naver_news_articles"):
         client.drop_collection("naver_news_articles")
+    if client.has_collection("naver_research_reports"):
+        client.drop_collection("naver_research_reports")
+
 
     return client
 
@@ -56,7 +61,7 @@ def get_naver_news_article_collection() -> Collection:
 def get_naver_research_report_collection() -> Collection:
     fields = [
         FieldSchema(name="report_id", dtype=DataType.VARCHAR, max_length=50, is_primary=True),  # Unique ID for each report
-        FieldSchema(name="chunk_num", dtype=DataType.VARCHAR, max_length=64),  
+        FieldSchema(name="chunk_num", dtype=DataType.INT64),  
         FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=500),
         FieldSchema(name="issuer_company_name", dtype=DataType.VARCHAR, max_length=200),
         FieldSchema(name="issuer_company_id", dtype=DataType.VARCHAR, max_length=50),
@@ -66,9 +71,9 @@ def get_naver_research_report_collection() -> Collection:
         FieldSchema(name="content", dtype=DataType.VARCHAR, max_length=20000, description="Chunked content"),  
         FieldSchema(name="content_embedding", dtype=DataType.FLOAT_VECTOR, dim=DEFAULT_EMBEDDING_DIM),
         FieldSchema(name="tags", dtype=DataType.ARRAY, element_type=DataType.VARCHAR, max_capacity=20, max_length=50),
-        FieldSchema(name="date", dtype=DataType.VARCHAR, max_length=30, description="Report publication date"),
-        FieldSchema(name="updated_at", dtype=DataType.VARCHAR, max_length=30 ),
-        FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=30),
+        FieldSchema(name="date", dtype=DataType.INT64, max_length=30, description="Report publication date"),
+        FieldSchema(name="updated_at", dtype=DataType.INT64, max_length=30),
+        FieldSchema(name="created_at", dtype=DataType.INT64, max_length=30),
     ]
     schema = CollectionSchema(fields=fields, description="Collection for Naver Research Reports")
     collection = Collection(

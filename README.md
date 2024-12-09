@@ -15,3 +15,42 @@ For additional information, please refer to the [Team Notion](https://www.notion
 - **Real-time data collection and ultra-short-term trading**: Collect analyst reports, electronic disclosures, and news data in real-time to execute ultra-short-term directional trading strategies.
 
 This project aims to use advanced natural language processing (NLP) techniques to reduce information asymmetries in financial markets and maximize the performance of quantitative trading strategies.
+
+## Deployments
+
+```bash
+# set ENVIRONMENT variable to DEV/STAGE/PROD
+export ENVIRONMENT=STAGE 
+# set PYTHONPATH to the root directory (when dev environment)
+export PYTHONPATH=$(pwd)
+
+# Run the docker-compose file
+docker-compose -f .dockerfiles/docker-compose.yml up -d
+
+# Migrate db with the following command
+# ALEMBCI_DB_URL is the database url in .dev.crawler.env/.prod.crawler.env file
+export ALEMBIC_DB_URL=postgresql://postgres:postgres@127.0.0.1:5432/market_mind
+# for stage environment
+export ALEMBIC_DB_URL=postgresql://postgres:postgres@192.168.219.191:5432/market_mind
+# Check the current revision
+alembic current
+# Upgrade the database
+alembic upgrade head
+# Create a new revision
+alembic revision --autogenerate -m "migration"
+# Upgrade the database
+alembic upgrade head
+# check the current revision
+alembic current
+
+# Set-up redis server
+docker exec -i -t mm-redis-standalone redis-cli -a "redis"  
+# Check the redis server info
+INFO
+# Set the password for the user redis
+ACL SETUSER redis on >redis
+# Set the permission for the user redis
+ACL SETUSER redis +@all
+# Check the list of users
+ACL LIST
+```

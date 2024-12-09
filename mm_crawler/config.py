@@ -1,7 +1,6 @@
 import os
-from typing import Annotated, Any
 
-from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
+from pydantic import PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings
 
@@ -37,7 +36,11 @@ class CrawlerSettings(BaseSettings):
         display_all_fields(self)
     
     class Config:
-        env_file = ".dev.crawler.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else ".prod.crawler.env"
+        env_file = (
+            ".dev.crawler.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".stage.crawler.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".prod.crawler.env"
+        )
         env_file_encoding = "utf-8"
 
 settings = CrawlerSettings() # type: ignore

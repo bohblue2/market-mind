@@ -59,7 +59,7 @@ TELNETCONSOLE_ENABLED = False
 # Disable the Scrapy User-Agent middleware
 DOWNLOADER_MIDDLEWARES = {
     'mm_crawler.middlewares.NaverDelayMiddleware': 543,
-    'scrapy.downloadermiddlewares.autothrottle.AutoThrottleMiddleware': 500,
+    # 'scrapy.downloadermiddlewares.autothrottle.AutoThrottleMiddleware': 500,
     # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
     # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,

@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+import os
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -16,7 +17,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from database.models import Base
+from mm_crawler.database.models import Base
 
 target_metadata = Base.metadata
 
@@ -24,6 +25,17 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+# In env.py,
+
+section = config.config_ini_section
+from dotenv import load_dotenv
+if load_dotenv('.dev.crawler.env') is False:
+    load_dotenv('.prod.crawler.env')
+alembic_db_url = os.environ.get("ALEMBIC_DB_URL")
+if alembic_db_url is not None:
+    config.set_section_option(section, "sqlalchemy.url", alembic_db_url)
+else:
+    raise ValueError("Environment variable 'ALEMBIC_DB_URL' is not set.")
 
 
 def run_migrations_offline() -> None:
