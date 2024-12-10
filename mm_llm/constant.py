@@ -1,3 +1,5 @@
+import pytz # type: ignore
+
 OPENAI_EMBEDDING_DIM=3072
 DEFAULT_EMBEDDING_DIM = OPENAI_EMBEDDING_DIM
 DEFAULT_CHUNK_SIZE= 500
@@ -13,3 +15,5 @@ MILVUS_TOP_K=10
 
 NAVER_NEWS_ARTICLE_COLLECTION="naver_news_articles"
 NAVER_RESEARCH_REPORT_COLLECTION='naver_research_reports'
+
+KST=pytz.timezone("Asia/Seoul")

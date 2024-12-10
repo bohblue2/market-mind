@@ -36,6 +36,7 @@ def split_pdf(
     input_pdf.close()
     return ret
 
+
 def format_docs_with_page_break(docs: List[Document]) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 

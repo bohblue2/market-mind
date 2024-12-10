@@ -1,3 +1,4 @@
+from langchain_core.prompts import PromptTemplate
 
 PROMPT_TEMPLATE = """
 Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
@@ -53,7 +54,9 @@ blocks is retrieved from a knowledge bank, not part of the conversation with the
 user.\
 """
 
-REPHRASE_TEMPLATE = """\
+REPHRASE_TEMPLATE = PromptTemplate(
+    input_variables=["chat_history", "question"],
+    template="""\
 Given the following conversation and a follow up question, rephrase the follow up \
 question to be a standalone question.
 
@@ -61,3 +64,5 @@ Chat History:
 {chat_history}
 Follow Up Input: {question}
 Standalone Question:"""
+)
+

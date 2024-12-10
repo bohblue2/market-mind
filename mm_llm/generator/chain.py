@@ -1,25 +1,18 @@
-
-# RetreiverChainFactory ?
-
 import os
 from operator import itemgetter
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models import LanguageModelLike
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import (ChatPromptTemplate, MessagesPlaceholder,
-                                    PromptTemplate)
+from langchain_core.prompts import (ChatPromptTemplate, MessagesPlaceholder)
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import (ConfigurableField, Runnable,
                                       RunnableBranch, RunnableLambda,
-                                      RunnablePassthrough, RunnableSequence,
-                                      chain)
-from langchain_milvus import Milvus
+                                      RunnablePassthrough)
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import SecretStr
-from pymilvus import Collection
 
 from mm_llm.config import settings
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
@@ -27,34 +20,26 @@ from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
-from mm_llm.vectorstore.milvus import (get_milvus_client,
-                                       get_naver_news_article_collection)
-
+from langchain_postgres.vectorstores import PGVector
 
 def get_retriever(
-    collection: Collection,
-    *,
-    search_type: Optional[str] = None, 
-    search_kwargs: Optional[dict] = {"k": 5},
+    embeddings: OpenAIEmbeddings = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL),
+    collection_name: str = "market_mind",
+    connection: str = str(settings.SQLALCHEMY_DATABASE_URL)
 ) -> BaseRetriever:
-    return Milvus(
-        collection_name = collection.name,
-        embedding_function = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL),
-        connection_args = {"uri": settings.MILVUS_URI},
-        primary_field="doc_id",
-        vector_field="content_embedding",
-        text_field="content",
-        drop_old=False
-    ).as_retriever(
-        search_type=search_type if search_type else "mmr",
-        search_kwargs=search_kwargs
+    vector_store = PGVector(
+        embeddings=embeddings,
+        collection_name=collection_name,
+        connection=connection,
+        use_jsonb=True,
     )
- 
+    return vector_store.as_retriever()
+    
 
 def create_retriever_chain(
     llm: LanguageModelLike, retriever: BaseRetriever
 ) -> Runnable:
-    CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(REPHRASE_TEMPLATE)
+    CONDENSE_QUESTION_PROMPT = REPHRASE_TEMPLATE
     condense_question_chain = (
         CONDENSE_QUESTION_PROMPT | llm | StrOutputParser()
     ).with_config(
@@ -144,10 +129,7 @@ llm = gpt4_o.configurable_alternatives(
     [gpt4_o, claude_3_sonnet]
 )
 
-_client = get_milvus_client(settings.MILVUS_URI)
-retriever = get_retriever(
-    get_naver_news_article_collection(),
-)
+retriever = get_retriever()
 answer_chain = create_chain(llm, retriever)
 
 if __name__ == "__main__":
