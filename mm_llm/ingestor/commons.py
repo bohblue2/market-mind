@@ -39,14 +39,12 @@ ENHANCED_CHUNK_PROMPT_TEMPLATE = PromptTemplate(
 
 class ProecssedChunks(BaseModel):
     enhanced_chunks: list[str] 
-    enhanced_embeddings: list[list[float]]
 
     def __str__(self) -> str:
         """Return a string representation of the processed chunks."""
-        return f"ProecssedChunks(enhanced_chunk={self.enhanced_chunks}, enhanced_embedding={self.enhanced_embeddings})"
+        return f"ProecssedChunks(enhanced_chunk={self.enhanced_chunks})"
 
 model = ChatOpenAI(model="gpt-4o-mini")
-embeddings = OpenAIEmbeddings(model=settings.DEFAULT_EMBEDDING_MODEL)
 cache_process_chunk = FanoutCache(
     directory=".cache/process_chunk",
     timeout=1,
@@ -78,8 +76,7 @@ def process_chunk(
     enhanced_chunks: list[str] = [
         ENHANCED_CHUNK_PROMPT_TEMPLATE.format(context=response.content, chunk_content=chunk_content) \
             for response, chunk_content in zip(responses, chunk_contents)] # type: ignore
-    enhanced_embeddings: list[list[float]] = embeddings.embed_documents(enhanced_chunks) 
-    ret = ProecssedChunks(enhanced_chunks=enhanced_chunks, enhanced_embeddings=enhanced_embeddings)
+    ret = ProecssedChunks(enhanced_chunks=enhanced_chunks)
     cache_process_chunk.set(f"{whole_document}_{chunk_contents}", ret)
     return ret
 

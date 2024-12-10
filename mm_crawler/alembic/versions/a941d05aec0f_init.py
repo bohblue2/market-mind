@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-import pgvector.sqlalchemy.vector
+import pgvector.sqlalchemy
 
 
 # revision identifiers, used by Alembic.
@@ -82,7 +82,7 @@ def upgrade() -> None:
     sa.Column('article_id', sa.String(), nullable=False),
     sa.Column('chunk_num', sa.Integer(), nullable=False),
     sa.Column('content', sa.String(), nullable=False),
-    sa.Column('content_embedding', pgvector.sqlalchemy.vector.VECTOR(dim=3072), nullable=False),
+    sa.Column('content_embedding', pgvector.sqlalchemy.Vector(dim=3072), nullable=False),
     sa.Column('tags', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['article_id'], ['naver_article_contents.article_id'], ),
@@ -93,7 +93,7 @@ def upgrade() -> None:
     sa.Column('report_id', sa.Integer(), nullable=False),
     sa.Column('chunk_num', sa.Integer(), nullable=False),
     sa.Column('content', sa.String(), nullable=False),
-    sa.Column('content_embedding', pgvector.sqlalchemy.vector.VECTOR(dim=3072), nullable=False),
+    sa.Column('content_embedding', pgvector.sqlalchemy.Vector(dim=3072), nullable=False),
     sa.Column('tags', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['report_id'], ['naver_research_reports.id'], ),

@@ -45,13 +45,11 @@ class NaverNewsIngestor:
             chunk_contents=[str(chunk) for chunk in chunk_contents]
         )
         enhanced_chunks = processed_chunks.enhanced_chunks
-        enhanced_embeddings = processed_chunks.enhanced_embeddings
-        for idx, (content, content_embedding) in enumerate(zip(enhanced_chunks, enhanced_embeddings)):
+        for idx, content in enumerate(enhanced_chunks):
             chunk_orm = NaverArticleChunkOrm(
                 article_id=article.article_id,
                 chunk_num=idx,
                 content=content,
-                content_embedding=content_embedding,
                 tags=[]
             )
             article.embedded_at = datetime.now(tz=KST) # type: ignore

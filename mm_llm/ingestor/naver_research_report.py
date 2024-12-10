@@ -137,15 +137,11 @@ class NaverResearchReportIngestor:
                     chunk_contents=[page.content_html for page in pages]
                 )
                 
-                for idx, (content, content_embedding) in enumerate(zip(
-                    processed_chunks.enhanced_chunks, 
-                    processed_chunks.enhanced_embeddings
-                )):
+                for idx, content in enumerate(processed_chunks.enhanced_chunks):
                     chunk_orm = NaverResearchReportChunkOrm(
                         report_id=report.report_id,
                         chunk_num=idx,
                         content=content,
-                        content_embedding=content_embedding,
                         tags=[],   
                     )
                     report.embedded_at = datetime.now(tz=KST) # type: ignore
