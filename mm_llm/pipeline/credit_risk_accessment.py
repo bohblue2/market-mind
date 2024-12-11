@@ -142,16 +142,16 @@ def add_tag_to_post(post_id, tag_name):
 # Add a tag independently
 def add_tag_independently(tag_name):
     # Check if the tag already exists
-    # print(supabase.table("tags").select("*").eq("name", tag_name.replace(" ", "-")).execute().data)
-    existing_tag = supabase.table("tags").select("*").eq("name", tag_name.replace(" ", "-")).execute().data
+    existing_tag = supabase.table("tags").select("*").eq("name", tag_name.replace(" ", "-").lower().strip()).execute().data
     if existing_tag:
         return existing_tag[0]["id"]
     tag_data = {
-        "name": tag_name.replace(" ", "-").lower(),
-        "slug": tag_name.replace(" ", "-").lower(),
-        # "index": None,
+        "name": tag_name.replace(" ", "-").lower().strip(), 
+        "slug": tag_name.replace(" ", "-").lower().strip(),
         "updated_at": datetime.utcnow().isoformat(),
     }
+    print(tag_data)
+    print(existing_tag)
     response = supabase.table("tags").insert(tag_data).execute()
     return response.data
 
@@ -176,7 +176,7 @@ def main():
     results = sess.query(NaverArticleContentOrm).join(
         NaverArticleListOrm, NaverArticleListOrm.article_id == NaverArticleContentOrm.article_id
     ).filter(NaverArticleListOrm.is_main == True).all()  # noqa: E712
-    for ret in results:
+    for ret in results[:]:
         page_content = f"{ret.title}\n{ret.content}"
         metadata = {
             "article_id": ret.article_id,
@@ -191,9 +191,14 @@ def main():
                 add_tag_independently(keyword)
             post = {
                 "title": str(ret.title),
-                "description": " ".join(doc_['metadata']['major_signals']) + "\n" + " ".join(doc_['metadata']['notable_points']),
+                "description": (
+                    "### 주요 진호\n" +
+                    "\n".join(f"- {signal}" for signal in doc_['metadata']['major_signals']) +
+                    "\n\n### 주목할 만한 점\n" +
+                    "\n".join(f"- {point}" for point in doc_['metadata']['notable_points'])
+                ),
                 "thumbnail": "",
-                "url": f"https://finance.naver.com/news/news_read.nhn?article_id={ret.article_id}",
+                "url": f"https://n.news.naver.com/mnews/article/{ret.media_id}/{ret.article_id}",
                 "is_published": True,
                 "author_id": "0fc79224-7139-49c4-a6dc-124180a0334f"
             }

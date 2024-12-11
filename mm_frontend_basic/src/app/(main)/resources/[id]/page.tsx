@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
 
 import {
   ArrowLeftIcon,
@@ -101,25 +102,27 @@ export default async function Page({ params, searchParams }: Props) {
                   ) : (
                     <p>Invalid URL</p>
                   )}
-                  <p>{resource.description}</p>
+                  <ReactMarkdown>{resource.description}</ReactMarkdown>
                 </div>
               </div>
             </div>
             <div className="order-first 2xl:order-last 2xl:col-span-1">
               <div className="flex w-full justify-center">
-                <Link
-                  className="relative inline-flex overflow-hidden rounded-lg bg-secondary"
-                  href={resource.url}
-                  target="_blank"
-                >
-                  <Image
-                    src={resource.thumbnail}
-                    alt={resource.title}
-                    width={1024}
-                    height={537}
-                    unoptimized
-                  />
-                </Link>
+                {resource.thumbnail && (
+                  <Link
+                    className="relative inline-flex overflow-hidden rounded-lg bg-secondary"
+                    href={resource.url}
+                    target="_blank"
+                  >
+                    <Image
+                      src={resource.thumbnail}
+                      alt={resource.title}
+                      width={1024}
+                      height={537}
+                      unoptimized
+                    />
+                  </Link>
+                )}
               </div>
             </div>
           </div>
