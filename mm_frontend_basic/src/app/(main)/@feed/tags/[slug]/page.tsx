@@ -16,7 +16,7 @@ export default async function Page({ params }: Props) {
     .order('created_at', { ascending: false })
   return (
     <ResourcesList
-      resources={resources?.filter((resource) => resource.tags.some((tag) => tag.slug === params.slug)) || []}
+      resources={resources?.filter((resource) => resource.tags.some((tag) => tag.slug === decodeURI(params.slug))) || []}
     />
   )
 }

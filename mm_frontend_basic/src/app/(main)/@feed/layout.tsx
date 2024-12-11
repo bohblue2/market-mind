@@ -27,7 +27,7 @@ export default function Layout({ children }: Props) {
       <PaneContainer>
         <PaneHeader>
           <SidebarToggle />
-          <h1 className="capitalize">{tagParam || 'Feed'}</h1>
+          <h1 className="capitalize">{decodeURI(tagParam || '') || 'Feed'}</h1>
         </PaneHeader>
         <PaneContent>{children}</PaneContent>
       </PaneContainer>
