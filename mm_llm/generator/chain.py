@@ -22,7 +22,7 @@ from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
 from langchain_postgres.vectorstores import PGVector
 
-from mm_llm.pg_retriever import init_vector_store
+from mm_llm.pgvector_retriever import init_vector_store
 
 def get_retriever(
     collection_name: str = "market_mind",

@@ -61,3 +61,26 @@ execute the following commands in the psql shell
 ```sql
 echo "CREATE EXTENSION vector;" | psql -U postgres -d market_mind
 ```
+
+## Dependencies-Grit
+
+```bash
+$ openai migrate
+Downloading Grit CLI from https://github.com/getgrit/gritql/releases/latest/download/marzano-x86_64-unknown-linux-gnu.tar.gz
+Error: Failed to download Grit CLI from https://github.com/getgrit/gritql/releases/latest/download/marzano-x86_64-unknown-linux-gnu.tar.gz
+
+$ curl -fsSL https://docs.grit.io/install | bash
+downloading grit 0.1.0-alpha.1730315451 x86_64-unknown-linux-gnu
+installing to /home/marcus/.grit/bin
+  grit
+everythings installed!
+
+To add $HOME/.grit/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.grit/bin/env (sh, bash, zsh)
+    source $HOME/.grit/bin/env.fish (fish)
+
+$  source $HOME/.grit/bin/env 
+
+$ grit apply openai
+```

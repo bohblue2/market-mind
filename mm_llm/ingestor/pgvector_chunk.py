@@ -6,7 +6,7 @@ from datetime import datetime
 from mm_llm.constant import KST
 from typing import List, Type, Any, Dict
 
-from mm_llm.pg_retriever import init_vector_store
+from mm_llm.pgvector_retriever import init_vector_store
 
 
 def process_chunks(
