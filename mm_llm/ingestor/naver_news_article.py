@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 import pytz  # type: ignore
 from langchain_core.documents import Document
@@ -67,7 +67,7 @@ class NaverNewsIngestor:
         
     def ingest_news_articles(
         self,
-        ticker: str, 
+        ticker: str | None, 
         from_datetime: str,
         to_datetime: str,
         yield_size: int = 1000,
@@ -81,7 +81,7 @@ class NaverNewsIngestor:
             articles = (sess.query(NaverArticleContentOrm)
                 .outerjoin(NaverArticleChunkOrm)  # left outer join으로 변경
                 .filter(
-                    NaverArticleContentOrm.ticker == ticker,
+                    NaverArticleContentOrm.ticker == ticker, # type: ignore
                     NaverArticleContentOrm.article_published_at.between(from_dt, to_dt),
                     # chunk가 없거나 chunked_at이 조건에 맞는 경우 필터
                     (
@@ -111,16 +111,17 @@ if __name__ == "__main__":
     ingestor = NaverNewsIngestor(chunk_size=1500, chunk_overlap=150)
     
     # 실행 파라미터
-    ticker = "005930"  # 예: 삼성전자
+    ticker = None  # 예: 삼성전자, 005930
     from_date = "2024-12-07"
-    to_date = "2024-12-09"
+    to_date = "2024-12-10"
     
     try:
         ingestor.ingest_news_articles(
             ticker=ticker,
             from_datetime=from_date,
             to_datetime=to_date,
-            yield_size=1000
+            yield_size=1000,
+            is_upsert=True
         )
         print(f"Successfully processed news articles for ticker {ticker}")
     except Exception as e:

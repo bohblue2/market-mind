@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${process.env.VERCEL_URL}`),
   title: {
-    default: 'Next Daily - Sharing things about Next.js',
-    template: `%s - Next Daily`,
+    default: '에지 - Ai Zzirasi',
+    template: `%s - Ai Zzirasi`,
   },
   description: '',
 }

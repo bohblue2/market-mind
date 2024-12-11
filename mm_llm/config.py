@@ -24,6 +24,10 @@ class LlmSettings(BaseSettings):
     MILVUS_READ_USER_ID: str
     MILVUS_READ_PASSWORD: str
 
+    PUBLIC_SUPABASE_URL: str
+    PUBLIC_SUPABASE_ANON_KEY: str
+
+
     ANTHROPIC_API_KEY: str
 
     UPSTAGE_API_KEY: str

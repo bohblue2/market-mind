@@ -84,3 +84,19 @@ $  source $HOME/.grit/bin/env
 
 $ grit apply openai
 ```
+
+## Developement-scrapy
+
+```bash
+scrapy shell
+```
+
+```python
+>>> fetch("https://finance.naver.com/news/mainnews.naver?date=2024-12-11")
+>>> bs = response.css("#contentarea_left > div.mainNewsList._replaceNewsLink > ul").extract()
+>>> from bs4 import BeautifulSoup
+>>> soup = BeautifulSoup(bs[0], 'html.parser')
+>>> articles = soup.find_all('li', class_='block1')
+```
+
+

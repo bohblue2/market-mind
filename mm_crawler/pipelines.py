@@ -66,11 +66,12 @@ class FinanceNewsListPipeline:
             media_name=item['media_name'],
             title=item['title'],
             link=item['link'],
+            is_main=item['is_main'],
             is_origin=item['is_origin'],
             original_id=item.get('origin_id'),
             article_published_at=kst.localize(
                 datetime.strptime(item['article_published_at'].strip(), "%Y.%m.%d %H:%M")
-            )
+            ) if not item.get('is_main') else item['article_published_at']
         )
         self.sess.add(article)
         self.sess.commit()
@@ -96,6 +97,13 @@ class FinanceNewsContentPipeline:
             self.sess.commit()
         else:
             raise DropItem(f"Article not found: {response.meta['article_id']}")
+        
+        exiting_record = self.sess.query(NaverArticleContentOrm).filter_by(
+            article_id=response.meta['article_id'],
+            media_id=response.meta['media_id']
+        ).first()
+        if exiting_record is not None:
+            return DropItem(f"Article content already exists: {response.meta['article_id']}")
                 
         article_content = NaverArticleContentOrm(
             ticker=item['ticker'],

@@ -10,6 +10,7 @@ import requests
 import scrapy
 from scrapy.http import HtmlResponse
 
+from mm_crawler.constant import KST
 from mm_crawler.items import ArticleItem, NaverArticleListFailedItem
 
 kst = pytz.timezone('Asia/Seoul')
@@ -48,8 +49,8 @@ class NaverNewsArticleList(scrapy.Spider):
     def __init__(self, ticker: str, from_date: str, to_date: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ticker = ticker
-        self.from_date = kst.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
-        self.to_date = kst.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
+        self.from_date = KST.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
+        self.to_date = KST.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
 
     def start_requests(self):
         tickers = self._fetch_tickers()
@@ -147,6 +148,7 @@ class NaverNewsArticleList(scrapy.Spider):
             'title': title,
             'link': content_url,
             'article_published_at': date,
+            'is_main': False,
             'is_origin': is_relation_origin,
             'origin_id': relation_origin_id if is_related else None,
         }

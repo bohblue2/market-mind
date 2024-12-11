@@ -38,6 +38,15 @@ export default async function Page({ params, searchParams }: Props) {
   if (!resource) {
     throw notFound()
   }
+  // Validate the URL
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <PaneContainer>
@@ -75,19 +84,23 @@ export default async function Page({ params, searchParams }: Props) {
                   <span>{formatDate(resource.created_at)}</span>
                 </div>
                 <div className="space-y-4">
-                  <Link
-                    className="flex flex-col transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    href={resource.url}
-                    target="_blank"
-                  >
-                    <h1 className="text-xl text-foreground">
-                      {resource.title}
-                    </h1>
-                    <div className="flex items-center space-x-1 text-sm">
-                      <ExternalLinkIcon size={14} />
-                      <span>{new URL(resource.url).hostname}</span>
-                    </div>
-                  </Link>
+                  {isValidUrl(resource.url) ? (
+                    <Link
+                      className="flex flex-col transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      href={resource.url}
+                      target="_blank"
+                    >
+                      <h1 className="text-xl text-foreground">
+                        {resource.title}
+                      </h1>
+                      <div className="flex items-center space-x-1 text-sm">
+                        <ExternalLinkIcon size={14} />
+                        <span>{new URL(resource.url).hostname}</span>
+                      </div>
+                    </Link>
+                  ) : (
+                    <p>Invalid URL</p>
+                  )}
                   <p>{resource.description}</p>
                 </div>
               </div>

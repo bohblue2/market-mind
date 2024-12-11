@@ -11,11 +11,12 @@ class NaverArticleListOrm(Base):
     __tablename__ = 'naver_article_list'
     id = Column(Integer, primary_key=True, autoincrement=True)
     article_id = Column(String, nullable=False)
-    ticker = Column(String, nullable=False)
+    ticker = Column(String, nullable=True)
     media_id = Column(String, nullable=False)
     media_name = Column(String, nullable=False)
     title = Column(String, nullable=False)
     link = Column(String, nullable=False)
+    is_main = Column(Boolean, nullable=True)
     is_origin = Column(Boolean, nullable=False)
     original_id = Column(String, nullable=True)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
@@ -31,6 +32,7 @@ class NaverArticleListOrm(Base):
             f"media_name='{self.media_name}'",
             f"title='{self.title}'",
             f"link='{self.link}'",
+            f"is_main={self.is_main}",
             f"is_origin={self.is_origin}",
             f"original_id='{self.original_id}'",
             f"article_published_at='{self.article_published_at}'",
@@ -43,7 +45,7 @@ class NaverArticleContentOrm(Base):
     __tablename__ = 'naver_article_contents'
     id = Column(Integer, primary_key=True, autoincrement=True)
     article_id = Column(String, nullable=False, unique=True)
-    ticker = Column(String, nullable=False)
+    ticker = Column(String, nullable=True)
     media_id = Column(String, nullable=False)
     html = Column(LargeBinary, nullable=False)
     title = Column(String, nullable=True)

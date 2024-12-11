@@ -30,7 +30,12 @@ r6:
 .PHONY: ac
 ac:
 	@echo "Crawl naver_news_content"
-	scrapy crawl naver_news_content -a ticker=005930 -a from_date=2023-12-04 -a to_date=2024-12-09
+	scrapy crawl naver_news_content -a ticker=005930 -a from_date=2023-12-04 -a to_date=2024-12-10
+
+.PHONY: ac2
+ac2:
+	@echo "Crawl naver_news_content"
+	scrapy crawl naver_news_content -a ticker=null -a from_date=2023-12-04 -a to_date=2024-12-10 
 
 .PHONY: al 
 al:

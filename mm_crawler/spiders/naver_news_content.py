@@ -44,11 +44,11 @@ class NaverNewsArticleContents(scrapy.Spider):
             "scrapy_fake_useragent.providers.FixedUserAgentProvider",
         ],
     )
-    def __init__(self, ticker:str, from_date, to_date, *args, **kwargs):
+    def __init__(self, from_date, to_date, ticker:str, *args, **kwargs):
         super(NaverNewsArticleContents, self).__init__(*args, **kwargs)
-        self.ticker = ticker
         self.from_date = kst.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
         self.to_date = kst.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
+        self.ticker = ticker if ticker != "null" else None
 
     def start_requests(self) -> Iterable[Request]:
         session = SessionLocal()

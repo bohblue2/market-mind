@@ -92,7 +92,7 @@ export async function Sidebar() {
             href="/"
           >
             <BookmarkIcon size={20} />
-            <span>Next Daily</span>
+            <span>에지 - Ai Zzirasi</span>
           </Link>
           <SidebarToggle />
         </PaneHeader>
