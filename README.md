@@ -57,7 +57,7 @@ ACL LIST
 
 ## Deployments-postgresql
 
+execute the following commands in the psql shell
 ```sql
-'execute the following commands in the psql shell'
 echo "CREATE EXTENSION vector;" | psql -U postgres -d market_mind
 ```

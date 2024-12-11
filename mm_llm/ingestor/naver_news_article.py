@@ -45,6 +45,16 @@ class NaverNewsIngestor:
             chunk_contents=[str(chunk) for chunk in chunk_contents]
         )
         enhanced_chunks = processed_chunks.enhanced_chunks
+        # process: 1. whole_document
+        whole_chunks = "\n".join(enhanced_chunks)
+        whole_chunk_orm = NaverArticleChunkOrm(
+            article_id=article.article_id,
+            chunk_num=-1,
+            content=whole_chunks,
+            tags=[]
+        )
+        article.chunks.append(whole_chunk_orm)
+        # process: 2. chunks
         for idx, content in enumerate(enhanced_chunks):
             chunk_orm = NaverArticleChunkOrm(
                 article_id=article.article_id,
@@ -52,27 +62,38 @@ class NaverNewsIngestor:
                 content=content,
                 tags=[]
             )
-            article.embedded_at = datetime.now(tz=KST) # type: ignore
             article.chunks.append(chunk_orm)
+        article.chunked_at = datetime.now(tz=KST) # type: ignore
         
     def ingest_news_articles(
         self,
         ticker: str, 
         from_datetime: str,
         to_datetime: str,
-        yield_size: int = 1000
+        yield_size: int = 1000,
+        is_upsert: bool = True 
     ) -> None:
         sess: Session = self._sess
         try:
             from_dt = self._parse_datetime(from_datetime)
             to_dt = self._parse_datetime(to_datetime)
 
-            articles = sess.query(NaverArticleContentOrm).filter(
-                NaverArticleContentOrm.ticker == ticker,
-                NaverArticleContentOrm.article_published_at.between(from_dt, to_dt),
-                NaverArticleContentOrm.embedded_at == None  # noqa: E711
-            ).yield_per(yield_size).all()
-
+            articles = (sess.query(NaverArticleContentOrm)
+                .outerjoin(NaverArticleChunkOrm)  # left outer join으로 변경
+                .filter(
+                    NaverArticleContentOrm.ticker == ticker,
+                    NaverArticleContentOrm.article_published_at.between(from_dt, to_dt),
+                    # chunk가 없거나 chunked_at이 조건에 맞는 경우 필터
+                    (
+                        ~NaverArticleContentOrm.chunks.any() |  # chunks가 비어있는 경우
+                        (
+                            NaverArticleContentOrm.chunked_at.is_(None) if not is_upsert 
+                            else NaverArticleContentOrm.chunked_at.isnot(None)
+                        )
+                    )
+                )
+                .yield_per(yield_size)
+                .all())
             for idx, article in enumerate(articles):
                 self._process_article(article)
                 sess.add(article)

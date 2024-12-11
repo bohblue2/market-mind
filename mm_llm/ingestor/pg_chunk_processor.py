@@ -6,19 +6,21 @@ from datetime import datetime
 from mm_llm.constant import KST
 from typing import List, Type, Any, Dict
 
-from mm_llm.vectorstore import init_vector_store
+from mm_llm.pg_retriever import init_vector_store
 
 
 def process_chunks(
     chunk_orm: Type[Any],
     vector_store: PGVector,
     metadata_mapping: Dict[str, str],
-    batch_size: int = 100
+    batch_size: int = 100,
+    is_upsert: bool = False
 ) -> None:
     with SessionLocal() as sess:
         # Add stream_results=True and set execution options
         chunks = sess.query(chunk_orm).filter(
-            chunk_orm.embedded_at == None  # Changed from != to == to process unembedded chunks
+            chunk_orm.embedded_at == None if not is_upsert else chunk_orm.embedded_at != None,  # noqa: E711
+            chunk_orm.chunk_num != -1
         ).execution_options(stream_results=True).yield_per(batch_size)
 
         docs = []
@@ -73,12 +75,14 @@ if __name__ == "__main__":
     process_chunks(
         NaverArticleChunkOrm,
         article_vector_store,
-        metadata_mapping={"article_id": "article_id", "chunk_num": "chunk_num"}
+        metadata_mapping={"article_id": "article_id", "chunk_num": "chunk_num"},
+        is_upsert=False
     )
     # # Process report chunks
     report_vector_store = init_vector_store("naver_research_reports")
     process_chunks(
         NaverResearchReportChunkOrm,
         report_vector_store,
-        metadata_mapping={"report_id": "report_id", "chunk_num": "chunk_num"}
+        metadata_mapping={"report_id": "report_id", "chunk_num": "chunk_num"},
+        is_upsert=False
     )

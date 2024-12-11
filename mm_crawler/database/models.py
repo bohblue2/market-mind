@@ -50,6 +50,7 @@ class NaverArticleContentOrm(Base):
     content = Column(String, nullable=True)
     language = Column(String, nullable=False)
     chunks = relationship('NaverArticleChunkOrm', backref='article_content', cascade='all, delete-orphan')
+    chunked_at = Column(DateTime(timezone=True), nullable=True, default=None)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
     article_modified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
@@ -62,6 +63,7 @@ class NaverArticleContentOrm(Base):
             'media_id': self.media_id,
             'title': self.title,
             'language': self.language,
+            'chunked_at': self.chunked_at,
             'article_published_at': self.article_published_at,
             'article_modified_at': self.article_modified_at,
             'created_at': self.created_at
@@ -123,7 +125,7 @@ class NaverResearchReportOrm(Base):
     downloaded = Column(Boolean, nullable=True)
     files = relationship('NaverResearchReportFileOrm', backref='naver_research_report', cascade='all, delete-orphan')
     chunks = relationship('NaverResearchReportChunkOrm', backref='naver_research_report', cascade='all, delete-orphan')
-    embedded_at = Column(DateTime(timezone=True), nullable=True, default=None)
+    chunked_at = Column(DateTime(timezone=True), nullable=True, default=None)
     updated_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 

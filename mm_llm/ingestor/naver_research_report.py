@@ -1,16 +1,13 @@
-import asyncio
 import json
 import os
 import tempfile
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import List, Optional
 
 import requests
-from langchain_openai import OpenAIEmbeddings
 from pydantic import BaseModel
 from requests.models import Response
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.session import Session
 
 from mm_crawler.database.models import (NaverResearchReportChunkOrm,
                                         NaverResearchReportFileOrm,
@@ -115,18 +112,36 @@ class NaverResearchReportIngestor:
 
     def ingest_research_reports(
         self, 
+        from_dt: datetime | None = None,
+        to_dt: datetime | None = None,
         yield_size: int | None = None,
-        commit_size: int | None = None
+        commit_size: int | None = None,
+        is_upsert: bool = False,
     ) -> None:
         yield_size = self._yield_size if self._yield_size is None else yield_size 
         commit_size = self._commit_size if self._commit_size is not None else commit_size 
         
         try:
-            for report_file in self._sess.query(
-                NaverResearchReportFileOrm
-            ).options(
-                joinedload(NaverResearchReportFileOrm.naver_research_report)
-            ).yield_per(yield_size).all(): # type: ignore 
+            report_files = (
+                self._sess.query(NaverResearchReportFileOrm)
+                .join(NaverResearchReportOrm)
+                .outerjoin(NaverResearchReportChunkOrm)
+                .filter(
+                    *([] if from_dt is None or to_dt is None else [NaverResearchReportOrm.published_at.between(from_dt, to_dt)]),
+                    # Filter for chunks that either don't exist or match embedded_at condition
+                    (
+                        ~NaverResearchReportOrm.chunks.any() |  # No chunks exist
+                        (
+                            NaverResearchReportChunkOrm.embedded_at.is_(None) if not is_upsert
+                            else NaverResearchReportChunkOrm.embedded_at.isnot(None)
+                        )
+                    )
+                )
+                .options(joinedload(NaverResearchReportFileOrm.naver_research_report))
+                .yield_per(yield_size) # type: ignore
+                .all()
+            )
+            for report_file in report_files: 
                 report: NaverResearchReportOrm = report_file.naver_research_report
                 pages = self._process_research_report(report_file)
 
@@ -136,7 +151,17 @@ class NaverResearchReportIngestor:
                     whole_document=whole_document, # type: ignore
                     chunk_contents=[page.content_html for page in pages]
                 )
+                # process: 1. whole_document
+                whole_chunks = "\n".join(processed_chunks.enhanced_chunks)
+                whole_chunk_orm = NaverResearchReportChunkOrm(
+                    report_id=report.report_id,
+                    chunk_num=-1,
+                    content=whole_chunks,
+                    tags=[]
+                )
+                report.chunks.append(whole_chunk_orm)
                 
+                # process: 2. chunks
                 for idx, content in enumerate(processed_chunks.enhanced_chunks):
                     chunk_orm = NaverResearchReportChunkOrm(
                         report_id=report.report_id,
@@ -144,8 +169,8 @@ class NaverResearchReportIngestor:
                         content=content,
                         tags=[],   
                     )
-                    report.embedded_at = datetime.now(tz=KST) # type: ignore
                     report.chunks.append(chunk_orm)
+                report.chunked_at = datetime.now(tz=KST) # type: ignore
                     
                 if idx % commit_size == 0: # type: ignore
                     self._sess.commit()

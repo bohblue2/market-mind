@@ -22,17 +22,12 @@ from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
 from langchain_postgres.vectorstores import PGVector
 
+from mm_llm.pg_retriever import init_vector_store
+
 def get_retriever(
-    embeddings: OpenAIEmbeddings = OpenAIEmbeddings(model=DEFAULT_EMBEDDING_MODEL),
     collection_name: str = "market_mind",
-    connection: str = str(settings.SQLALCHEMY_DATABASE_URL)
 ) -> BaseRetriever:
-    vector_store = PGVector(
-        embeddings=embeddings,
-        collection_name=collection_name,
-        connection=connection,
-        use_jsonb=True,
-    )
+    vector_store = init_vector_store(collection_name=collection_name,)
     return vector_store.as_retriever()
     
 
@@ -134,4 +129,4 @@ answer_chain = create_chain(llm, retriever)
 
 if __name__ == "__main__":
     print(settings.OPENAI_API_KEY)
-    answer_chain.invoke(ChatRequest(question="What is the capital of France?", chat_history=[{"human": "What is the capital of France?"}]).model_dump())
+    print(answer_chain.invoke(ChatRequest(question="", chat_history=[{"human": ""}]).model_dump()))
