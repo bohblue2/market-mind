@@ -17,7 +17,7 @@ from pydantic import SecretStr
 from mm_llm.config import settings
 from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
-from mm_llm.pgvector_retriever import init_vector_store
+from mm_llm.pg_retriever import init_vector_store
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
 

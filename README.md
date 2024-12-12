@@ -16,6 +16,25 @@ For additional information, please refer to the [Team Notion](https://www.notion
 
 This project aims to use advanced natural language processing (NLP) techniques to reduce information asymmetries in financial markets and maximize the performance of quantitative trading strategies.
 
+## How to use
+```bash
+# scrapy the news articles *list* for the given date and ticker
+make nl ticker=005930 from_date=2024-12-09 to_date=2024-12-10
+
+# scrapy the news articles *list* for the given date and category
+make nl_main target_date=2024-12-09
+# or 
+make nl_outlook target_date=2024-12-09
+
+# scrapy the news articles *content* for the given date and category
+make nc from_date=2024-12-08 to_date=2024-12-12 ticker=null category=main
+# or
+make nc from_date=2024-12-08 to_date=2024-12-12 ticker=null category=outlook
+
+# ingest the news articles *content* for the given date and ticker
+python cli.py mm-llm ingest-news --from-date 2024-12-09 --to-date 2024-12-11
+```
+
 ## Deployments
 
 ```bash
@@ -58,11 +77,12 @@ ACL LIST
 ## Deployments-postgresql
 
 execute the following commands in the psql shell
+
 ```sql
 echo "CREATE EXTENSION vector;" | psql -U postgres -d market_mind
 ```
 
-## Dependencies-Grit
+## Dependencies-grit
 
 ```bash
 $ openai migrate
@@ -99,4 +119,21 @@ scrapy shell
 >>> articles = soup.find_all('li', class_='block1')
 ```
 
+## Developement-postgresql
 
+```sql
+-- ENUM 타입 생성
+CREATE TYPE naverarticlecategoryenum AS ENUM (
+    'MAIN',
+    'OUTLOOK',
+    'ANALYSIS',
+    'GLOBAL',
+    'DERIVATIVES',
+    'DISCLOSURES',
+    'FOREX'
+);
+
+-- naver_article_list 테이블에 category 컬럼 추가
+ALTER TABLE naver_article_list
+ADD COLUMN category naverarticlecategoryenum;
+```

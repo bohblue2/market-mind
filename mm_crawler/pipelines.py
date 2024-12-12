@@ -68,12 +68,12 @@ class FinanceNewsListPipeline:
             media_name=item['media_name'],
             title=item['title'],
             link=item['link'],
-            is_main=item['is_main'],
+            category=item['category'],
             is_origin=item['is_origin'],
             original_id=item.get('origin_id'),
             article_published_at=kst.localize(
                 datetime.strptime(item['article_published_at'].strip(), "%Y.%m.%d %H:%M")
-            ) if not item.get('is_main') else item['article_published_at']
+            ) if not item.get('category') else item['article_published_at']
         )
         self.sess.add(article)
         self.sess.commit()

@@ -1,47 +1,74 @@
-.PHONY: b
-b:
+# Set PYTHONPATH globally
+PYTHONPATH := $(pwd)
+ENVIRONMENT := STAGE
+
+.PHONY: backend
+backend:
 	@echo "Run backend"
-	PYTHONPATH=$(pwd) python -m mm_backend
+	python -m mm_backend
 
-.PHONY: r1
-r1:
-	scrapy crawl naver_research_market_info -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: rmi
+rmi:
+	scrapy crawl naver_research_market_info -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: r2 
-r2:
-	scrapy crawl naver_research_company_list -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: rcl 
+rcl:
+	scrapy crawl naver_research_company_list -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: r3 
-r3:
-	scrapy crawl naver_research_debenture_list -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: rdl 
+rdl:
+	scrapy crawl naver_research_debenture_list -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: r4 
-r4:
-	scrapy crawl naver_research_economy_list -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: rel
+rel:
+	scrapy crawl naver_research_economy_list -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: r5
-r5:
-	scrapy crawl naver_research_industry_list -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: ridl
+ridl:
+	scrapy crawl naver_research_industry_list -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: r6
-r6:
-	scrapy crawl naver_research_invest_list -a from_date=2024-11-27 -a to_date=2024-11-29
+.PHONY: rivl
+rivl:
+	scrapy crawl naver_research_invest_list -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: ac
-ac:
+.PHONY: nc
+nc:
 	@echo "Crawl naver_news_content"
-	scrapy crawl naver_news_content -a ticker=005930 -a from_date=2023-12-04 -a to_date=2024-12-10
+	scrapy crawl naver_news_content -a from_date=$(from_date) -a to_date=$(to_date) -a ticker=$(ticker) -a category=$(category)
 
-.PHONY: ac2
-ac2:
+.PHONY: nc_main 
+nc_main:
 	@echo "Crawl naver_news_content"
-	scrapy crawl naver_news_content -a ticker=null -a from_date=2023-12-04 -a to_date=2024-12-10 
+	scrapy crawl naver_news_content -a from_date=$(from_date) -a to_date=$(to_date) -a ticker=null -a category=main
 
-.PHONY: al 
-al:
+.PHONY: nc_outlook 
+nc_outlook:
+	@echo "Crawl naver_news_content"
+	scrapy crawl naver_news_content -a from_date=$(from_date) -a to_date=$(to_date) -a ticker=null -a category=outlook
+
+.PHONY: nc_analysis
+nc_analysis:
+	@echo "Crawl naver_news_content"
+	scrapy crawl naver_news_content -a from_date=$(from_date) -a to_date=$(to_date) -a ticker=null -a category=analysis
+
+# ----------------------------
+
+.PHONY: nl 
+nl:
 	@echo "Crawl naver_news_list"
-	scrapy crawl naver_news_list -a ticker=005930 -a from_date=2023-12-04 -a to_date=2024-12-09
+	scrapy crawl naver_news_list -a ticker=$(ticker) -a from_date=$(from_date) -a to_date=$(to_date)
 
-.PHONY: c5
-c5:
-	PYTHONPATH=/Users/baeyeongmin/Desktop/workspace/market_mind python mm_llm/ingestor/naver_research_report.py
+.PHONY: nl_main
+nl_main:
+	@echo "Crawl naver_news_list"
+	scrapy crawl naver_main_news_list -a target_date=$(target_date)
+
+.PHONY: nl_outlook
+nl_outlook:
+	@echo "Crawl naver_news_list"
+	scrapy crawl naver_outlook_news_article_list -a target_date=$(target_date)
+
+.PHONY: nl_analysis
+nl_analysis:
+	@echo "Crawl naver_news_list"
+	scrapy crawl naver_analysis_news_article_list -a target_date=$(target_date)

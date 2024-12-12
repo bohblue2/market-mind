@@ -1,9 +1,11 @@
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
+from typing import Optional
+from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
                         LargeBinary, String)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
+from mm_crawler.constant import NaverArticleCategoryEnum
 from mm_crawler.database.base import Base
 
 
@@ -16,7 +18,7 @@ class NaverArticleListOrm(Base):
     media_name = Column(String, nullable=False)
     title = Column(String, nullable=False)
     link = Column(String, nullable=False)
-    is_main = Column(Boolean, nullable=True)
+    category = Column(Enum(NaverArticleCategoryEnum), nullable=False) # type: ignore 
     is_origin = Column(Boolean, nullable=False)
     original_id = Column(String, nullable=True)
     article_published_at = Column(DateTime(timezone=True), nullable=False)
@@ -32,7 +34,7 @@ class NaverArticleListOrm(Base):
             f"media_name='{self.media_name}'",
             f"title='{self.title}'",
             f"link='{self.link}'",
-            f"is_main={self.is_main}",
+            f"category='{self.category}'",
             f"is_origin={self.is_origin}",
             f"original_id='{self.original_id}'",
             f"article_published_at='{self.article_published_at}'",
@@ -44,7 +46,7 @@ class NaverArticleListOrm(Base):
 class NaverArticleContentOrm(Base):
     __tablename__ = 'naver_article_contents'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    article_id = Column(String, nullable=False, unique=True)
+    article_id = Column(String, unique=True, nullable=False)
     ticker = Column(String, nullable=True)
     media_id = Column(String, nullable=False)
     html = Column(LargeBinary, nullable=False)

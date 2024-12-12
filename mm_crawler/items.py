@@ -24,7 +24,7 @@ class ArticleItem(ItemBase):
     media_name = scrapy.Field()
     title = scrapy.Field()
     link = scrapy.Field()
-    is_main = scrapy.Field()
+    category = scrapy.Field()
     is_origin = scrapy.Field()
     origin_id = scrapy.Field()
     article_published_at = scrapy.Field()

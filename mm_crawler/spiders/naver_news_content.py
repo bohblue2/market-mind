@@ -10,6 +10,7 @@ from scrapy.http import Request
 from scrapy.http.response.html import HtmlResponse
 from twisted.python.failure import Failure
 
+from mm_crawler.constant import NaverArticleCategoryEnum
 from mm_crawler.database.models import NaverArticleListOrm
 from mm_crawler.database.session import SessionLocal
 from mm_crawler.items import ArticleContentItem
@@ -44,11 +45,12 @@ class NaverNewsArticleContents(scrapy.Spider):
             "scrapy_fake_useragent.providers.FixedUserAgentProvider",
         ],
     )
-    def __init__(self, from_date, to_date, ticker:str, *args, **kwargs):
+    def __init__(self, from_date, to_date, ticker:str, category: NaverArticleCategoryEnum, *args, **kwargs):
         super(NaverNewsArticleContents, self).__init__(*args, **kwargs)
         self.from_date = kst.localize(datetime.strptime(from_date.strip(), "%Y-%m-%d"))
         self.to_date = kst.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
         self.ticker = ticker if ticker != "null" else None
+        self.category = NaverArticleCategoryEnum(category) if category != "null" else None
 
     def start_requests(self) -> Iterable[Request]:
         session = SessionLocal()
@@ -56,7 +58,10 @@ class NaverNewsArticleContents(scrapy.Spider):
             .query(NaverArticleListOrm)\
             .filter(
                 NaverArticleListOrm.latest_scraped_at == None,
-                NaverArticleListOrm.ticker == self.ticker,
+                NaverArticleListOrm.ticker == self.ticker if self.ticker != None \
+                    else NaverArticleListOrm.ticker == None,
+                NaverArticleListOrm.category == self.category if self.category != None \
+                    else NaverArticleListOrm.category == None, 
                 NaverArticleListOrm.article_published_at.between(self.from_date, self.to_date)
             )\
             .yield_per(1000)\

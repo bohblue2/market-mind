@@ -77,11 +77,14 @@ class NaverNewsIngestor:
         try:
             from_dt = self._parse_datetime(from_datetime)
             to_dt = self._parse_datetime(to_datetime)
+            
+            print(f"Processing articles for ticker {ticker} from {from_dt} to {to_dt}")
 
             articles = (sess.query(NaverArticleContentOrm)
                 .outerjoin(NaverArticleChunkOrm)  # left outer join으로 변경
                 .filter(
-                    NaverArticleContentOrm.ticker == ticker, # type: ignore
+                    NaverArticleContentOrm.ticker == ticker if ticker is not None \
+                        else NaverArticleContentOrm.ticker == None,
                     NaverArticleContentOrm.article_published_at.between(from_dt, to_dt),
                     # chunk가 없거나 chunked_at이 조건에 맞는 경우 필터
                     (
@@ -94,6 +97,10 @@ class NaverNewsIngestor:
                 )
                 .yield_per(yield_size)
                 .all())
+            
+            if len(articles) == 0:
+                raise ValueError("No articles found for the given ticker and date range")
+
             for idx, article in enumerate(articles):
                 self._process_article(article)
                 sess.add(article)

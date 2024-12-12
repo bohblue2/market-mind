@@ -85,9 +85,9 @@ def ingest_reports(yield_size, commit_size, from_date, to_date, is_upsert):
 @click.option('--is-upsert', is_flag=True, default=False, help='Flag to upsert chunks into the vector store')
 def process_chunks(entity_type, is_upsert):
     """Process chunks for articles or reports and store them in a vector store."""
-    from mm_llm.ingestor.pgvector_chunk import pg_process_chunks
+    from mm_llm.ingestor.pg_chunk import pg_process_chunks
     from mm_crawler.database.models import NaverArticleChunkOrm, NaverResearchReportChunkOrm
-    from mm_llm.pgvector_retriever import init_vector_store
+    from mm_llm.pg_retriever import init_vector_store
 
     if entity_type == 'article':
         vector_store = init_vector_store("naver_news_articles")

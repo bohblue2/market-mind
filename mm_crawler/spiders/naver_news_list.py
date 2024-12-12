@@ -10,7 +10,7 @@ import requests
 import scrapy
 from scrapy.http import HtmlResponse
 
-from mm_crawler.constant import KST
+from mm_crawler.constant import KST, NaverArticleCategoryEnum
 from mm_crawler.items import ArticleItem, NaverArticleListFailedItem
 
 kst = pytz.timezone('Asia/Seoul')
@@ -53,10 +53,11 @@ class NaverNewsArticleList(scrapy.Spider):
         self.to_date = KST.localize(datetime.strptime(to_date.strip(), "%Y-%m-%d"))
 
     def start_requests(self):
-        tickers = self._fetch_tickers()
-        self.log(f"Extracted {len(tickers)} tickers from API")
-        if self.ticker in tickers:
-            yield self._create_request(self.ticker)
+        # tickers = self._fetch_tickers()
+        # self.log(f"Extracted {len(tickers)} tickers from API")
+        # if self.ticker in tickers:
+        #     yield self._create_request(self.ticker)
+        yield self._create_request(self.ticker)
 
     async def parse(self, response: HtmlResponse) -> Any:
         meta = response.meta
@@ -129,7 +130,7 @@ class NaverNewsArticleList(scrapy.Spider):
             return NaverArticleErrorEnum.PROCESSED_ID_EXISTS 
 
         article_published_at = kst.localize(datetime.strptime(date.strip(), "%Y.%m.%d %H:%M"))
-        if article_published_at < self.from_date or article_published_at > self.to_date:
+        if article_published_at <= self.from_date or article_published_at >= self.to_date:
             return NaverArticleErrorEnum.OUT_OF_DATE_RANGE 
 
         processed_ids.add(f"{office_id}{article_id}")
@@ -148,7 +149,7 @@ class NaverNewsArticleList(scrapy.Spider):
             'title': title,
             'link': content_url,
             'article_published_at': date,
-            'is_main': False,
+            'category': NaverArticleCategoryEnum.CODE,
             'is_origin': is_relation_origin,
             'origin_id': relation_origin_id if is_related else None,
         }

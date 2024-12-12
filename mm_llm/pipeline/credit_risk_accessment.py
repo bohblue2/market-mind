@@ -1,5 +1,3 @@
-import json
-from random import random
 from typing import Any, Dict, List, Literal, Optional
 
 from langchain import hub
@@ -7,17 +5,15 @@ from langchain_community.document_transformers.openai_functions import \
     create_metadata_tagger
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-
+from mm_crawler.constant import NaverArticleCategoryEnum
 from mm_crawler.database.models import (NaverArticleContentOrm,
                                         NaverArticleListOrm,
                                         NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_llm.database.models import CreditRiskPropertiesOrm
-from mm_llm.pgvector_retriever import (DEFAULT_COLLECTION_NAME,
-                                       init_vector_store)
+from mm_llm.supabase import add_post_with_tags, add_tag_independently
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 
 class CreditRiskProperties(BaseModel):
@@ -99,72 +95,6 @@ def get_report_by_id(report_id: int, sess: Session):
     print(f"Report with id {report_id} not found.")
     return None
 
-from datetime import datetime
-
-from supabase import Client, create_client
-
-from mm_llm.config import settings
-
-# Initialize the Supabase client
-url = settings.PUBLIC_SUPABASE_URL
-key = settings.PUBLIC_SUPABASE_ANON_KEY
-supabase: Client = create_client(url, key)
-
-# Add a new post with tags
-def add_post_with_tags(post, tag_ids):
-    # Insert the new post
-    post_data = {
-        "title": post["title"],
-        "description": post["description"],
-        "thumbnail": post["thumbnail"],
-        "url": post["url"],
-        "is_published": post["is_published"],
-        "author_id": post["author_id"],
-    }
-    response = supabase.table("resources").insert(post_data).execute()
-    post_id = response.data[0]["id"]
-
-    # Link tags to the post
-    resource_tags = [{"resource_id": post_id, "tag_id": tag_id} for tag_id in tag_ids]
-    supabase.table("resource_tags").insert(resource_tags).execute()
-    return post_id
-
-# Add a new tag to an existing post
-def add_tag_to_post(post_id, tag_name):
-    # Check if the tag already exists, insert if not
-    tag_response = supabase.table("tags").select("*").eq("name", tag_name).execute()
-    if tag_response.data:
-        tag_id = tag_response.data[0]["id"]
-    else:
-        tag_data = {
-            "name": tag_name,
-            "slug": tag_name.replace(" ", "-").lower(),
-            # "index": None,
-            "updated_at": datetime.utcnow().isoformat(),
-        }
-        tag_response = supabase.table("tags").insert(tag_data).execute()
-        tag_id = tag_response.data[0]["id"]
-
-    # Link the tag to the post
-    supabase.table("resource_tags").insert({"resource_id": post_id, "tag_id": tag_id}).execute()
-    return tag_id
-
-# Add a tag independently
-def add_tag_independently(tag_name):
-    # Check if the tag already exists
-    existing_tag = supabase.table("tags").select("*").eq("name", tag_name.replace(" ", "-").lower().strip()).execute().data
-    if existing_tag:
-        return existing_tag[0]["id"]
-    tag_data = {
-        "name": tag_name.replace(" ", "-").lower().strip(), 
-        "slug": tag_name.replace(" ", "-").lower().strip(),
-        "updated_at": datetime.utcnow().isoformat(),
-    }
-    print(tag_data)
-    print(existing_tag)
-    response = supabase.table("tags").insert(tag_data).execute()
-    return response.data
-
 def save_credit_risk_properties(doc, sess: Session):
     # Create an instance of CreditRiskPropertiesOrm
     credit_risk_properties = CreditRiskPropertiesOrm(
@@ -177,13 +107,8 @@ def save_credit_risk_properties(doc, sess: Session):
         article_id=doc['metadata']['article_id'],
         article_published_at=doc['metadata']['article_published_at']
     )
-
-    # Add the instance to the session
     sess.add(credit_risk_properties)
-
-    # Commit the transaction to save the data
     sess.commit()
-
     print(f"Saved CreditRiskPropertiesOrm with article_id: {credit_risk_properties.article_id}")
 
 def main():
@@ -204,8 +129,12 @@ def main():
     prompt = hub.pull("teddynote/metadata-tagger")
     document_transformer = create_metadata_tagger(CreditRiskProperties, llm=llm)
     results = sess.query(NaverArticleContentOrm).join(
-        NaverArticleListOrm, NaverArticleListOrm.article_id == NaverArticleContentOrm.article_id
-    ).filter(NaverArticleListOrm.is_main == True).all()  # noqa: E712
+        NaverArticleListOrm, 
+        NaverArticleListOrm.article_id == NaverArticleContentOrm.article_id
+    ).filter(
+        NaverArticleListOrm.category == NaverArticleCategoryEnum.MAIN
+    ).all()  # noqa: E712
+
     for ret in results[:]:
         page_content = f"{ret.title}\n{ret.content}"
         metadata = {
@@ -221,9 +150,9 @@ def main():
                 post = {
                     "title": str(ret.title),
                     "description": (
-                        "### 주요 진호\n" +
+                        "# 주요 진호\n" +
                         "\n".join(f"- {signal}" for signal in doc['metadata']['major_signals']) +
-                        "\n\n### 주목할 만한 점\n" +
+                        "\n\n# 주목할 만한 점\n" +
                         "\n".join(f"- {point}" for point in doc['metadata']['notable_points'])
                     ),
                     "thumbnail": "",
@@ -234,11 +163,6 @@ def main():
                 tag_ids = []
                 tag_slug = f"리스크평가-{grade}"
                 tag_ids.append(add_tag_independently(tag_slug))
-                # keywords = doc['metadata']['keywords']
-                # for keyword in keywords:
-                #     tag_id = add_tag_independently(keyword)
-                #     if tag_id:
-                #         tag_ids.append(tag_id)
                 save_credit_risk_properties(doc, sess)
                 post_id = add_post_with_tags(post, tag_ids)
                 print(f"Post ID: {post_id}")

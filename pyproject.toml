@@ -54,6 +54,7 @@ isort = "^5.13.2"
 clipboard = "^0.0.4"
 flake8 = "^7.1.1"
 pytest = "^8.3.3"
+pyflyby = "^1.9.10"
 
 [build-system]
 requires = ["poetry-core"]
