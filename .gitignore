@@ -11,3 +11,4 @@ examples
 **/__pycache__/
 .mypy_cache
 .cache/*
+.env.*
