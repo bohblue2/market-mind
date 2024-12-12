@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-lint && tsc --noEmit --skipLibCheck",
+    "build_nolint": "next build --no-lint && tsc --noEmit --skipLibCheck",
+    "build": "next build ",
     "start": "next start",
     "lint": "next lint",
     "types": "supabase gen types typescript --project-id inouvsyffdppfinupgbs > src/types/database.types.ts"

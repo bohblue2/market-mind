@@ -38,7 +38,7 @@ export function ResourceCard({ resource }: Props) {
         </div>
         <div>
           <h2 className="line-clamp-2 text-foreground">{resource.title}</h2>
-          <p className="line-clamp-1">{resource.description}</p>
+          {/* <p className="line-clamp-1">{resource.description}</p> */}
         </div>
       </Link>
     </article>

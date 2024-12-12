@@ -13,7 +13,8 @@ export default async function Page({ params }: Props) {
   const { data: resources } = await supabase
     .from('resources')
     .select('*, tags(*)')
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
+
   return (
     <ResourcesList
       resources={resources?.filter((resource) => resource.tags.some((tag) => tag.slug === decodeURI(params.slug))) || []}

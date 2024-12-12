@@ -8,6 +8,7 @@ from mm_crawler.database.session import SessionLocal
 from langchain_community.document_transformers.openai_functions import create_metadata_tagger
 from langchain_openai import ChatOpenAI
 from langchain import hub
+from mm_llm.database.models import CreditRiskPropertiesOrm
 from mm_llm.pgvector_retriever import DEFAULT_COLLECTION_NAME, init_vector_store
 from langchain_core.documents import Document
 import json
@@ -155,6 +156,27 @@ def add_tag_independently(tag_name):
     response = supabase.table("tags").insert(tag_data).execute()
     return response.data
 
+def save_credit_risk_properties(doc, sess: Session):
+    # Create an instance of CreditRiskPropertiesOrm
+    credit_risk_properties = CreditRiskPropertiesOrm(
+        grade=doc['metadata']['grade'],
+        tone=doc['metadata']['tone'],
+        major_signals=doc['metadata']['major_signals'],
+        keywords=doc['metadata']['keywords'],
+        notable_points=doc['metadata'].get('notable_points', None),
+        boundary_case_details=doc['metadata'].get('boundary_case_details', None),
+        article_id=doc['metadata']['article_id'],
+        article_published_at=doc['metadata']['article_published_at']
+    )
+
+    # Add the instance to the session
+    sess.add(credit_risk_properties)
+
+    # Commit the transaction to save the data
+    sess.commit()
+
+    print(f"Saved CreditRiskPropertiesOrm with article_id: {credit_risk_properties.article_id}")
+
 def main():
     sess = SessionLocal()
     # llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
@@ -164,7 +186,6 @@ def main():
     # vs_filter = {}  # type: ignore
     # data = vector_store.similarity_search("중국", k=20, filter=vs_filter)
     # enhanced_documents = document_transformer.transform_documents(data[:5], prompt=prompt)
-
     # for doc in enhanced_documents:
     #     doc_ = doc.model_dump()
     #     # print(doc_.get('page_content', None))
@@ -184,36 +205,35 @@ def main():
         }
         doc = Document(page_content=page_content, metadata=metadata)
         enhanced_documents = document_transformer.transform_documents([doc], prompt=prompt)
-        for doc in enhanced_documents:
-            doc_ = doc.model_dump()
-            print(doc_['metadata'])
-            for keyword in doc_['metadata']['keywords']:
-                add_tag_independently(keyword)
-            post = {
-                "title": str(ret.title),
-                "description": (
-                    "### 주요 진호\n" +
-                    "\n".join(f"- {signal}" for signal in doc_['metadata']['major_signals']) +
-                    "\n\n### 주목할 만한 점\n" +
-                    "\n".join(f"- {point}" for point in doc_['metadata']['notable_points'])
-                ),
-                "thumbnail": "",
-                "url": f"https://n.news.naver.com/mnews/article/{ret.media_id}/{ret.article_id}",
-                "is_published": True,
-                "author_id": "0fc79224-7139-49c4-a6dc-124180a0334f"
-            }
-            tag_ids = []
-            for keyword in doc_['metadata']['keywords']:
-                tag_id = add_tag_independently(keyword)
-                if tag_id:
-                    tag_ids.append(tag_id)
-            post_id = add_post_with_tags(post, tag_ids)
-            print(f"Post ID: {post_id}")
-            print("Tags added.")
+        for enhanced_doc in enhanced_documents:
+            doc = enhanced_doc.model_dump()
+            grade = doc['metadata']['grade']
+            if grade in ['A', 'B', 'C']:
+                post = {
+                    "title": str(ret.title),
+                    "description": (
+                        "### 주요 진호\n" +
+                        "\n".join(f"- {signal}" for signal in doc['metadata']['major_signals']) +
+                        "\n\n### 주목할 만한 점\n" +
+                        "\n".join(f"- {point}" for point in doc['metadata']['notable_points'])
+                    ),
+                    "thumbnail": "",
+                    "url": f"https://n.news.naver.com/mnews/article/{ret.media_id}/{ret.article_id}",
+                    "is_published": True,
+                    "author_id": "0fc79224-7139-49c4-a6dc-124180a0334f"
+                }
+                tag_ids = []
+                tag_slug = f"리스크평가-{grade}"
+                tag_ids.append(add_tag_independently(tag_slug))
+                # keywords = doc['metadata']['keywords']
+                # for keyword in keywords:
+                #     tag_id = add_tag_independently(keyword)
+                #     if tag_id:
+                #         tag_ids.append(tag_id)
+                post_id = add_post_with_tags(post, tag_ids)
+                print(f"Post ID: {post_id}")
+                print("Tags added.")
     sess.close()
     
-        
-
-
 if __name__ == "__main__":
     main()

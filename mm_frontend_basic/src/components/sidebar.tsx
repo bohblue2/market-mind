@@ -37,20 +37,8 @@ import { cookies } from 'next/headers'
 
 const externalLinks = [
   {
-    label: 'GitHub',
-    href: 'https://github.com/eckoln/nextdaily',
-  },
-  {
-    label: 'Next.js Docs',
-    href: 'https://nextjs.org/docs',
-  },
-  {
-    label: 'Next.js GitHub',
-    href: 'https://github.com/vercel/next.js',
-  },
-  {
-    label: 'RSS',
-    href: '/feed.xml',
+    label: 'About Us',
+    href: 'https://naver.com',
   },
 ]
 

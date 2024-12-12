@@ -22,7 +22,7 @@ function PaneHeader({
   return (
     <header
       className={cn(
-        'sticky top-0 z-10 flex h-16 w-full shrink-0 flex-row items-center gap-4 border-b bg-background px-2 xl:px-7',
+        'sticky top-0 z-10 flex h-12 w-full shrink-0 flex-row items-center gap-4 border-b bg-background px-2 xl:px-7',
         className,
       )}
       {...props}
