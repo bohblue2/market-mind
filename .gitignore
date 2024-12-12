@@ -1,6 +1,5 @@
 examples
 .examples
-.dockerfiles/volumes
 .README.md
 
 .DS_Store
@@ -10,5 +9,5 @@ examples
 **/*.pyc
 **/__pycache__/
 .mypy_cache
-.cache/*
 .env.*
+.cache

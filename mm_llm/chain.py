@@ -11,12 +11,10 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import (ConfigurableField, Runnable,
                                       RunnableBranch, RunnableLambda,
                                       RunnablePassthrough)
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_postgres.vectorstores import PGVector
+from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
 from mm_llm.config import settings
-from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
 from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
 from mm_llm.pgvector_retriever import init_vector_store

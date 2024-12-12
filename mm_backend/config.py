@@ -30,10 +30,6 @@ class BackendSettings(BaseSettings):
     LANGCHAIN_ENDPOINT: AnyUrl
     LANGCHAIN_API_KEY: str
     LANGCHAIN_PROJECT: str
-    MILVUS_API_KEY: str
-    MILVUS_URI: AnyUrl
-    MILVUS_READ_USER_ID: str
-    MILVUS_READ_PASSWORD: str
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -58,9 +54,10 @@ class BackendSettings(BaseSettings):
     
     class Config:
         env_file = (
-            ".dev.backend.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
-            ".stage.backend.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
-            ".prod.backend.env"
+            ".env.dev.backend" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".env.stage.backend" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".env.prod.backend" if os.getenv("ENVIRONMENT", "PROD") == 'PROD' else
+            ".env.backend"
         )
         env_file_encoding = "utf-8"
 

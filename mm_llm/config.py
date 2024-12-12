@@ -41,9 +41,10 @@ class LlmSettings(BaseSettings):
 
     class Config:
         env_file = (
-            ".dev.llm.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
-            ".stage.llm.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
-            ".prod.llm.env"
+            ".env.dev.llm" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".env.stage.llm" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".env.prod.llm" if os.getenv("ENVIRONMENT", "PROD") == 'PROD' else
+            ".env.llm"
         )
         env_file_encoding = "utf-8"
 

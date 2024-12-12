@@ -37,9 +37,10 @@ class CrawlerSettings(BaseSettings):
     
     class Config:
         env_file = (
-            ".dev.crawler.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
-            ".stage.crawler.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
-            ".prod.crawler.env"
+            ".env.dev.crawler" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".env.stage.crawler" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".env.prod.crawler" if os.getenv("ENVIRONMENT", "PROD") == 'PROD' else
+            ".env.crawler"
         )
         env_file_encoding = "utf-8"
 

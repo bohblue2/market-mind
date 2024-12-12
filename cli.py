@@ -2,7 +2,6 @@ import os
 
 import click
 
-
 @click.group()
 def cli():
     """Main CLI group."""
@@ -39,40 +38,75 @@ def res_converter(task, path):
 @cli.group()
 def mm_llm(): ...
 
+@mm_llm.command()
+@click.option('--ticker', default=None, help='Ticker symbol, e.g., 삼성전자, 005930')
+@click.option('--from-date', required=True, help='Start date for news ingestion, e.g., 2024-12-07')
+@click.option('--to-date', required=True, help='End date for news ingestion, e.g., 2024-12-10')
+@click.option('--chunk-size', default=1500, help='Chunk size for news ingestion')
+@click.option('--chunk-overlap', default=150, help='Chunk overlap for news ingestion')
+@click.option('--yield-size', default=1000, help='Yield size for news ingestion')
+@click.option('--is-upsert', is_flag=True, default=False, help='Flag to upsert news articles')
+def ingest_news(ticker, from_date, to_date, chunk_size, chunk_overlap, yield_size, is_upsert):
+    """Ingest news articles from Naver News."""
+    from mm_llm.ingestor.naver_news_article import NaverNewsIngestor
+    ingestor = NaverNewsIngestor(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    ingestor.ingest_news_articles(
+        ticker=ticker,
+        from_datetime=from_date,
+        to_datetime=to_date,
+        yield_size=yield_size,
+        is_upsert=is_upsert
+    )
+    print(f"Successfully processed news articles for ticker {ticker}")
 
-from scrapy.crawler import CrawlerRunner
-from scrapy.utils.project import get_project_settings
-from twisted.internet import defer, reactor
+@mm_llm.command()
+@click.option('--yield-size', default=1000, help='Number of records to yield per batch')
+@click.option('--commit-size', default=10, help='Number of records to commit per transaction')
+@click.option('--from-date', type=click.DateTime(formats=["%Y-%m-%d"]), help='Start date for report ingestion, e.g., 2024-12-07')
+@click.option('--to-date', type=click.DateTime(formats=["%Y-%m-%d"]), help='End date for report ingestion, e.g., 2024-12-10')
+@click.option('--is-upsert', is_flag=True, default=False, help='Flag to upsert research reports')
+def ingest_reports(yield_size, commit_size, from_date, to_date, is_upsert):
+    """Ingest research reports from Naver."""
+    from mm_llm.ingestor.naver_research_report import NaverResearchReportIngestor
+    ingestor = NaverResearchReportIngestor(
+        yield_size=yield_size,
+        commit_size=commit_size
+    )
+    ingestor.ingest_research_reports(
+        from_dt=from_date,
+        to_dt=to_date,
+        is_upsert=is_upsert
+    )
+    print("Successfully processed research reports")
 
 
-@cli.group()
-def mm_crawler(): 
-    os.environ["SCRAPY_PROJECT"] = "mm_crawler"
-    os.environ["SCRAPY_SETTINGS_MODULE"] = "mm_crawler.settings"
+@mm_llm.command()
+@click.option('--entity-type', type=click.Choice(['article', 'report']), required=True, help='Type of entity to process: article or report')
+@click.option('--is-upsert', is_flag=True, default=False, help='Flag to upsert chunks into the vector store')
+def process_chunks(entity_type, is_upsert):
+    """Process chunks for articles or reports and store them in a vector store."""
+    from mm_llm.ingestor.pgvector_chunk import pg_process_chunks
+    from mm_crawler.database.models import NaverArticleChunkOrm, NaverResearchReportChunkOrm
+    from mm_llm.pgvector_retriever import init_vector_store
 
-@mm_crawler.command()
-@click.argument('spider_name')
-@click.option('--arg', '-a', multiple=True, type=(str, str), help='Additional arguments for the spider in key=value format.')
-def run_spider_with_runner(spider_name, arg):
-    """Scrapy spider를 CrawlerRunner를 사용하여 추가 인자와 함께 실행합니다.
-
-    사용 예:
-    python cli.py run_spider_with_runner my_spider --arg key1 value1 --arg key2 value2
-    """
-    os.environ["SCRAPY_PROJECT"] = "mm_crawler"
-    os.environ["SCRAPY_SETTINGS_MODULE"] = "mm_crawler.settings"
-    runner = CrawlerRunner(get_project_settings())
-    
-    # Convert the list of tuples into a dictionary
-    additional_args = {key: value for key, value in arg}
-    
-    @defer.inlineCallbacks
-    def crawl():
-        yield runner.crawl(spider_name, **additional_args)
-        reactor.stop() # type: ignore
-    
-    crawl()
-    reactor.run() # type: ignore
+    if entity_type == 'article':
+        vector_store = init_vector_store("naver_news_articles")
+        pg_process_chunks(
+            NaverArticleChunkOrm,
+            vector_store,
+            metadata_mapping={"article_id": "article_id", "chunk_num": "chunk_num"},
+            is_upsert=is_upsert
+        )
+        print("Successfully processed article chunks")
+    elif entity_type == 'report':
+        vector_store = init_vector_store("naver_research_reports")
+        pg_process_chunks(
+            NaverResearchReportChunkOrm,
+            vector_store,
+            metadata_mapping={"report_id": "report_id", "chunk_num": "chunk_num"},
+            is_upsert=is_upsert
+        )
+        print("Successfully processed report chunks")
 
 if __name__ == "__main__":
     cli()

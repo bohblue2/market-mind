@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 import pytz  # type: ignore
 from langchain_core.documents import Document
@@ -106,24 +106,3 @@ class NaverNewsIngestor:
         finally:
             sess.close()
 
-if __name__ == "__main__":
-    # 인스턴스 생성
-    ingestor = NaverNewsIngestor(chunk_size=1500, chunk_overlap=150)
-    
-    # 실행 파라미터
-    ticker = None  # 예: 삼성전자, 005930
-    from_date = "2024-12-07"
-    to_date = "2024-12-10"
-    
-    try:
-        ingestor.ingest_news_articles(
-            ticker=ticker,
-            from_datetime=from_date,
-            to_datetime=to_date,
-            yield_size=1000,
-            is_upsert=True
-        )
-        print(f"Successfully processed news articles for ticker {ticker}")
-    except Exception as e:
-        print(f"Error processing news articles: {str(e)}")
-        raise e

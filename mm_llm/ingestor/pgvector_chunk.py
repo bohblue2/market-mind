@@ -4,14 +4,11 @@ from typing import Any, Dict, List, Type
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 
-from mm_crawler.database.models import (NaverArticleChunkOrm,
-                                        NaverResearchReportChunkOrm)
 from mm_crawler.database.session import SessionLocal
 from mm_llm.constant import KST
-from mm_llm.pgvector_retriever import init_vector_store
 
 
-def process_chunks(
+def pg_process_chunks(
     chunk_orm: Type[Any],
     vector_store: PGVector,
     metadata_mapping: Dict[str, str],
@@ -70,21 +67,3 @@ def save_batch(
     for chunk in db_chunks:
         chunk.embedded_at = current_time
     session.bulk_save_objects(db_chunks)
-
-if __name__ == "__main__":
-    # Process article chunks
-    article_vector_store = init_vector_store("naver_news_articles")
-    process_chunks(
-        NaverArticleChunkOrm,
-        article_vector_store,
-        metadata_mapping={"article_id": "article_id", "chunk_num": "chunk_num"},
-        is_upsert=False
-    )
-    # # Process report chunks
-    report_vector_store = init_vector_store("naver_research_reports")
-    process_chunks(
-        NaverResearchReportChunkOrm,
-        report_vector_store,
-        metadata_mapping={"report_id": "report_id", "chunk_num": "chunk_num"},
-        is_upsert=False
-    )

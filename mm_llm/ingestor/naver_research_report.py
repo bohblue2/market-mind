@@ -181,14 +181,3 @@ class NaverResearchReportIngestor:
         finally:
             self._sess.close()
 
-if __name__ == "__main__":
-    try:
-        ingestor = NaverResearchReportIngestor(
-            yield_size=1000,
-            commit_size=10
-        )
-        ingestor.ingest_research_reports()
-        print("Successfully processed research reports")
-    except Exception as e:
-        print(f"Error processing research reports: {str(e)}")
-        raise e

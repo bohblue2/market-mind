@@ -72,7 +72,7 @@ class NaverMainNewsArticleList(scrapy.Spider):
     @classmethod
     def _get_headers(cls) -> Dict[str, str]:
         return {
-            "Referer": f"https://finance.naver.com/news/mainnews.naver",
+            "Referer": "https://finance.naver.com/news/mainnews.naver",
             "Accept": "application/json, text/plain, */*",
         }    
         

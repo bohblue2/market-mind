@@ -9,9 +9,10 @@ class XingSettings(BaseSettings):
 
     class Config:
         env_file = (
-            ".dev.xing.env" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
-            ".stage.xing.env" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
-            ".prod.xing.env"
+            ".env.dev.xing" if os.getenv("ENVIRONMENT", "DEV") == 'DEV' else
+            ".env.stage.xing" if os.getenv("ENVIRONMENT", "STAGE") == 'STAGE' else
+            ".env.prod.xing" if os.getenv("ENVIRONMENT", "PROD") == 'PROD' else
+            ".env.xing"
         )
         env_file_encoding = "utf-8"
 

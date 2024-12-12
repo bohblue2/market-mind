@@ -1,8 +1,5 @@
 import asyncio
-import os
-from datetime import datetime
-from time import sleep
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from httpx import Client, Response
 from pydantic import BaseModel
@@ -16,11 +13,10 @@ from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
                            t9943OutBlock, t9944InBlock, t9944OutBlock)
 from mm_xing.config import settings
 # TODO: Refactor this import (mm_xing.constant -> mm_xing.config)
-from mm_xing.constant import (INDTP_MARKET_DATA_PATH, MM_DB_PATH, O3101,
-                              STOCK_EXCHANGE_PATH, STOCK_SECTOR_PATH, T1764,
+from mm_xing.constant import (O3101,
+                              T1764,
                               T8401, T8424, T8425, T8426, T8436, T9943, T9943S,
-                              T9943V, T9944, TR_CODE_TO_URL, XING_APP_KEY,
-                              XING_APP_SECRET, XING_REST_URL)
+                              T9943V, T9944, TR_CODE_TO_URL, XING_REST_URL)
 from mm_xing.schemas import XingDataConfig, XingTrHeaders
 
 
