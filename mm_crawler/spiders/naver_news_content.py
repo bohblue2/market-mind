@@ -1,9 +1,9 @@
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
 from typing import Any, Iterable, Union
 
-import pytz # type: ignore
+import pytz  # type: ignore
 import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import Request

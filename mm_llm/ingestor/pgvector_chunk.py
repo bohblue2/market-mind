@@ -1,11 +1,13 @@
+from datetime import datetime
+from typing import Any, Dict, List, Type
+
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
-from mm_crawler.database.session import SessionLocal
-from mm_crawler.database.models import NaverArticleChunkOrm, NaverResearchReportChunkOrm
-from datetime import datetime
-from mm_llm.constant import KST
-from typing import List, Type, Any, Dict
 
+from mm_crawler.database.models import (NaverArticleChunkOrm,
+                                        NaverResearchReportChunkOrm)
+from mm_crawler.database.session import SessionLocal
+from mm_llm.constant import KST
 from mm_llm.pgvector_retriever import init_vector_store
 
 

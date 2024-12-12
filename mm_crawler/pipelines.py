@@ -11,12 +11,14 @@ import pytz  # type: ignore
 from scrapy.exceptions import DropItem
 
 from mm_crawler.commons import async_load_to_buffer
-from mm_crawler.database.models import (NaverArticleContentOrm, NaverArticleFailureOrm,
+from mm_crawler.database.models import (NaverArticleContentOrm,
+                                        NaverArticleFailureOrm,
                                         NaverArticleListOrm,
                                         NaverResearchReportFileOrm,
                                         NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
-from mm_crawler.items import ArticleContentItem, ArticleItem, NaverArticleListFailedItem
+from mm_crawler.items import (ArticleContentItem, ArticleItem,
+                              NaverArticleListFailedItem)
 
 kst = pytz.timezone('Asia/Seoul')
 

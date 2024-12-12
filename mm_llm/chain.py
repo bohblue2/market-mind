@@ -6,23 +6,23 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models import LanguageModelLike
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import (ChatPromptTemplate, MessagesPlaceholder)
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import (ConfigurableField, Runnable,
                                       RunnableBranch, RunnableLambda,
                                       RunnablePassthrough)
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_postgres.vectorstores import PGVector
 from pydantic import SecretStr
 
 from mm_llm.config import settings
 from mm_llm.constant import DEFAULT_EMBEDDING_MODEL
 from mm_llm.enums import RunNames
 from mm_llm.models import ChatRequest
+from mm_llm.pgvector_retriever import init_vector_store
 from mm_llm.prompts.default import REPHRASE_TEMPLATE, RESPONSE_TEMPLATE
 from mm_llm.spliter import format_docs_with_ids
-from langchain_postgres.vectorstores import PGVector
 
-from mm_llm.pgvector_retriever import init_vector_store
 
 def get_retriever(
     collection_name: str = "market_mind",

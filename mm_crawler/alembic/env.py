@@ -1,5 +1,5 @@
-from logging.config import fileConfig
 import os
+from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -29,6 +29,7 @@ target_metadata = Base.metadata
 
 section = config.config_ini_section
 from dotenv import load_dotenv
+
 if load_dotenv('.dev.crawler.env') is False:
     load_dotenv('.prod.crawler.env')
 alembic_db_url = os.environ.get("ALEMBIC_DB_URL")

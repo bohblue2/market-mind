@@ -1,4 +1,4 @@
-import pytz # type: ignore
+import pytz  # type: ignore
 
 OPENAI_EMBEDDING_DIM=3072
 DEFAULT_EMBEDDING_DIM = OPENAI_EMBEDDING_DIM

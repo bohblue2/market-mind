@@ -1,17 +1,24 @@
+import json
 from random import random
-from typing import List, Optional, Literal, Dict, Any
+from typing import Any, Dict, List, Literal, Optional
+
+from langchain import hub
+from langchain_community.document_transformers.openai_functions import \
+    create_metadata_tagger
+from langchain_core.documents import Document
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from mm_crawler.database.models import NaverArticleContentOrm, NaverArticleListOrm, NaverResearchReportOrm
+
+from mm_crawler.database.models import (NaverArticleContentOrm,
+                                        NaverArticleListOrm,
+                                        NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
-from langchain_community.document_transformers.openai_functions import create_metadata_tagger
-from langchain_openai import ChatOpenAI
-from langchain import hub
 from mm_llm.database.models import CreditRiskPropertiesOrm
-from mm_llm.pgvector_retriever import DEFAULT_COLLECTION_NAME, init_vector_store
-from langchain_core.documents import Document
-import json
+from mm_llm.pgvector_retriever import (DEFAULT_COLLECTION_NAME,
+                                       init_vector_store)
+
 
 class CreditRiskProperties(BaseModel):
     grade: Literal["A", "B", "C", "D", "F"] = Field(
@@ -92,8 +99,10 @@ def get_report_by_id(report_id: int, sess: Session):
     print(f"Report with id {report_id} not found.")
     return None
 
-from supabase import create_client, Client
 from datetime import datetime
+
+from supabase import Client, create_client
+
 from mm_llm.config import settings
 
 # Initialize the Supabase client
@@ -230,6 +239,7 @@ def main():
                 #     tag_id = add_tag_independently(keyword)
                 #     if tag_id:
                 #         tag_ids.append(tag_id)
+                save_credit_risk_properties(doc, sess)
                 post_id = add_post_with_tags(post, tag_ids)
                 print(f"Post ID: {post_id}")
                 print("Tags added.")

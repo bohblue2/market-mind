@@ -1,16 +1,20 @@
 from typing import Any, Dict
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_postgres import PGVector
-from pydantic import BaseModel
-from mm_llm.config import settings
-from langchain_community.cache import SQLiteCache
+
 from langchain.globals import set_llm_cache
-from langchain_community.document_transformers import EmbeddingsRedundantFilter
-from langchain_text_splitters import CharacterTextSplitter
-from langchain_teddynote.document_compressors import LLMChainExtractor
 from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors.base import DocumentCompressorPipeline
-from langchain.retrievers.document_compressors.embeddings_filter import EmbeddingsFilter
+from langchain.retrievers.document_compressors.base import \
+    DocumentCompressorPipeline
+from langchain.retrievers.document_compressors.embeddings_filter import \
+    EmbeddingsFilter
+from langchain_community.cache import SQLiteCache
+from langchain_community.document_transformers import EmbeddingsRedundantFilter
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_postgres import PGVector
+from langchain_teddynote.document_compressors import LLMChainExtractor
+from langchain_text_splitters import CharacterTextSplitter
+from pydantic import BaseModel
+
+from mm_llm.config import settings
 
 # Constants
 DEFAULT_EMBEDDINGS_MODEL = "text-embedding-3-large"

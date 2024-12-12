@@ -12,26 +12,19 @@ class LlmSettings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_DB: str
 
-    ALEMBIC_DB_URL: str
-    OPENAI_API_KEY: str
-    TAVILY_API_KEY: str
     LANGCHAIN_TRACING_V2: bool
     LANGCHAIN_ENDPOINT: AnyUrl
     LANGCHAIN_API_KEY: str
     LANGCHAIN_PROJECT: str
-    MILVUS_API_KEY: str
-    MILVUS_URI: str
-    MILVUS_READ_USER_ID: str
-    MILVUS_READ_PASSWORD: str
 
     PUBLIC_SUPABASE_URL: str
     PUBLIC_SUPABASE_ANON_KEY: str
 
-
+    ALEMBIC_DB_URL: str
+    OPENAI_API_KEY: str
+    TAVILY_API_KEY: str
     ANTHROPIC_API_KEY: str
-
     UPSTAGE_API_KEY: str
-
     DEFAULT_EMBEDDING_MODEL: str
 
     @computed_field  # type: ignore[prop-decorator]

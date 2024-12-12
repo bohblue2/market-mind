@@ -1,12 +1,14 @@
-from datetime import datetime
-import re
-from typing import Dict, Optional
-from bs4 import BeautifulSoup
 import os
+import re
+from datetime import datetime
+from typing import Dict, Optional
+
 import scrapy
+from bs4 import BeautifulSoup
 
 from mm_crawler.constant import KST
 from mm_crawler.items import ArticleItem
+
 
 def _get_target_url(date: str, page: int) -> str:
     return f"https://finance.naver.com/news/mainnews.naver?date={date}&page={str(page)}"

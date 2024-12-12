@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import requests
+from diskcache import FanoutCache
 from pydantic import BaseModel
 from requests.models import Response
 from sqlalchemy.orm import joinedload
@@ -18,7 +19,6 @@ from mm_llm.config import settings
 from mm_llm.constant import KST
 from mm_llm.ingestor.commons import process_chunk
 from mm_llm.spliter import split_pdf
-from diskcache import FanoutCache
 
 
 class ReportPage(BaseModel):

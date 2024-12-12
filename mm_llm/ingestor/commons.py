@@ -3,10 +3,8 @@ from typing import List
 from diskcache import FanoutCache
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
-
-from mm_llm.config import settings
 
 CHUNK_CONTEXT_TEMPLATE = PromptTemplate(
     input_variables=["whole_document", "chunk_content"],

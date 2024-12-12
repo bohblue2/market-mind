@@ -1508,17 +1508,6 @@ socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
-name = "httpx-sse"
-version = "0.4.0"
-description = "Consume Server-Sent Event (SSE) messages with HTTPX."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "httpx-sse-0.4.0.tar.gz", hash = "sha256:1e81a3a3070ce322add1d3529ed42eb5f70817f45ed6ec915ab753f961139721"},
-    {file = "httpx_sse-0.4.0-py3-none-any.whl", hash = "sha256:f329af6eae57eaa2bdfd962b42524764af68075ea87370a2de920af5341e318f"},
-]
-
-[[package]]
 name = "huggingface-hub"
 version = "0.26.1"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
@@ -2105,18 +2094,18 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<10"
 
 [[package]]
 name = "langchain-core"
-version = "0.3.21"
+version = "0.3.24"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_core-0.3.21-py3-none-any.whl", hash = "sha256:7e723dff80946a1198976c6876fea8326dc82566ef9bcb5f8d9188f738733665"},
-    {file = "langchain_core-0.3.21.tar.gz", hash = "sha256:561b52b258ffa50a9fb11d7a1940ebfd915654d1ec95b35e81dfd5ee84143411"},
+    {file = "langchain_core-0.3.24-py3-none-any.whl", hash = "sha256:97192552ef882a3dd6ae3b870a180a743801d0137a1159173f51ac555eeb7eec"},
+    {file = "langchain_core-0.3.24.tar.gz", hash = "sha256:460851e8145327f70b70aad7dce2cdbd285e144d14af82b677256b941fc99656"},
 ]
 
 [package.dependencies]
 jsonpatch = ">=1.33,<2.0"
-langsmith = ">=0.1.125,<0.2.0"
+langsmith = ">=0.1.125,<0.3"
 packaging = ">=23.2,<25"
 pydantic = [
     {version = ">=2.5.2,<3.0.0", markers = "python_full_version < \"3.12.4\""},
@@ -2267,29 +2256,29 @@ types-requests = ">=2.31.0.2,<3.0.0.0"
 
 [[package]]
 name = "langgraph"
-version = "0.2.39"
+version = "0.2.59"
 description = "Building stateful, multi-actor applications with LLMs"
 optional = false
 python-versions = "<4.0,>=3.9.0"
 files = [
-    {file = "langgraph-0.2.39-py3-none-any.whl", hash = "sha256:5dfbdeefbf599f16d245799609f2b43c1ec7a7e8ed6e1d7981b1a7979a4ad7fe"},
-    {file = "langgraph-0.2.39.tar.gz", hash = "sha256:32af60291f9260c3acb8a3d4bec99e32abd89ddb6b4a10a79aa3dbc90fa920ac"},
+    {file = "langgraph-0.2.59-py3-none-any.whl", hash = "sha256:9b2d1331bbdcea96cfffde8e88700776118f4583d15f6a3423fc4482fe84ae56"},
+    {file = "langgraph-0.2.59.tar.gz", hash = "sha256:61cb5dd409878641fe8a12e9d7928a7524caa3e54ab12bc883feeaba4a5ba618"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.2.39,<0.4"
-langgraph-checkpoint = ">=2.0.0,<3.0.0"
-langgraph-sdk = ">=0.1.32,<0.2.0"
+langchain-core = ">=0.2.43,<0.3.0 || >0.3.0,<0.3.1 || >0.3.1,<0.3.2 || >0.3.2,<0.3.3 || >0.3.3,<0.3.4 || >0.3.4,<0.3.5 || >0.3.5,<0.3.6 || >0.3.6,<0.3.7 || >0.3.7,<0.3.8 || >0.3.8,<0.3.9 || >0.3.9,<0.3.10 || >0.3.10,<0.3.11 || >0.3.11,<0.3.12 || >0.3.12,<0.3.13 || >0.3.13,<0.3.14 || >0.3.14,<0.3.15 || >0.3.15,<0.3.16 || >0.3.16,<0.3.17 || >0.3.17,<0.3.18 || >0.3.18,<0.3.19 || >0.3.19,<0.3.20 || >0.3.20,<0.3.21 || >0.3.21,<0.3.22 || >0.3.22,<0.4.0"
+langgraph-checkpoint = ">=2.0.4,<3.0.0"
+langgraph-sdk = ">=0.1.42,<0.2.0"
 
 [[package]]
 name = "langgraph-checkpoint"
-version = "2.0.2"
+version = "2.0.8"
 description = "Library with base interfaces for LangGraph checkpoint savers."
 optional = false
 python-versions = "<4.0.0,>=3.9.0"
 files = [
-    {file = "langgraph_checkpoint-2.0.2-py3-none-any.whl", hash = "sha256:6e5dfd90e1fc71b91ccff75939ada1114e5d7f824df5f24c62d39bed69039ee2"},
-    {file = "langgraph_checkpoint-2.0.2.tar.gz", hash = "sha256:c1d033e4e4855f580fa56830327eb86513b64ab5be527245363498e76b19a0b9"},
+    {file = "langgraph_checkpoint-2.0.8-py3-none-any.whl", hash = "sha256:c65243e0d759ca6f556d01fc0039c545fdc8c6917214e750c9ecf8a7bc78bec6"},
+    {file = "langgraph_checkpoint-2.0.8.tar.gz", hash = "sha256:897c21d677d62946481334b3b37e8ae25f6b7fd474f3bc4ee3715ec5fd5f6055"},
 ]
 
 [package.dependencies]
@@ -2312,19 +2301,35 @@ aiosqlite = ">=0.20.0,<0.21.0"
 langgraph-checkpoint = ">=2.0.2,<3.0.0"
 
 [[package]]
+name = "langgraph-cli"
+version = "0.1.61"
+description = "CLI for interacting with LangGraph API"
+optional = false
+python-versions = "<4.0.0,>=3.9.0"
+files = [
+    {file = "langgraph_cli-0.1.61-py3-none-any.whl", hash = "sha256:f66e3e11c30c1bf049fc7e83e1944f9ac1e8b427b5987858b094df1f974a5857"},
+    {file = "langgraph_cli-0.1.61.tar.gz", hash = "sha256:373bba9c297408afb84ffb19df868b49c23390195bb0029cb6f8945f8a202eca"},
+]
+
+[package.dependencies]
+click = ">=8.1.7,<9.0.0"
+
+[package.extras]
+inmem = ["langgraph-api (>=0.0.6,<0.1.0)", "python-dotenv (>=0.8.0)"]
+
+[[package]]
 name = "langgraph-sdk"
-version = "0.1.33"
+version = "0.1.43"
 description = "SDK for interacting with LangGraph API"
 optional = false
 python-versions = "<4.0.0,>=3.9.0"
 files = [
-    {file = "langgraph_sdk-0.1.33-py3-none-any.whl", hash = "sha256:fe2311ebfe231219a7ad06c3dad4860a9e2917e780aaa2f228d1a9f5653da686"},
-    {file = "langgraph_sdk-0.1.33.tar.gz", hash = "sha256:addffc33554b690e81525c12fe9b2656cc7b740678e4724bc706d1ca13b3de93"},
+    {file = "langgraph_sdk-0.1.43-py3-none-any.whl", hash = "sha256:b299dd091a7547dba0ffd041ccacadd1caeb57e0c52f2ccf80de64eac45f6e7a"},
+    {file = "langgraph_sdk-0.1.43.tar.gz", hash = "sha256:3df9c1bc946dcaf0e3e4453e51509166495e2ce1dcd2273426e22ff9317e64f5"},
 ]
 
 [package.dependencies]
 httpx = ">=0.25.2"
-httpx-sse = ">=0.4.0"
 orjson = ">=3.10.1"
 
 [[package]]
@@ -6560,4 +6565,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "0a301356b6a37948bbff1df6473f264c03345675bc049a0f943d14578318f35a"
+content-hash = "659e3c5d4ec2e991891f44cbc2e37f9f1a8b958e4bbbc5f2e90733ffc442f6f3"
