@@ -1,0 +1,21 @@
+
+.markdown h1 {
+    font-size: 1.75rem; /* Tailwind text-3xl */
+    font-weight: 1000;  /* Tailwind font-bold */
+    line-height: 2;     /* Adjusted for more vertical spacing */
+  }
+
+  .markdown h2 {
+    font-size: 1.5rem; /* Tailwind text-2xl */
+    font-weight: 1000;   /* Tailwind font-bold */
+  }
+
+  .markdown h3 {
+    font-size: 1.25rem; /* Tailwind text-xl */
+    font-weight: 1000;   /* Tailwind font-bold */
+  }
+
+  .markdown p {
+    font-size: 1rem; /* Tailwind text-base */
+    line-height: 2;     /* Adjusted for more vertical spacing */
+  }

@@ -13,7 +13,7 @@ export default async function Page({ params }: Props) {
   const { data: resources } = await supabase
     .from('resources')
     .select('*, tags(*)')
-    .order('created_at', { ascending: true })
+    .order('created_at', { ascending : true })
 
   return (
     <ResourcesList

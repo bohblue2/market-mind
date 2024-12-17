@@ -108,5 +108,12 @@ def process_chunks(entity_type, is_upsert):
         )
         print("Successfully processed report chunks")
 
+@mm_llm.command()
+@click.option('--category', type=click.Choice(['main', 'outlook', 'analysis']), required=True, help='Category of the model to train: main, outlook, analysis')
+def do_credit_risk_accessment(category):
+    """Train and evaluate a credit risk assessment model."""
+    from mm_llm.pipeline.credit_risk_accessment import credit_risk_accessment
+    credit_risk_accessment(category) 
+
 if __name__ == "__main__":
     cli()

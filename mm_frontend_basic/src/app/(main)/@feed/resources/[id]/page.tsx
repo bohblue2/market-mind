@@ -33,7 +33,7 @@ export default async function Page({ params }: Props) {
         .in('tag_id', tagIds)
         .then(({ data }) => data?.map(r => r.resource_id) || [])
     ))
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
 
   if (!relatedResources?.length) {
     return (

@@ -7,8 +7,6 @@
 This project aims to develop algorithmic trading models that crawl news articles to predict and trade the direction of stocks and financial instruments.
 It also aims to utilize the [LangChain-ai](https://github.com/langchain-ai) and [Transformers(HuggingFace)](https://github.com/huggingface/transformers)models to deeply analyze linguistic data from the financial domain and detect inefficiencies in the market.
 
-For additional information, please refer to the [Team Notion](https://www.notion.so/yb98/097de26b8c5f4b5c83a4cd5b18c78103).
-
 ## Key Features
 
 - **Analyze the causes of price fluctuations**: Infer the causes of price fluctuations in your holdings from analyst reports, electronic disclosures, and news data, and automatically report them.
@@ -33,6 +31,9 @@ make nc from_date=2024-12-08 to_date=2024-12-12 ticker=null category=outlook
 
 # ingest the news articles *content* for the given date and ticker
 python cli.py mm-llm ingest-news --from-date 2024-12-09 --to-date 2024-12-11
+
+# do the credit risk accessment for the given category
+python cli.py mm-llm do-credit-risk-accessment --category=main
 ```
 
 ## Deployments

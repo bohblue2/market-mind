@@ -9,7 +9,7 @@ from mm_crawler.constant import NaverArticleCategoryEnum
 from mm_crawler.database.models import (NaverArticleContentOrm,
                                         NaverArticleListOrm,
                                         NaverResearchReportOrm)
-from mm_crawler.database.session import SessionLocal
+from mm_llm.database.session import SessionLocal
 from mm_llm.database.models import CreditRiskPropertiesOrm
 from mm_llm.supabase import add_post_with_tags, add_tag_independently
 from pydantic import BaseModel, Field
@@ -111,7 +111,7 @@ def save_credit_risk_properties(doc, sess: Session):
     sess.commit()
     print(f"Saved CreditRiskPropertiesOrm with article_id: {credit_risk_properties.article_id}")
 
-def main():
+def credit_risk_accessment(category_str: str):
     sess = SessionLocal()
     # llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
     # document_transformer = create_metadata_tagger(CreditRiskProperties, llm=llm)
@@ -124,7 +124,7 @@ def main():
     #     doc_ = doc.model_dump()
     #     # print(doc_.get('page_content', None))
     #     print(doc_['metadata'])
-
+    category = NaverArticleCategoryEnum(category_str)
     llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
     prompt = hub.pull("teddynote/metadata-tagger")
     document_transformer = create_metadata_tagger(CreditRiskProperties, llm=llm)
@@ -132,7 +132,7 @@ def main():
         NaverArticleListOrm, 
         NaverArticleListOrm.article_id == NaverArticleContentOrm.article_id
     ).filter(
-        NaverArticleListOrm.category == NaverArticleCategoryEnum.MAIN
+        NaverArticleListOrm.category == category
     ).all()  # noqa: E712
 
     for ret in results[:]:
@@ -141,19 +141,28 @@ def main():
             "article_id": ret.article_id,
             "article_published_at": ret.article_published_at
         }
-        doc = Document(page_content=page_content, metadata=metadata)
-        enhanced_documents = document_transformer.transform_documents([doc], prompt=prompt)
+        _doc = Document(page_content=page_content, metadata=metadata)
+        enhanced_documents = document_transformer.transform_documents(
+            [_doc], prompt=prompt 
+        ) 
         for enhanced_doc in enhanced_documents:
-            doc = enhanced_doc.model_dump()
-            grade = doc['metadata']['grade']
-            if grade in ['A', 'B', 'C']:
+            doc: Dict[str, Any] = enhanced_doc.model_dump() # type: ignore
+            grade = doc.get('metadata', {}).get('grade', None)
+            if grade in ['A', 'B', 'C', 'D', 'F']:
+                major_signals = doc.get('metadata', {}).get('major_signals', ['없음'])
+                notable_points = doc.get('metadata', {}).get('notable_points', ['없음'])
+                
+                # Handle the case where notable_points is None
+                if notable_points is None:
+                    notable_points = ['없음']
+                
                 post = {
                     "title": str(ret.title),
                     "description": (
-                        "# 주요 진호\n" +
-                        "\n".join(f"- {signal}" for signal in doc['metadata']['major_signals']) +
+                        "# 주요 신호\n" +
+                        "\n".join([f"- {signal}" for signal in major_signals]) +
                         "\n\n# 주목할 만한 점\n" +
-                        "\n".join(f"- {point}" for point in doc['metadata']['notable_points'])
+                        "\n".join([f"- {point}" for point in notable_points])
                     ),
                     "thumbnail": "",
                     "url": f"https://n.news.naver.com/mnews/article/{ret.media_id}/{ret.article_id}",
@@ -161,13 +170,11 @@ def main():
                     "author_id": "0fc79224-7139-49c4-a6dc-124180a0334f"
                 }
                 tag_ids = []
-                tag_slug = f"리스크평가-{grade}"
+                tag_slug = f"리스크평가-{grade}-{category_str}"
                 tag_ids.append(add_tag_independently(tag_slug))
-                save_credit_risk_properties(doc, sess)
                 post_id = add_post_with_tags(post, tag_ids)
+                save_credit_risk_properties(doc, sess)
                 print(f"Post ID: {post_id}")
                 print("Tags added.")
     sess.close()
     
-if __name__ == "__main__":
-    main()

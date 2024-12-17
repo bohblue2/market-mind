@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import styles from '@/styles/markdown.module.css'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 import {
   ArrowLeftIcon,
@@ -102,7 +104,9 @@ export default async function Page({ params, searchParams }: Props) {
                   ) : (
                     <p>Invalid URL</p>
                   )}
-                  <ReactMarkdown>{resource.description}</ReactMarkdown>
+                  <div className={styles.markdown}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{resource.description}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </div>
