@@ -10,6 +10,7 @@ import { Sidebar } from '@/components/sidebar'
 import { cn } from '@/lib/utils'
 
 import '@/styles/globals.css'
+import GoogleAnalytics from '@/lib/ga'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +43,9 @@ export default function Layout({ children }: Props) {
           GeistSans.variable,
         )}
       >
+      	{process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
+					<GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
+				) : null}
         <Providers>
           <Sidebar />
           <main className="flex-1">{children}</main>

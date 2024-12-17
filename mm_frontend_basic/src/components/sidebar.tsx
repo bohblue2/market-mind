@@ -36,10 +36,10 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 
 const externalLinks = [
-  {
-    label: 'About Us',
-    href: 'https://naver.com',
-  },
+  // {
+  //   label: 'About Us',
+  //   href: 'https://naver.com',
+  // },
 ]
 
 function getTagIcon(slug: string) {
@@ -158,14 +158,14 @@ export async function Sidebar() {
               </div>
             )}
             {/* External links */}
-            <div className="space-y-0.5 py-2 xl:mt-auto xl:py-4">
+            {/* <div className="space-y-0.5 py-2 xl:mt-auto xl:py-4">
               {externalLinks.map((item) => (
                 <NavItem href={item.href} target="_blank" key={item.href}>
                   <ExternalLinkIcon size={16} />
                   <span>{item.label}</span>
                 </NavItem>
               ))}
-            </div>
+            </div> */}
 
             {/* Sign in */}
             {!session.data?.user && (
