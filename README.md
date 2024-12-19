@@ -36,7 +36,7 @@ python cli.py mm-llm ingest-news --from-date 2024-12-09 --to-date 2024-12-11
 python cli.py mm-llm do-credit-risk-accessment --category=main
 ```
 
-## Deployments
+## Deployments-Production
 
 ```bash
 # set ENVIRONMENT variable to DEV/STAGE/PROD
@@ -137,4 +137,18 @@ CREATE TYPE naverarticlecategoryenum AS ENUM (
 -- naver_article_list 테이블에 category 컬럼 추가
 ALTER TABLE naver_article_list
 ADD COLUMN category naverarticlecategoryenum;
+```
+
+## Developement-Supabase
+
+```bash
+brew install supabase/tap/supabase
+supabase init
+supabase start
+```
+
+## Developement-nextjs
+
+```bash
+pnpm dev
 ```
