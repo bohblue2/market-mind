@@ -1,6 +1,6 @@
 # flyctl launch added from .gitignore
 # **/.startup.sh
-# **/*.env
+**/*.env
 fly.toml
 
 .mypy_cache

@@ -8,5 +8,6 @@ export default async function Default() {
     .from('resources')
     .select('*, tags(*)')
     .order('created_at', { ascending: false })
+  // TODO: 최근 일주일치만 가져오기.
   return <ResourcesList resources={resources || []} />
 }
