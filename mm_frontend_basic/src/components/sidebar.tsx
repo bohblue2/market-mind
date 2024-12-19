@@ -68,7 +68,26 @@ function getTagIcon(slug: string) {
 export async function Sidebar() {
   const supabase = await createClient(cookies())
   const session = await supabase.auth.getUser()
-  const { data: tags } = await supabase.from('tags').select('*, resources(id)')
+  const from_datetime_7days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const from_datetime_1month = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const { data: tags_hot_topic} = await supabase
+    .from('tags')
+    .select('*, resources(id)')
+    .eq('type', 'hot_topic')
+    .order('index', { ascending: false })
+    .gte('updated_at', from_datetime_7days)
+  const { data: tags_category } = await supabase
+    .from('tags')
+    .select('*, resources(id)')
+    .eq('type', 'trend_thema')
+    .order('index', { ascending: false })
+    .gte('updated_at', from_datetime_7days)
+  const { data: tags_normal } = await supabase
+    .from('tags')
+    .select('*, resources(id)')
+    .eq('type', 'normal')
+    .order('index', { ascending: false })
+    .gte('updated_at', from_datetime_1month)
 
   return (
     <SidebarClient>
@@ -86,7 +105,7 @@ export async function Sidebar() {
         </PaneHeader>
         <PaneContent>
           <nav className="flex flex-1 flex-col divide-y divide-border text-muted-foreground">
-            {/* User section */}
+            {/* User section TODO: 여기 날려도 되나 ? */}
             {session.data?.user && (
               <div className="space-y-0.5 py-2 xl:py-4">
                 <div className="flex h-9 items-center justify-between space-x-3 px-2 text-sm xl:px-3">
@@ -132,30 +151,80 @@ export async function Sidebar() {
             )}
 
             {/* Tags */}
-            {tags && tags.length > 0 && (
-              <div className="space-y-0.5 py-2 xl:py-4">
-                <div className="flex h-9 items-center px-2 xl:px-3">
-                  <span className="text-sm">Menu</span>
+            {tags_hot_topic && tags_hot_topic.length > 0 && (
+                <div className="space-y-0.5 py-2 xl:py-2">
+                  <div className="flex h-9 items-center px-2 xl:px-3">
+                    <span className="text-sm">주요 이슈</span>
+                  </div>
+                  {tags_hot_topic.map((tag) => {
+                    const TagIcon = getTagIcon(tag.slug)
+                    return (
+                      <NavItem
+                        className="justify-between"
+                        href={`/tags/${tag.slug}`}
+                        tag={tag.slug}
+                        key={tag.slug}
+                        prefetch
+                      >
+                        <div className="flex items-center space-x-3">
+                          <TagIcon size={16} />
+                          <span>{tag.name}</span>
+                        </div>
+                        <span>{tag.resources.length}</span>
+                      </NavItem>
+                    )
+                  })}
                 </div>
-                {tags.map((tag) => {
-                  const TagIcon = getTagIcon(tag.slug)
-                  return (
-                    <NavItem
-                      className="justify-between"
-                      href={`/tags/${tag.slug}`}
-                      tag={tag.slug}
-                      key={tag.slug}
-                      prefetch
-                    >
-                      <div className="flex items-center space-x-3">
-                        <TagIcon size={16} />
-                        <span>{tag.name}</span>
-                      </div>
-                      <span>{tag.resources.length}</span>
-                    </NavItem>
-                  )
-                })}
-              </div>
+            )}
+            {tags_category && tags_category.length > 0 && (
+                <div className="space-y-0.5 py-2 xl:py-1">
+                  <div className="flex h-9 items-center px-2 xl:px-3">
+                    <span className="text-sm">주요 테마</span>
+                  </div>
+                  {tags_category.map((tag) => {
+                    const TagIcon = getTagIcon(tag.slug)
+                    return (
+                      <NavItem
+                        className="justify-between"
+                        href={`/tags/${tag.slug}`}
+                        tag={tag.slug}
+                        key={tag.slug}
+                        prefetch
+                      >
+                        <div className="flex items-center space-x-3">
+                          <TagIcon size={16} />
+                          <span>{tag.name}</span>
+                        </div>
+                        <span>{tag.resources.length}</span>
+                      </NavItem>
+                    )
+                  })}
+                </div>
+            )}
+            {tags_normal && tags_normal.length > 0 && (
+                <div className="space-y-0.5 py-2 xl:py-1">
+                  <div className="flex h-9 items-center px-2 xl그px-3">
+                    <span className="text-sm">최근 태그</span>
+                  </div>
+                  {tags_normal.map((tag) => {
+                    const TagIcon = getTagIcon(tag.slug)
+                    return (
+                      <NavItem
+                        className="justify-between"
+                        href={`/tags/${tag.slug}`}
+                        tag={tag.slug}
+                        key={tag.slug}
+                        prefetch
+                      >
+                        <div className="flex items-center space-x-3">
+                          <TagIcon size={16} />
+                          <span>{tag.name}</span>
+                        </div>
+                        <span>{tag.resources.length}</span>
+                      </NavItem>
+                    )
+                  })}
+                </div>
             )}
             {/* External links */}
             {/* <div className="space-y-0.5 py-2 xl:mt-auto xl:py-4">
@@ -168,7 +237,7 @@ export async function Sidebar() {
             </div> */}
 
             {/* Sign in */}
-            {!session.data?.user && (
+            {/* {!session.data?.user && (
               <div className="p-2">
                 <form
                 // action={signInWithGithub}
@@ -179,7 +248,7 @@ export async function Sidebar() {
                   </Button>
                 </form>
               </div>
-            )}
+            )} */}
           </nav>
         </PaneContent>
       </PaneContainer>

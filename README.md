@@ -15,6 +15,7 @@ It also aims to utilize the [LangChain-ai](https://github.com/langchain-ai) and 
 This project aims to use advanced natural language processing (NLP) techniques to reduce information asymmetries in financial markets and maximize the performance of quantitative trading strategies.
 
 ## How to use
+
 ```bash
 # scrapy the news articles *list* for the given date and ticker
 make nl ticker=005930 from_date=2024-12-09 to_date=2024-12-10
