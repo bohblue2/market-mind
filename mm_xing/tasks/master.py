@@ -12,7 +12,6 @@ from mm_xing.block import (o3101InBlock, o3101OutBlock, t1764InBlock,
                            t8436InBlock, t8436OutBlock, t9943InBlock,
                            t9943OutBlock, t9944InBlock, t9944OutBlock)
 from mm_xing.config import settings
-# TODO: Refactor this import (mm_xing.constant -> mm_xing.config)
 from mm_xing.constant import (O3101,
                               T1764,
                               T8401, T8424, T8425, T8426, T8436, T9943, T9943S,
@@ -20,7 +19,6 @@ from mm_xing.constant import (O3101,
 from mm_xing.schemas import XingDataConfig, XingTrHeaders
 
 
-# TODO: make config_type enum for "code" and "ticker"
 def get_data_config(config_type: str, tr_code: str) -> Optional[XingDataConfig]:
     """Get data configuration for a given TR code and type.
     
