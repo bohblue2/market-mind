@@ -4,17 +4,10 @@
     <img src="./.github/assets/main.png" alt="Logo">
 </p>
 
-This project aims to develop algorithmic trading models that crawl news articles to predict and trade the direction of stocks and financial instruments.
-It also aims to utilize the [LangChain-ai](https://github.com/langchain-ai) and [Transformers(HuggingFace)](https://github.com/huggingface/transformers)models to deeply analyze linguistic data from the financial domain and detect inefficiencies in the market.
-
-## Key Features
-
-- **Analyze the causes of price fluctuations**: Infer the causes of price fluctuations in your holdings from analyst reports, electronic disclosures, and news data, and automatically report them.
-- **Real-time data collection and ultra-short-term trading**: Collect analyst reports, electronic disclosures, and news data in real-time to execute ultra-short-term directional trading strategies.
-
-This project aims to use advanced natural language processing (NLP) techniques to reduce information asymmetries in financial markets and maximize the performance of quantitative trading strategies.
+[Link to the project](https://mm-frontend-basic.vercel.app/)
 
 ## How to use
+
 
 ```bash
 # scrapy the news articles *list* for the given date and ticker
