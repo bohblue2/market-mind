@@ -17,7 +17,7 @@ from mm_crawler.database.models import (NaverArticleContentOrm,
                                         NaverResearchReportFileOrm,
                                         NaverResearchReportOrm)
 from mm_crawler.database.session import SessionLocal
-from mm_crawler.items import (ArticleContentItem, ArticleItem,
+from mm_crawler.items import (NaverArticleContentItem, NaverArticleItem,
                               NaverArticleListFailedItem)
 
 kst = pytz.timezone('Asia/Seoul')
@@ -49,7 +49,7 @@ class FinanceNewsListPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    def process_item(self, item: Optional[ArticleItem], spider):
+    def process_item(self, item: Optional[NaverArticleItem], spider):
         if item is None:
             raise DropItem("Item is None")
         if isinstance(item, NaverArticleListFailedItem):
@@ -86,7 +86,7 @@ class FinanceNewsContentPipeline:
     def close_spider(self, spider): 
         self.sess.close()
 
-    def process_item(self, item: ArticleContentItem, spider):
+    def process_item(self, item: NaverArticleContentItem, spider):
         response = item['response']
         article = self.sess.query(NaverArticleListOrm).filter_by(
             article_id=response.meta['article_id'],

@@ -17,7 +17,7 @@ class NaverArticleListFailedItem(ItemBase):
     created_at = scrapy.Field()
     is_fatal = scrapy.Field()
 
-class ArticleItem(ItemBase):
+class NaverArticleItem(ItemBase):
     ticker = scrapy.Field()
     article_id = scrapy.Field()
     media_id = scrapy.Field()
@@ -30,7 +30,7 @@ class ArticleItem(ItemBase):
     article_published_at = scrapy.Field()
 
 
-class ArticleContentItem(ItemBase):
+class NaverArticleContentItem(ItemBase):
     ticker = scrapy.Field()
     article_id = scrapy.Field()
     media_id = scrapy.Field()

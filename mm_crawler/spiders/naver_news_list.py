@@ -11,7 +11,7 @@ import scrapy
 from scrapy.http import HtmlResponse
 
 from mm_crawler.constant import KST, NaverArticleCategoryEnum
-from mm_crawler.items import ArticleItem, NaverArticleListFailedItem
+from mm_crawler.items import NaverArticleItem, NaverArticleListFailedItem
 
 kst = pytz.timezone('Asia/Seoul')
 
@@ -83,7 +83,7 @@ class NaverNewsArticleList(scrapy.Spider):
                 if ret.get('is_fatal', False) is True:
                     return
             else:
-                yield ArticleItem(**article_data)
+                yield NaverArticleItem(**article_data)
         yield self._create_next_page_request(meta, current_page)
 
     def _fetch_tickers(self, limit:int = 5000) -> list:

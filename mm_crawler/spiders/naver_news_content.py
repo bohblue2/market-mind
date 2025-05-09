@@ -13,7 +13,7 @@ from twisted.python.failure import Failure
 from mm_crawler.constant import NaverArticleCategoryEnum
 from mm_crawler.database.models import NaverArticleListOrm
 from mm_crawler.database.session import SessionLocal
-from mm_crawler.items import ArticleContentItem
+from mm_crawler.items import NaverArticleContentItem
 
 ArticleId = Union[str, int, Any]
 OfficeId = Union[str, int, Any]
@@ -111,7 +111,7 @@ class NaverNewsArticleContents(scrapy.Spider):
             self.log("Failed to extract title or content_html")
             return
 
-        yield ArticleContentItem(
+        yield NaverArticleContentItem(
             ticker=response.meta['ticker'],
             article_id=response.meta['article_id'],
             media_id=response.meta['media_id'],

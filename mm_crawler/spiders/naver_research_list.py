@@ -1,17 +1,13 @@
 import abc
-import os
-import re
-import time
 from datetime import datetime
 from typing import List
 
-import pandas as pd
 import pytz  # type: ignore
 import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http.response.html import HtmlResponse
 
-from mm_crawler.items import ArticleItem, NaverResearchItem
+from mm_crawler.items import NaverResearchItem
 from mm_crawler.spiders.commons import parse_report_url
 
 KST = pytz.timezone('Asia/Seoul')

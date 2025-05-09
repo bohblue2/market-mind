@@ -9,7 +9,7 @@ import scrapy
 from bs4 import BeautifulSoup
 
 from mm_crawler.constant import KST, NaverArticleCategoryEnum
-from mm_crawler.items import ArticleItem
+from mm_crawler.items import NaverArticleItem
 
 
 
@@ -118,7 +118,7 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
             self.logger.error(f"Error parsing response: {e}")
             self.is_done = True
 
-    def _parse_article(self, article) -> Optional[ArticleItem]:
+    def _parse_article(self, article) -> Optional[NaverArticleItem]:
         try:
             press = article.find('span', class_='press').get_text(strip=True)
             title = article.find('dd', class_='articleSubject').get_text(strip=True)
@@ -131,7 +131,7 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
                 self.logger.warning(f"Failed to extract IDs from {link}")
                 return None
 
-            return ArticleItem(
+            return NaverArticleItem(
                 ticker=None,
                 article_id=ids['article_id'],
                 media_id=ids['office_id'],
@@ -193,8 +193,8 @@ class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
         li_tags_top = soup.find_all("li", class_="newsList")
         return [dl for li in li_tags_top for dl in li.find_all("dl")]
 
-    def _parse_dl_tag(self, dl_tag) -> Iterator[Optional[ArticleItem]]:
-        """Parse a single dl tag and yield ArticleItems"""
+    def _parse_dl_tag(self, dl_tag) -> Iterator[Optional[NaverArticleItem]]:
+        """Parse a single dl tag and yield NaverArticleItems"""
         subjects = dl_tag.find_all("dd", class_="articleSubject")
         for subject in subjects:
             try:
@@ -234,9 +234,9 @@ class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
             "ids": ids
         }
 
-    def _create_article_item(self, data: Dict) -> ArticleItem:
-        """Create ArticleItem from extracted data"""
-        return ArticleItem(
+    def _create_article_item(self, data: Dict) -> NaverArticleItem:
+        """Create NaverArticleItem from extracted data"""
+        return NaverArticleItem(
             ticker=None,
             article_id=data['ids']['article_id'],
             media_id=data['ids']['office_id'],
