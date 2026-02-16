@@ -10,12 +10,14 @@ import scrapy
 class ItemBase(scrapy.Item):
     response = scrapy.Field()
 
+
 class NaverArticleListFailedItem(ItemBase):
     ticker = scrapy.Field()
     error_code = scrapy.Field()
     response = scrapy.Field()
     created_at = scrapy.Field()
     is_fatal = scrapy.Field()
+
 
 class NaverArticleItem(ItemBase):
     ticker = scrapy.Field()
@@ -41,6 +43,7 @@ class NaverArticleContentItem(ItemBase):
     article_published_at = scrapy.Field()
     article_modified_at = scrapy.Field()
 
+
 class NaverReportItem(ItemBase):
     category = scrapy.Field()
     security_company_id = scrapy.Field()
@@ -50,6 +53,7 @@ class NaverReportItem(ItemBase):
     target_company = scrapy.Field()
     target_industry = scrapy.Field()
 
+
 class NaverResearchItem(ItemBase):
     category = scrapy.Field()
     company = scrapy.Field()
@@ -58,4 +62,20 @@ class NaverResearchItem(ItemBase):
     date_obj = scrapy.Field()
     file_url = scrapy.Field()
     securities_company_name = scrapy.Field()
-    report_item: NaverReportItem = scrapy.Field() # type: ignore
+    report_item: NaverReportItem = scrapy.Field()  # type: ignore
+
+
+class CanonicalDocumentItem(ItemBase):
+    source_code = scrapy.Field()
+    stream_key = scrapy.Field()
+    external_id = scrapy.Field()
+    canonical_url = scrapy.Field()
+    title = scrapy.Field()
+    published_at = scrapy.Field()
+    content_text = scrapy.Field()
+    content_hash = scrapy.Field()
+    metadata_json = scrapy.Field()
+
+
+class HankyungConsensusItem(CanonicalDocumentItem):
+    skin_type = scrapy.Field()
