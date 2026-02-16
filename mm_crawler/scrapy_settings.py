@@ -1,22 +1,25 @@
-
 BOT_NAME = "mm_crawler"
 
-SPIDER_MODULES = ["mm_crawler.spiders"]
+SPIDER_MODULES = [
+    "mm_crawler.spiders",
+    "mm_crawler.spiders.naver",
+    "mm_crawler.spiders.hankyung",
+]
 NEWSPIDER_MODULE = "mm_crawler.spiders"
 
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = "INFO"
 
 # 중복 방지 - 동일한 URL로 요청이 여러 번 가지 않도록 설정
-DUPEFILTER_CLASS = 'scrapy.dupefilters.RFPDupeFilter'
+DUPEFILTER_CLASS = "scrapy.dupefilters.RFPDupeFilter"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "market_mind (+http://www.yourdomain.com)"
+# USER_AGENT = "market_mind (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False 
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -27,18 +30,18 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 16
 CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+# COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
+# DEFAULT_REQUEST_HEADERS = {
 #    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 #    "Accept-Language": "en",
-#}
+# }
 
-# In DOWNLOAD_HANDLERS, we specify that we’ll want to use the Scrapy Playwright request handlers 
+# In DOWNLOAD_HANDLERS, we specify that we’ll want to use the Scrapy Playwright request handlers
 # for both our http and https requests.
 
 # Disable the scrapy-playwright download handler
@@ -54,11 +57,11 @@ TELNETCONSOLE_ENABLED = False
 # PLAYWRIGHT_BROWSER_TYPE = "chromium"
 # PLAYWRIGHT_LAUNCH_OPTIONS = {
 #     "headless": False,
-# } 
+# }
 
 # Disable the Scrapy User-Agent middleware
 DOWNLOADER_MIDDLEWARES = {
-    'mm_crawler.middlewares.NaverDelayMiddleware': 543,
+    "mm_crawler.middlewares.naver.NaverDelayMiddleware": 543,
     # 'scrapy.downloadermiddlewares.autothrottle.AutoThrottleMiddleware': 500,
     # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
@@ -68,7 +71,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # FAKEUSERAGENT_PROVIDERS = [
 #     'scrapy_fake_useragent.providers.FakeUserAgentProvider',
-#     'scrapy_fake_useragent.providers.FakerProvider',  
+#     'scrapy_fake_useragent.providers.FakerProvider',
 #     'scrapy_fake_useragent.providers.FixedUserAgentProvider',
 # ]
 
@@ -77,27 +80,34 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
+# SPIDER_MIDDLEWARES = {
 #    "market_mind.middlewares.LanguageCrawlerSpiderMiddleware": 543,
-#}
+# }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
+# DOWNLOADER_MIDDLEWARES = {
 #    "market_mind.middlewares.LanguageCrawlerDownloaderMiddleware": 543,
-#}
+# }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-#EXTENSIONS = {
+# EXTENSIONS = {
 #    "scrapy.extensions.telnet.TelnetConsole": None,
-#}
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    "market_mind.pipelines.FinanceNewsListPipeline": 1,
-# }
+DOMAIN_ITEM_PIPELINES = {
+    "naver": {
+        "mm_crawler.pipelines.naver.FinanceNewsListPipeline": 400,
+        "mm_crawler.pipelines.naver.FinanceNewsContentPipeline": 410,
+        "mm_crawler.pipelines.naver.ResearchMarketinfoListPipeline": 420,
+    },
+    "hankyung": {
+        "mm_crawler.pipelines.canonical.CanonicalDocumentPipeline": 400,
+    },
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -116,11 +126,11 @@ AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-#HTTPCACHE_ENABLED = True
-#HTTPCACHE_EXPIRATION_SECS = 0
-#HTTPCACHE_DIR = "httpcache"
-#HTTPCACHE_IGNORE_HTTP_CODES = []
-#HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
+# HTTPCACHE_ENABLED = True
+# HTTPCACHE_EXPIRATION_SECS = 0
+# HTTPCACHE_DIR = "httpcache"
+# HTTPCACHE_IGNORE_HTTP_CODES = []
+# HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 # Set settings whose default value is deprecated to a future-proof value
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"

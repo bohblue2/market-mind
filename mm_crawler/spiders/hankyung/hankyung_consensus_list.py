@@ -9,19 +9,18 @@ import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import HtmlResponse, Request
 
-from mm_crawler.items import HankyungConsensusItem
+from mm_crawler.items.hankyung import HankyungConsensusItem
+from mm_crawler.spiders.base_domain_spider import DomainPipelineSpider
 
 
 KST = pytz.timezone("Asia/Seoul")
 SKIN_TYPES = {"business", "market", "derivative", "economy", "stock_good", "stock_bad"}
 
 
-class HankyungConsensusList(scrapy.Spider):
+class HankyungConsensusList(DomainPipelineSpider):
+    pipeline_domain = "hankyung"
     name = os.path.basename(__file__).replace(".py", "")
     allowed_domains = ["consensus.hankyung.com"]
-    custom_settings = {
-        "ITEM_PIPELINES": {"mm_crawler.pipelines.CanonicalDocumentPipeline": 1},
-    }
 
     def __init__(
         self,

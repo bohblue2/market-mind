@@ -1,6 +1,6 @@
 # SPEC: Evolve `mm_crawler` into a Multi-Source Ingestion Platform (Scrapy + Playwright)
 
-Baseline: Python Scrapy project with `spiders/ items.py pipelines.py database/ alembic/ scrapy_settings.py`, SQLAlchemy ORM + Alembic migrations, mixed async/sync, no test harness in this directory, current spider->pipeline->DB coupling.
+Baseline: Python Scrapy project with `spiders/ items/ pipelines/ middlewares/ database/ alembic/ scrapy_settings.py`, SQLAlchemy ORM + Alembic migrations, mixed async/sync, no test harness in this directory, current spider->pipeline->DB coupling.
 
 New sources to add:
 - Hankyung Consensus (Scrapy)
@@ -32,7 +32,7 @@ Hard requirements:
 
 ## 3) Constraints and Current Coupling
 
-- Pipelines currently write ORM directly (`pipelines.py` -> `database/models.py`) and depend on:
+- Pipelines currently write ORM directly (`pipelines/naver.py`, `pipelines/canonical.py` -> `database/models.py`) and depend on:
   - item field names
   - `response.meta` keys (`article_id`, `media_id`, etc.)
 - Current state is mostly `latest_scraped_at` and date filters; no cursor/job tables.

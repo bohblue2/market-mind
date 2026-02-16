@@ -10,7 +10,8 @@ import scrapy
 from scrapy.http import HtmlResponse
 
 from mm_crawler.constant import KST, NaverArticleCategoryEnum
-from mm_crawler.items import NaverArticleItem, NaverArticleListFailedItem
+from mm_crawler.items.naver import NaverArticleItem, NaverArticleListFailedItem
+from mm_crawler.spiders.base_domain_spider import DomainPipelineSpider
 
 kst = pytz.timezone("Asia/Seoul")
 
@@ -29,11 +30,11 @@ class NaverArticleErrorEnum(Enum):
     NON_FATAL_ERROR = "Non-fatal error"
 
 
-class NaverNewsArticleList(scrapy.Spider):
+class NaverNewsArticleList(DomainPipelineSpider):
+    pipeline_domain = "naver"
     name = os.path.basename(__file__).replace(".py", "")
     allowed_domains = ["naver.com"]
     custom_settings = {
-        "ITEM_PIPELINES": {"mm_crawler.pipelines.FinanceNewsListPipeline": 1},
         "DOWNLOADER_MIDDLEWARES": {
             "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
             "scrapy.downloadermiddlewares.retry.RetryMiddleware": None,

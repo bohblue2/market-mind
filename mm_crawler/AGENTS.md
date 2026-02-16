@@ -11,41 +11,43 @@ Runtime path is spider -> item -> pipeline -> SQLAlchemy ORM, with Alembic migra
 ## STRUCTURE
 ```text
 mm_crawler/
-├── spiders/           # Crawl entry points and page parsers
+├── spiders/           # Domain spiders + pipeline composition base
+├── pipelines/         # Domain persistence pipelines
+├── items/             # Domain item schemas
+├── middlewares/       # Domain downloader middlewares
 ├── database/          # SQLAlchemy models + session bootstrap
 ├── alembic/           # Migration environment and revisions
 ├── scrapy_settings.py # Global Scrapy settings
-├── pipelines.py       # Persistence pipelines
-├── items.py           # Scrapy item schemas
-├── middlewares.py     # Downloader/spider middleware
 └── config.py          # Env-driven DB settings
 ```
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Add new crawler target | `spiders/` | Prefer extending existing base spiders in `spiders/naver_main_news_list.py` or `spiders/naver_research_list.py` |
-| Change crawl throttling/UA/retry | `scrapy_settings.py`, `middlewares.py`, spider `custom_settings` | Settings are split global + per-spider |
-| Change item payload schema | `items.py` | Keep keys aligned with pipeline/model mapping |
-| Change DB writes | `pipelines.py` | Pipelines own DB persistence and LZMA compression for article HTML |
+| Add new crawler target | `spiders/naver/`, `spiders/hankyung/` | Prefer extending existing base spiders in `spiders/naver/naver_main_news_list.py` or `spiders/naver/naver_research_list.py` |
+| Change crawl throttling/UA/retry | `scrapy_settings.py`, `middlewares/naver.py`, spider `custom_settings` | Settings are split global + per-spider |
+| Change item payload schema | `items/naver.py`, `items/hankyung.py`, `items/canonical.py` | Keep keys aligned with pipeline/model mapping |
+| Change DB writes | `pipelines/naver.py`, `pipelines/canonical.py` | Pipelines own DB persistence and LZMA compression for article HTML |
 | Change DB schema | `database/models.py`, `alembic/versions/` | Update model and add Alembic revision together |
 | Change DB connection/env loading | `config.py`, `database/session.py`, `alembic/env.py` | Runtime and migration env loading are separate |
 
 ## CODE MAP
 | Symbol | Type | Location | Refs | Role |
 |--------|------|----------|------|------|
-| `NaverNewsArticleList` | spider | `spiders/naver_news_list.py` | high | Stock-code news list crawl |
-| `NaverNewsArticleContents` | spider | `spiders/naver_news_content.py` | high | Fetch and parse article body |
-| `BaseNaverNewsSpider` | base spider | `spiders/naver_main_news_list.py` | medium | Shared paging/header flow for section spiders |
-| `NaverResearchBase` | base spider | `spiders/naver_research_list.py` | high | Shared research-list crawl flow |
-| `FinanceNewsListPipeline` | pipeline | `pipelines.py` | high | Persist list/failure items |
-| `FinanceNewsContentPipeline` | pipeline | `pipelines.py` | high | Persist article content and scrape status |
-| `ResearchMarketinfoListPipeline` | pipeline | `pipelines.py` | high | Persist research reports and binary file |
+| `DomainPipelineSpider` | base spider | `spiders/base_domain_spider.py` | high | Composes domain pipelines from settings |
+| `NaverNewsArticleList` | spider | `spiders/naver/naver_news_list.py` | high | Stock-code news list crawl |
+| `NaverNewsArticleContents` | spider | `spiders/naver/naver_news_content.py` | high | Fetch and parse article body |
+| `BaseNaverNewsSpider` | base spider | `spiders/naver/naver_main_news_list.py` | medium | Shared paging/header flow for section spiders |
+| `NaverResearchBase` | base spider | `spiders/naver/naver_research_list.py` | high | Shared research-list crawl flow |
+| `FinanceNewsListPipeline` | pipeline | `pipelines/naver.py` | high | Persist list/failure items |
+| `FinanceNewsContentPipeline` | pipeline | `pipelines/naver.py` | high | Persist article content and scrape status |
+| `ResearchMarketinfoListPipeline` | pipeline | `pipelines/naver.py` | high | Persist research reports and binary file |
+| `CanonicalDocumentPipeline` | pipeline | `pipelines/canonical.py` | high | Persist canonical document streams |
 | `SessionLocal` | DB session factory | `database/session.py` | high | Shared SQLAlchemy session maker |
 
 ## CONVENTIONS
 - Scrapy settings file is `scrapy_settings.py` (not the common `settings.py`).
-- Spider-specific `custom_settings` is heavily used; do not assume global settings alone govern behavior.
+- Spider-specific `custom_settings` is used for downloader controls; pipelines are composed via `DomainPipelineSpider.update_settings` + `DOMAIN_ITEM_PIPELINES`.
 - Timezone handling is explicit with KST localization (`Asia/Seoul`) in spiders/pipelines.
 - Article content HTML is compressed with `lzma` before DB write.
 

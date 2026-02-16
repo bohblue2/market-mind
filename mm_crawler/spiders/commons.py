@@ -1,9 +1,7 @@
-
-
 import re
 from urllib.parse import urlparse
 
-from mm_crawler.items import NaverReportItem
+from mm_crawler.items.naver import NaverReportItem
 
 
 def parse_report_url(url):
@@ -32,16 +30,16 @@ def parse_report_url(url):
     path = parsed_url.path
     pattern = r"/stock-research/(\w+)/(\d+)/(\d{8})_(\w+)_(\d+)\.pdf"
     match = re.search(pattern, path)
-    
+
     if match:
         category, company_id, date, report_type, report_id = match.groups()
-        
+
         return NaverReportItem(
             category=category,
             security_company_id=company_id,
             date=date,
             report_type=report_type,
-            report_id=report_id
+            report_id=report_id,
         )
     else:
         return None

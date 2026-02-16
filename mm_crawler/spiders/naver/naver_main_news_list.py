@@ -9,8 +9,8 @@ import scrapy
 from bs4 import BeautifulSoup
 
 from mm_crawler.constant import KST, NaverArticleCategoryEnum
-from mm_crawler.items import NaverArticleItem
-
+from mm_crawler.items.naver import NaverArticleItem
+from mm_crawler.spiders.base_domain_spider import DomainPipelineSpider
 
 
 def extract_ids(url: str) -> Optional[Dict[str, str]]:
@@ -25,18 +25,16 @@ def extract_ids(url: str) -> Optional[Dict[str, str]]:
     """
     pattern = r"article_id=(\d+)&office_id=(\d+)"
     match = re.search(pattern, url)
-    
+
     if match:
-        return {
-            "article_id": match.group(1),
-            "office_id": match.group(2)
-        }
+        return {"article_id": match.group(1), "office_id": match.group(2)}
     return None
 
-class BaseNaverNewsSpider(scrapy.Spider, abc.ABC):
-    allowed_domains = ['naver.com']
+
+class BaseNaverNewsSpider(DomainPipelineSpider, abc.ABC):
+    pipeline_domain = "naver"
+    allowed_domains = ["naver.com"]
     custom_settings = {
-        "ITEM_PIPELINES": {"mm_crawler.pipelines.FinanceNewsListPipeline": 1},
         "DOWNLOADER_MIDDLEWARES": {
             "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
             "scrapy.downloadermiddlewares.retry.RetryMiddleware": None,
@@ -53,7 +51,9 @@ class BaseNaverNewsSpider(scrapy.Spider, abc.ABC):
 
     def __init__(self, target_date: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target_date = KST.localize(datetime.strptime(target_date.strip(), "%Y-%m-%d"))
+        self.target_date = KST.localize(
+            datetime.strptime(target_date.strip(), "%Y-%m-%d")
+        )
         self.is_done = False
         self._current_page = 1
 
@@ -68,7 +68,7 @@ class BaseNaverNewsSpider(scrapy.Spider, abc.ABC):
                 errback=self.errback,
             )
             self._current_page += 1
-    
+
     @abstractmethod
     def _get_target_url(self, date: str, page: int) -> str: ...
 
@@ -94,8 +94,9 @@ class BaseNaverNewsSpider(scrapy.Spider, abc.ABC):
             return True
         return False
 
+
 class NaverMainNewsArticleList(BaseNaverNewsSpider):
-    name = os.path.basename(__file__).replace('.py', '')
+    name = os.path.basename(__file__).replace(".py", "")
 
     def _format_date(self) -> str:
         return self.target_date.strftime("%Y-%m-%d")
@@ -105,14 +106,20 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
         return f"https://finance.naver.com/news/mainnews.naver?date={date}&page={str(page)}"
 
     def parse(self, response):
-        if self._check_page_limit(response.meta['page']):
+        if self._check_page_limit(response.meta["page"]):
             return
 
         try:
-            html_content = response.css("#contentarea_left > div.mainNewsList._replaceNewsLink > ul").extract().pop()
-            soup = BeautifulSoup(html_content, 'html.parser')
-            
-            for article in soup.find_all('li', class_='block1'):
+            html_content = (
+                response.css(
+                    "#contentarea_left > div.mainNewsList._replaceNewsLink > ul"
+                )
+                .extract()
+                .pop()
+            )
+            soup = BeautifulSoup(html_content, "html.parser")
+
+            for article in soup.find_all("li", class_="block1"):
                 yield self._parse_article(article)
         except Exception as e:
             self.logger.error(f"Error parsing response: {e}")
@@ -120,10 +127,10 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
 
     def _parse_article(self, article) -> Optional[NaverArticleItem]:
         try:
-            press = article.find('span', class_='press').get_text(strip=True)
-            title = article.find('dd', class_='articleSubject').get_text(strip=True)
-            link = article.find('a')['href']
-            wdate_str = article.find('span', class_='wdate').get_text(strip=True)
+            press = article.find("span", class_="press").get_text(strip=True)
+            title = article.find("dd", class_="articleSubject").get_text(strip=True)
+            link = article.find("a")["href"]
+            wdate_str = article.find("span", class_="wdate").get_text(strip=True)
             wdate = datetime.strptime(wdate_str, "%Y-%m-%d %H:%M:%S")
 
             ids = extract_ids(link)
@@ -133,8 +140,8 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
 
             return NaverArticleItem(
                 ticker=None,
-                article_id=ids['article_id'],
-                media_id=ids['office_id'],
+                article_id=ids["article_id"],
+                media_id=ids["office_id"],
                 media_name=press,
                 title=title,
                 link=link,
@@ -150,17 +157,21 @@ class NaverMainNewsArticleList(BaseNaverNewsSpider):
 
 # ... previous code with BaseNaverNewsSpider and NaverMainNewsArticleList ...
 
+
 class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
     """Base class for section-specific news spiders (Outlook and Analysis)"""
+
     section_id3: str | None = None  # Override in child classes
     category: NaverArticleCategoryEnum | None = None  # Override in child classes
 
     @classmethod
     def _get_target_url(cls, date: str, page: int) -> str:
-        return (f"https://finance.naver.com/news/news_list.naver?"
-                f"mode=LSS3D&section_id=101&section_id2=258&"
-                f"section_id3={cls.section_id3}&date={date}&page={page}")
-    
+        return (
+            f"https://finance.naver.com/news/news_list.naver?"
+            f"mode=LSS3D&section_id=101&section_id2=258&"
+            f"section_id3={cls.section_id3}&date={date}&page={page}"
+        )
+
     @classmethod
     def _get_headers(cls, date: str) -> Dict[str, str]:
         return {
@@ -169,13 +180,13 @@ class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
         }
 
     def parse(self, response):
-        if self._check_page_limit(response.meta['page']):
+        if self._check_page_limit(response.meta["page"]):
             return
 
         try:
             html_content = response.css("#contentarea_left > ul").extract().pop()
-            soup = BeautifulSoup(html_content, 'html.parser')
-            
+            soup = BeautifulSoup(html_content, "html.parser")
+
             dl_tags = self._extract_dl_tags(soup)
             if not dl_tags:
                 self.is_done = True
@@ -183,7 +194,7 @@ class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
 
             for dl_tag in dl_tags:
                 yield from self._parse_dl_tag(dl_tag)
-                
+
         except Exception as e:
             self.logger.error(f"Error parsing response: {e}", exc_info=True)
             self.is_done = True
@@ -231,28 +242,30 @@ class BaseNaverSectionNewsSpider(BaseNaverNewsSpider):
             "link": link,
             "press": press,
             "wdate": wdate,
-            "ids": ids
+            "ids": ids,
         }
 
     def _create_article_item(self, data: Dict) -> NaverArticleItem:
         """Create NaverArticleItem from extracted data"""
         return NaverArticleItem(
             ticker=None,
-            article_id=data['ids']['article_id'],
-            media_id=data['ids']['office_id'],
-            media_name=data['press'],
-            title=data['title'],
-            link=data['link'],
+            article_id=data["ids"]["article_id"],
+            media_id=data["ids"]["office_id"],
+            media_name=data["press"],
+            title=data["title"],
+            link=data["link"],
             category=self.category,
             is_origin=True,
             origin_id=None,
-            article_published_at=data['wdate'],
+            article_published_at=data["wdate"],
         )
+
 
 class NaverOutlookNewsArticleList(BaseNaverSectionNewsSpider):
     name = "naver_outlook_news_article_list"
     section_id3 = "401"
     category = NaverArticleCategoryEnum.OUTLOOK
+
 
 class NaverAnalysisNewsArticleList(BaseNaverSectionNewsSpider):
     name = "naver_analysis_news_article_list"
