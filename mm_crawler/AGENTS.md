@@ -78,3 +78,4 @@ alembic revision --autogenerate -m "describe change"
 - `config.py` chooses env file by `ENVIRONMENT` (`.env.dev.crawler`, `.env.stage.crawler`, `.env.prod.crawler`, fallback `.env.crawler`).
 - `alembic/env.py` loads `.dev.crawler.env` then `.prod.crawler.env`; this differs from runtime `config.py` env naming.
 - TODO markers exist in spiders; unfinished error-handling branches are expected in current codebase state.
+- Domain split operation guide: `domain_refactor_runbook.md`.
