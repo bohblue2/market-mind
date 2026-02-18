@@ -1,17 +1,29 @@
 {
-    "files.autoSave": "afterDelay",
-    "python.analysis.typeCheckingMode": "basic",
-    "mypy-type-checker.importStrategy": "fromEnvironment",
-    "ruff.enable": true,
-    "ruff.importStrategy": "fromEnvironment",
-    "ruff.interpreter": ["python"],
-    "ruff.nativeServer": "on",
-    "ruff.configuration": "${workspaceFolder}/ruff.toml",
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.organizeImports": "never" // This might need to be adjusted
-    },
-    "makefile.configureOnOpen": false,
-    "cursorpyright.analysis.typeCheckingMode": "basic"
+  "files.autoSave": "afterDelay",
+  "python.analysis.typeCheckingMode": "basic",
+  "cursorpyright.analysis.typeCheckingMode": "basic",
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "ruff.enable": true,
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.interpreter": ["python"],
+  "ruff.nativeServer": "on",
+  "ruff.configuration": "${workspaceFolder}/ruff.toml",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "never"
+  },
+  "makefile.configureOnOpen": false,
+  "workbench.editorAssociations": {
+    "*.md": "vscode.markdown.preview.editor"
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/.git": true
+  }
 }

@@ -8,6 +8,20 @@ examples
 
 **/*.pyc
 **/__pycache__/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
 .mypy_cache
 .env.*
 .cache
+
+*.log
+.sisyphus/
+.ipynb_checkpoints/
+
+node_modules/
+.next/
+dist/
+build/
+coverage/
